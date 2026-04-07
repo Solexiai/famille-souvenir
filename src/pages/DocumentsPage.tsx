@@ -98,9 +98,9 @@ const DocumentsPage: React.FC = () => {
     setUploading(true);
 
     const ext = file.name.split('.').pop();
-    const storagePath = `${circle.id}/${crypto.randomUUID()}.${ext}`;
+    const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, file);
-    if (uploadError) { toast.error("Erreur lors de l'envoi."); setUploading(false); return; }
+    if (uploadError) { toast.error("Erreur lors de l'envoi du fichier. Veuillez réessayer."); setUploading(false); return; }
 
     const { error } = await supabase.from('documents').insert({
       circle_id: circle.id,
