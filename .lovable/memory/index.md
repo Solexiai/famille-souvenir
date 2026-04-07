@@ -12,4 +12,5 @@ App does NOT replace law/notary/executor. No fake legal authority. No auto-assig
 - [Database schema](mem://features/schema) — v2 schema: documents, checklist_items, governance, executor_workspace_notes, member_family_labels
 - [Roles & access](mem://features/roles) — Role-based access with security definer functions, RLS policies, 3-layer model (app roles, family labels, documentary status)
 - [MVP scope](mem://constraints/scope) — v2 boundaries, forbidden features, legal constraints
-- [Family labels](mem://features/family-labels) — FamilyLabelsManager, ExecutorDesignation components, 3-tier executor designation (family-proposed, testament-named, app-verified)
+- [Family labels](mem://features/family-labels) — FamilyLabelsManager, ExecutorDesignation components, 3-tier executor designation
+- [Members module](mem://features/members) — MemberCard, MembersList, InviteMemberForm, InvitationsList components, extended profiles with contact fields

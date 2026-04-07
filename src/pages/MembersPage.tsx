@@ -1,90 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/AppLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { Loader2, UserPlus, Shield, Eye, Edit, Crown } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { CircleMember, FamilyCircle, AppRole, MemberFamilyLabel } from '@/types/database';
-import { z } from 'zod';
-import { FamilyLabelsForMember } from '@/components/FamilyLabelsManager';
+import { MembersList } from '@/components/members/MembersList';
+import { InviteMemberForm } from '@/components/members/InviteMemberForm';
+import { InvitationsList } from '@/components/members/InvitationsList';
 import { FamilyLabelsManager } from '@/components/FamilyLabelsManager';
 import { ExecutorDesignation } from '@/components/ExecutorDesignation';
-
-const inviteSchema = z.object({
-  firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
-  lastName: z.string().trim().min(1, 'Le nom est requis').max(50),
-  email: z.string().trim().email('Adresse email invalide'),
-  phone: z.string().trim().max(20).optional().or(z.literal('')),
-});
-
-const roleLabels: Record<AppRole, string> = {
-  owner: 'Propriétaire',
-  family_manager: 'Gestionnaire',
-  family_member: 'Membre',
-  heir: 'Héritier',
-  proposed_executor: 'Exécuteur pressenti',
-  verified_executor: 'Exécuteur documenté',
-};
-
-const roleIcons: Record<AppRole, React.FC<{ className?: string }>> = {
-  owner: Crown,
-  family_manager: Shield,
-  family_member: Edit,
-  heir: Eye,
-  proposed_executor: Eye,
-  verified_executor: Shield,
-};
 
 const MembersPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [members, setMembers] = useState<CircleMember[]>([]);
   const [memberLabels, setMemberLabels] = useState<MemberFamilyLabel[]>([]);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<AppRole>('family_member');
   const [loading, setLoading] = useState(true);
-  const [inviting, setInviting] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
   const [isManager, setIsManager] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState<AppRole | null>(null);
+  const [inviteRefresh, setInviteRefresh] = useState(0);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return;
     const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
     if (!circles || circles.length === 0) { setLoading(false); return; }
-    
+
     const c = circles[0] as FamilyCircle;
     setCircle(c);
-    setIsManager(c.owner_id === user.id);
 
-    // Also check if user is family_manager
+    // Get current user role
     const { data: myRole } = await supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1);
-    if (myRole && myRole.length > 0 && (myRole[0].role === 'owner' || myRole[0].role === 'family_manager')) {
-      setIsManager(true);
-    }
+    const role = myRole?.[0]?.role as AppRole | undefined;
+    setCurrentUserRole(role || null);
+    setIsManager(c.owner_id === user.id || role === 'owner' || role === 'family_manager');
 
-    const { data: memberData } = await supabase
-      .from('circle_members')
-      .select('*')
-      .eq('circle_id', c.id);
-    
-    // Load profiles separately for each member
+    // Load members with profiles
+    const { data: memberData } = await supabase.from('circle_members').select('*').eq('circle_id', c.id);
     if (memberData) {
       const membersWithProfiles = await Promise.all(
         memberData.map(async (m) => {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', m.user_id)
-            .single();
+          const { data: profileData } = await supabase.from('profiles').select('*').eq('user_id', m.user_id).single();
           return { ...m, profiles: profileData } as CircleMember;
         })
       );
@@ -94,46 +51,16 @@ const MembersPage: React.FC = () => {
     // Load labels
     const { data: labelsData } = await supabase.from('member_family_labels').select('*').eq('circle_id', c.id);
     setMemberLabels((labelsData as MemberFamilyLabel[]) || []);
-
     setLoading(false);
-  };
+  }, [user]);
 
-  const loadLabels = async () => {
+  const loadLabels = useCallback(async () => {
     if (!circle) return;
     const { data } = await supabase.from('member_family_labels').select('*').eq('circle_id', circle.id);
     setMemberLabels((data as MemberFamilyLabel[]) || []);
-  };
+  }, [circle]);
 
-  useEffect(() => { loadData(); }, [user]);
-
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = inviteSchema.safeParse({ firstName, lastName, email, phone });
-    if (!result.success) {
-      toast.error(result.error.errors[0].message);
-      return;
-    }
-    if (!circle || !user) return;
-    setInviting(true);
-
-    const { error } = await supabase.from('invitations').insert({
-      circle_id: circle.id,
-      email,
-      role,
-      invited_by: user.id,
-    });
-
-    if (error) {
-      toast.error("Erreur lors de l'envoi de l'invitation.");
-    } else {
-      toast.success(`Invitation envoyée à ${firstName} ${lastName} (${email})`);
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPhone('');
-    }
-    setInviting(false);
-  };
+  useEffect(() => { loadData(); }, [loadData]);
 
   if (loading) {
     return (
@@ -158,144 +85,56 @@ const MembersPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         <h1 className="font-heading text-2xl font-semibold text-foreground">Membres du cercle</h1>
 
-        {/* Members list */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="font-heading text-lg">
-              {members.length} membre{members.length !== 1 ? 's' : ''}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {members.map((m) => {
-              const RoleIcon = roleIcons[m.role];
-              const mLabels = memberLabels.filter(l => l.member_id === m.id);
-              return (
-                <div key={m.id} className="rounded-lg border border-border p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
-                        <span className="text-sm font-medium text-secondary-foreground">
-                          {(m.profiles?.full_name || m.profiles?.email || '?')[0].toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">
-                          {m.profiles?.full_name || m.profiles?.email || 'Membre'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{m.profiles?.email}</p>
-                      </div>
-                    </div>
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <RoleIcon className="h-3 w-3" />
-                      {roleLabels[m.role]}
-                    </Badge>
-                  </div>
-                  {mLabels.length > 0 && (
-                    <div className="ml-13 pl-13">
-                      <FamilyLabelsForMember labels={mLabels} />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="members" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="members">Membres</TabsTrigger>
+            {isManager && <TabsTrigger value="invitations">Invitations</TabsTrigger>}
+            <TabsTrigger value="labels">Labels familiaux</TabsTrigger>
+            <TabsTrigger value="executor">Exécuteur</TabsTrigger>
+          </TabsList>
 
-        {/* Family labels */}
-        {circle && (
-          <FamilyLabelsManager
-            circleId={circle.id}
-            members={members}
-            canEdit={isManager}
-            onLabelsChange={loadLabels}
-          />
-        )}
+          <TabsContent value="members" className="space-y-4">
+            <MembersList
+              members={members}
+              memberLabels={memberLabels}
+              currentUserRole={currentUserRole}
+            />
+          </TabsContent>
 
-        {/* Executor designation */}
-        {circle && (
-          <ExecutorDesignation members={members} labels={memberLabels} />
-        )}
+          <TabsContent value="invitations" className="space-y-4">
+            {isManager && user && (
+              <>
+                <InviteMemberForm
+                  circleId={circle.id}
+                  userId={user.id}
+                  onInviteSent={() => setInviteRefresh(r => r + 1)}
+                />
+                <InvitationsList
+                  circleId={circle.id}
+                  userId={user.id}
+                  canManage={isManager}
+                  refreshKey={inviteRefresh}
+                />
+              </>
+            )}
+          </TabsContent>
 
-        {/* Invite form — visible to owner and managers */}
-        {isOwner && (
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="font-heading text-lg flex items-center gap-2">
-                <UserPlus className="h-5 w-5 text-accent" />
-                Inviter un membre
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleInvite} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="inviteFirstName">Prénom</Label>
-                    <Input
-                      id="inviteFirstName"
-                      type="text"
-                      placeholder="Jean"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="inviteLastName">Nom</Label>
-                    <Input
-                      id="inviteLastName"
-                      type="text"
-                      placeholder="Dupont"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="inviteEmail">Adresse email</Label>
-                  <Input
-                    id="inviteEmail"
-                    type="email"
-                    placeholder="membre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="invitePhone">Numéro de téléphone</Label>
-                  <Input
-                    id="invitePhone"
-                    type="tel"
-                    placeholder="+33 6 12 34 56 78"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Rôle</Label>
-                  <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="family_manager">Gestionnaire</SelectItem>
-                      <SelectItem value="family_member">Membre</SelectItem>
-                      <SelectItem value="heir">Héritier</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" disabled={inviting} className="w-full">
-                  {inviting && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Envoyer l'invitation
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+          <TabsContent value="labels" className="space-y-4">
+            <FamilyLabelsManager
+              circleId={circle.id}
+              members={members}
+              canEdit={isManager}
+              onLabelsChange={loadLabels}
+            />
+          </TabsContent>
+
+          <TabsContent value="executor" className="space-y-4">
+            <ExecutorDesignation members={members} labels={memberLabels} />
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );
