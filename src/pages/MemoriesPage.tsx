@@ -41,10 +41,24 @@ const visibilityLabels: Record<MemoryVisibility, string> = {
   private: 'Privé (moi uniquement)',
 };
 
+type MemoryWithMedia = Memory & { mediaSrc?: string };
+
+const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
+  if (!mediaUrl) return null;
+  if (!/^https?:\/\//i.test(mediaUrl)) return mediaUrl;
+
+  const bucketMarker = '/memories-media/';
+  const markerIndex = mediaUrl.indexOf(bucketMarker);
+
+  if (markerIndex === -1) return null;
+
+  return decodeURIComponent(mediaUrl.slice(markerIndex + bucketMarker.length).split('?')[0]);
+};
+
 const MemoriesPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
-  const [memories, setMemories] = useState<(Memory & { signedUrl?: string })[]>([]);
+  const [memories, setMemories] = useState<MemoryWithMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -57,8 +71,13 @@ const MemoriesPage: React.FC = () => {
 
   const loadData = async () => {
     if (!user) return;
+
     const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
-    if (!circles || circles.length === 0) { setLoading(false); return; }
+    if (!circles || circles.length === 0) {
+      setLoading(false);
+      return;
+    }
+
     const c = circles[0] as FamilyCircle;
     setCircle(c);
 
@@ -67,27 +86,48 @@ const MemoriesPage: React.FC = () => {
       .select('*')
       .eq('circle_id', c.id)
       .order('created_at', { ascending: false });
-    
+
     const rawMemories = (data as Memory[]) || [];
-    
-    // Generate signed URLs for media
+
     const memoriesWithUrls = await Promise.all(
-      rawMemories.map(async (m) => {
-        if (m.media_url && (m.type === 'photo' || m.type === 'video' || m.type === 'audio')) {
-          const { data: signedData } = await supabase.storage
-            .from('memories-media')
-            .createSignedUrl(m.media_url, 3600);
-          return { ...m, signedUrl: signedData?.signedUrl || undefined };
+      rawMemories.map(async (memory) => {
+        if (!memory.media_url || !['photo', 'video', 'audio'].includes(memory.type)) {
+          return memory;
         }
-        return m;
+
+        const storagePath = resolveMemoryMediaPath(memory.media_url);
+        if (!storagePath) {
+          return {
+            ...memory,
+            mediaSrc: /^https?:\/\//i.test(memory.media_url) ? memory.media_url : undefined,
+          };
+        }
+
+        const { data: signedData, error: signedError } = await supabase.storage
+          .from('memories-media')
+          .createSignedUrl(storagePath, 3600);
+
+        if (signedError) {
+          return {
+            ...memory,
+            mediaSrc: /^https?:\/\//i.test(memory.media_url) ? memory.media_url : undefined,
+          };
+        }
+
+        return {
+          ...memory,
+          mediaSrc: signedData?.signedUrl,
+        };
       })
     );
-    
+
     setMemories(memoriesWithUrls);
     setLoading(false);
   };
 
-  useEffect(() => { loadData(); }, [user]);
+  useEffect(() => {
+    loadData();
+  }, [user]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,7 +288,6 @@ const MemoriesPage: React.FC = () => {
           </Dialog>
         </div>
 
-        {/* Memory feed */}
         {memories.length === 0 ? (
           <Card className="shadow-soft">
             <CardContent className="py-12 text-center">
@@ -272,9 +311,9 @@ const MemoriesPage: React.FC = () => {
                       </div>
                       <div className="flex-1 space-y-2">
                         <p className="text-foreground">{memory.caption}</p>
-                        {memory.signedUrl && memory.type === 'photo' && (
+                        {memory.mediaSrc && memory.type === 'photo' && (
                           <img
-                            src={memory.signedUrl}
+                            src={memory.mediaSrc}
                             alt={memory.caption}
                             className="rounded-lg max-h-80 object-cover"
                             loading="lazy"
