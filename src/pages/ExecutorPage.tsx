@@ -23,7 +23,6 @@ const ExecutorPage: React.FC = () => {
   const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
   const [labels, setLabels] = useState<MemberFamilyLabel[]>([]);
-  const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
   const [loading, setLoading] = useState(true);
   const [isManager, setIsManager] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
