@@ -52,10 +52,23 @@ const MembersPage: React.FC = () => {
 
     const { data: memberData } = await supabase
       .from('circle_members')
-      .select('*, profiles(*)')
+      .select('*')
       .eq('circle_id', c.id);
     
-    setMembers((memberData as CircleMember[]) || []);
+    // Load profiles separately for each member
+    if (memberData) {
+      const membersWithProfiles = await Promise.all(
+        memberData.map(async (m) => {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', m.user_id)
+            .single();
+          return { ...m, profiles: profileData } as CircleMember;
+        })
+      );
+      setMembers(membersWithProfiles);
+    }
     setLoading(false);
   };
 
