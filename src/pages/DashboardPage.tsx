@@ -26,7 +26,7 @@ const DashboardPage: React.FC = () => {
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memberCount, setMemberCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
-  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0 });
+  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
