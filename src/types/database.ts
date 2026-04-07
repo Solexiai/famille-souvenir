@@ -12,6 +12,7 @@ export type DossierReadinessStatus = 'initial' | 'in_progress' | 'partial' | 're
 export type DocumentaryStatus = 'unknown' | 'declared' | 'located' | 'professionally_confirmed';
 export type FamilyLabel = 'protected_person' | 'family_manager_label' | 'caregiver' | 'heir_label' | 'trusted_contact' | 'proposed_executor_label' | 'testament_named_executor' | 'external_professional';
 export type InvitationStatus = 'pending' | 'accepted' | 'declined' | 'expired';
+export type ContactVisibility = 'visible_to_family' | 'managers_only' | 'private';
 
 // Legacy types kept for backward compat with vault_documents (to be removed later)
 export type VaultVisibility = 'owner' | 'managers' | 'circle';
@@ -20,7 +21,17 @@ export interface Profile {
   id: string;
   user_id: string;
   full_name: string;
+  first_name: string;
+  last_name: string;
   email: string;
+  phone: string;
+  secondary_phone: string;
+  city: string;
+  relationship_label: string;
+  contact_preference: string;
+  notes: string;
+  is_emergency_contact: boolean;
+  is_visible_to_family: boolean;
   language: string;
   avatar_url: string | null;
   created_at: string;
@@ -69,6 +80,14 @@ export interface Invitation {
   token: string;
   status: InvitationStatus;
   invited_by: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  city: string;
+  relationship_label: string;
+  invitation_message: string;
+  resent_at: string | null;
+  resent_count: number;
   expires_at: string;
   created_at: string;
 }
