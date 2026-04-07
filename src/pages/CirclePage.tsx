@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, Users } from 'lucide-react';
-import type { FamilyCircle } from '@/types/database';
+import type { FamilyCircle, AppRole } from '@/types/database';
+import { DocumentaryStatusManager } from '@/components/DocumentaryStatusManager';
+import { canEditDocumentaryStatus } from '@/components/PermissionMatrix';
 import { z } from 'zod';
 
 const circleSchema = z.object({
@@ -25,6 +27,7 @@ const CirclePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [userRole, setUserRole] = useState<AppRole | null>(null);
 
   const loadCircle = async () => {
     if (!user) return;
@@ -37,6 +40,17 @@ const CirclePage: React.FC = () => {
       setCircle(c);
       setName(c.name);
       setDescription(c.description || '');
+
+      // Get user role
+      const { data: memberData } = await supabase
+        .from('circle_members')
+        .select('role')
+        .eq('circle_id', c.id)
+        .eq('user_id', user.id)
+        .limit(1);
+      if (memberData && memberData.length > 0) {
+        setUserRole(memberData[0].role as AppRole);
+      }
     }
     setLoading(false);
   };
@@ -46,10 +60,7 @@ const CirclePage: React.FC = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = circleSchema.safeParse({ name, description });
-    if (!result.success) {
-      toast.error(result.error.errors[0].message);
-      return;
-    }
+    if (!result.success) { toast.error(result.error.errors[0].message); return; }
     if (!user) return;
     setSaving(true);
 
@@ -59,19 +70,13 @@ const CirclePage: React.FC = () => {
       .select()
       .single();
 
-    if (error) {
-      toast.error('Erreur lors de la création du cercle.');
-      setSaving(false);
-      return;
-    }
+    if (error) { toast.error('Erreur lors de la création du cercle.'); setSaving(false); return; }
 
-    // Add owner as member
-    await supabase
-      .from('circle_members')
-      .insert({ circle_id: data.id, user_id: user.id, role: 'owner' as const });
+    await supabase.from('circle_members').insert({ circle_id: data.id, user_id: user.id, role: 'owner' as const });
 
     toast.success('Cercle familial créé avec succès !');
     setCircle(data as FamilyCircle);
+    setUserRole('owner');
     setSaving(false);
   };
 
@@ -79,10 +84,7 @@ const CirclePage: React.FC = () => {
     e.preventDefault();
     if (!circle) return;
     const result = circleSchema.safeParse({ name, description });
-    if (!result.success) {
-      toast.error(result.error.errors[0].message);
-      return;
-    }
+    if (!result.success) { toast.error(result.error.errors[0].message); return; }
     setSaving(true);
     const { error } = await supabase
       .from('family_circles')
@@ -126,23 +128,11 @@ const CirclePage: React.FC = () => {
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nom du cercle</Label>
-                  <Input
-                    id="name"
-                    placeholder="Famille Dupont"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
+                  <Input id="name" placeholder="Famille Dupont" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Description (optionnel)</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Notre espace familial pour préserver nos souvenirs..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={3}
-                  />
+                  <Textarea id="description" placeholder="Notre espace familial pour préserver nos souvenirs..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
                 </div>
                 <Button type="submit" size="lg" disabled={saving} className="w-full">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -153,9 +143,7 @@ const CirclePage: React.FC = () => {
           </Card>
         ) : editing ? (
           <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="font-heading text-lg">Modifier le cercle</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="font-heading text-lg">Modifier le cercle</CardTitle></CardHeader>
             <CardContent>
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div className="space-y-2">
@@ -167,13 +155,8 @@ const CirclePage: React.FC = () => {
                   <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
                 </div>
                 <div className="flex gap-3">
-                  <Button type="submit" disabled={saving}>
-                    {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Enregistrer
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => { setEditing(false); setName(circle.name); setDescription(circle.description || ''); }}>
-                    Annuler
-                  </Button>
+                  <Button type="submit" disabled={saving}>{saving && <Loader2 className="h-4 w-4 animate-spin" />}Enregistrer</Button>
+                  <Button type="button" variant="outline" onClick={() => { setEditing(false); setName(circle.name); setDescription(circle.description || ''); }}>Annuler</Button>
                 </div>
               </form>
             </CardContent>
@@ -189,12 +172,19 @@ const CirclePage: React.FC = () => {
             </CardHeader>
             <CardContent>
               {circle.owner_id === user?.id && (
-                <Button variant="outline" onClick={() => setEditing(true)}>
-                  Modifier
-                </Button>
+                <Button variant="outline" onClick={() => setEditing(true)}>Modifier</Button>
               )}
             </CardContent>
           </Card>
+        )}
+
+        {/* Documentary status management */}
+        {circle && (
+          <DocumentaryStatusManager
+            circle={circle}
+            canEdit={canEditDocumentaryStatus(userRole)}
+            onUpdate={(updated) => setCircle({ ...circle!, ...updated } as FamilyCircle)}
+          />
         )}
       </div>
     </AppLayout>
