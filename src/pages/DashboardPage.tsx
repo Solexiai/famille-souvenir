@@ -72,26 +72,33 @@ const DashboardPage: React.FC = () => {
         });
 
         // Load executor designation summary
-        const [{ data: labelsData }, { data: membersData }] = await Promise.all([
+        const [{ data: labelsData }, { data: membersRaw }] = await Promise.all([
           supabase.from('member_family_labels').select('*').eq('circle_id', c.id),
-          supabase.from('circle_members').select('*, profiles:profiles!circle_members_user_id_fkey(full_name, email)').eq('circle_id', c.id),
+          supabase.from('circle_members').select('*').eq('circle_id', c.id),
         ]);
         const allLabels = (labelsData as MemberFamilyLabel[]) || [];
-        const allMembers = (membersData || []) as any[];
+        const allMembersRaw = (membersRaw as CircleMember[]) || [];
+
+        // Load profiles for members
+        const profileIds = allMembersRaw.map(m => m.user_id);
+        const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name, email').in('user_id', profileIds);
+        const profileMap = new Map((profilesData || []).map(p => [p.user_id, p]));
 
         const getMName = (memberId: string) => {
-          const m = allMembers.find((m: any) => m.id === memberId);
-          return m?.profiles?.full_name || m?.profiles?.email || null;
+          const m = allMembersRaw.find(m => m.id === memberId);
+          if (!m) return null;
+          const p = profileMap.get(m.user_id);
+          return p?.full_name || p?.email || null;
         };
 
         const proposedLabel = allLabels.find(l => l.label === 'proposed_executor_label');
         const testamentLabel = allLabels.find(l => l.label === 'testament_named_executor');
-        const verifiedMember = allMembers.find((m: any) => m.role === 'verified_executor');
+        const verifiedMember = allMembersRaw.find(m => m.role === 'verified_executor');
 
         setExecutorSummary({
           proposed: proposedLabel ? getMName(proposedLabel.member_id) : null,
           testamentNamed: testamentLabel ? getMName(testamentLabel.member_id) : null,
-          verified: verifiedMember ? (verifiedMember.profiles?.full_name || verifiedMember.profiles?.email || 'Vérifié') : null,
+          verified: verifiedMember ? (profileMap.get(verifiedMember.user_id)?.full_name || 'Vérifié') : null,
         });
       }
       setLoading(false);
