@@ -52,6 +52,7 @@ export type Database = {
       checklist_items: {
         Row: {
           assigned_to: string | null
+          blocked_reason: string | null
           category: Database["public"]["Enums"]["checklist_category"]
           circle_id: string
           created_at: string
@@ -67,6 +68,7 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          blocked_reason?: string | null
           category?: Database["public"]["Enums"]["checklist_category"]
           circle_id: string
           created_at?: string
@@ -82,6 +84,7 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          blocked_reason?: string | null
           category?: Database["public"]["Enums"]["checklist_category"]
           circle_id?: string
           created_at?: string

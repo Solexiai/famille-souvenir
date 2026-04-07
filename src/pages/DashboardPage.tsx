@@ -26,7 +26,7 @@ const DashboardPage: React.FC = () => {
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memberCount, setMemberCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
-  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0 });
+  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
@@ -56,6 +56,8 @@ const DashboardPage: React.FC = () => {
           total: items.length,
           completed: items.filter(i => i.status === 'completed').length,
           needsReview: items.filter(i => i.status === 'needs_review').length,
+          blocked: items.filter(i => i.status === 'blocked').length,
+          proReview: items.filter(i => i.requires_professional_review && i.status !== 'completed').length,
         });
       }
       setLoading(false);
@@ -144,8 +146,20 @@ const DashboardPage: React.FC = () => {
                   {checklistSummary.needsReview > 0 && (
                     <div className="flex items-center gap-2 text-sm text-amber-600">
                       <AlertTriangle className="h-4 w-4" />
-                      {checklistSummary.needsReview} élément{checklistSummary.needsReview > 1 ? 's' : ''} à vérifier
+                      {checklistSummary.needsReview} à vérifier
                     </div>
+                  )}
+                  {checklistSummary.blocked > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      {checklistSummary.blocked} bloqué{checklistSummary.blocked > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  {checklistSummary.proReview > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <AlertTriangle className="h-4 w-4" />
+                      {checklistSummary.proReview} revue pro requise
+                     </div>
                   )}
                 </CardContent>
               </Card>
