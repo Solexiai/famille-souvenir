@@ -201,6 +201,23 @@ const MembersPage: React.FC = () => {
                 </div>
               );
             })}
+          </CardContent>
+        </Card>
+
+        {/* Family labels */}
+        {circle && (
+          <FamilyLabelsManager
+            circleId={circle.id}
+            members={members}
+            canEdit={isManager}
+            onLabelsChange={loadLabels}
+          />
+        )}
+
+        {/* Executor designation */}
+        {circle && (
+          <ExecutorDesignation members={members} labels={memberLabels} />
+        )}
 
         {/* Invite form — visible to owner and managers */}
         {isOwner && (
