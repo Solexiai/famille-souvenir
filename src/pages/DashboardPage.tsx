@@ -160,7 +160,11 @@ const DashboardPage: React.FC = () => {
                       <AlertTriangle className="h-4 w-4" />
                       {checklistSummary.proReview} revue pro requise
                     </div>
-                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Documentary status summary */}
             <Card className="shadow-card">
               <CardHeader className="pb-3">
                 <CardTitle className="font-heading text-lg flex items-center gap-2">
