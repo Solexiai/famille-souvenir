@@ -140,6 +140,9 @@ const ExecutorPage: React.FC = () => {
           </AlertDescription>
         </Alert>
 
+        {/* Executor designation */}
+        <ExecutorDesignation members={members} labels={labels} />
+
         {/* Readiness overview */}
         <Card className="shadow-card">
           <CardHeader>
