@@ -49,6 +49,69 @@ export type Database = {
           },
         ]
       }
+      checklist_items: {
+        Row: {
+          assigned_to: string | null
+          category: Database["public"]["Enums"]["checklist_category"]
+          circle_id: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          evidence_note: string | null
+          id: string
+          linked_document_id: string | null
+          requires_professional_review: boolean
+          status: Database["public"]["Enums"]["checklist_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["checklist_category"]
+          circle_id: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_note?: string | null
+          id?: string
+          linked_document_id?: string | null
+          requires_professional_review?: boolean
+          status?: Database["public"]["Enums"]["checklist_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: Database["public"]["Enums"]["checklist_category"]
+          circle_id?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          evidence_note?: string | null
+          id?: string
+          linked_document_id?: string | null
+          requires_professional_review?: boolean
+          status?: Database["public"]["Enums"]["checklist_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checklist_items_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checklist_items_linked_document_id_fkey"
+            columns: ["linked_document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circle_members: {
         Row: {
           circle_id: string
@@ -111,32 +174,200 @@ export type Database = {
         }
         Relationships: []
       }
-      family_circles: {
+      documents: {
         Row: {
+          category: string
+          circle_id: string
           created_at: string
           description: string | null
+          file_name: string
+          file_size: number | null
           id: string
+          linked_responsible_member: string | null
+          review_note: string | null
+          storage_path: string
+          title: string
+          updated_at: string
+          uploaded_by: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          visibility: Database["public"]["Enums"]["document_visibility"]
+        }
+        Insert: {
+          category?: string
+          circle_id: string
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_size?: number | null
+          id?: string
+          linked_responsible_member?: string | null
+          review_note?: string | null
+          storage_path: string
+          title: string
+          updated_at?: string
+          uploaded_by: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          visibility?: Database["public"]["Enums"]["document_visibility"]
+        }
+        Update: {
+          category?: string
+          circle_id?: string
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_size?: number | null
+          id?: string
+          linked_responsible_member?: string | null
+          review_note?: string | null
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          visibility?: Database["public"]["Enums"]["document_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      executor_workspace_notes: {
+        Row: {
+          author_id: string
+          circle_id: string
+          content: string | null
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          visibility_scope: string
+        }
+        Insert: {
+          author_id: string
+          circle_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          visibility_scope?: string
+        }
+        Update: {
+          author_id?: string
+          circle_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          visibility_scope?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executor_workspace_notes_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_circles: {
+        Row: {
+          beneficiary_designation_status: Database["public"]["Enums"]["documentary_status"]
+          created_at: string
+          critical_documents_status: string
+          death_status: Database["public"]["Enums"]["death_status"]
+          description: string | null
+          dossier_readiness_status: Database["public"]["Enums"]["dossier_readiness_status"]
+          id: string
+          mandate_status: Database["public"]["Enums"]["documentary_status"]
           name: string
+          notary_status: Database["public"]["Enums"]["documentary_status"]
           owner_id: string
+          testament_status: Database["public"]["Enums"]["documentary_status"]
           updated_at: string
         }
         Insert: {
+          beneficiary_designation_status?: Database["public"]["Enums"]["documentary_status"]
           created_at?: string
+          critical_documents_status?: string
+          death_status?: Database["public"]["Enums"]["death_status"]
           description?: string | null
+          dossier_readiness_status?: Database["public"]["Enums"]["dossier_readiness_status"]
           id?: string
+          mandate_status?: Database["public"]["Enums"]["documentary_status"]
           name: string
+          notary_status?: Database["public"]["Enums"]["documentary_status"]
           owner_id: string
+          testament_status?: Database["public"]["Enums"]["documentary_status"]
           updated_at?: string
         }
         Update: {
+          beneficiary_designation_status?: Database["public"]["Enums"]["documentary_status"]
           created_at?: string
+          critical_documents_status?: string
+          death_status?: Database["public"]["Enums"]["death_status"]
           description?: string | null
+          dossier_readiness_status?: Database["public"]["Enums"]["dossier_readiness_status"]
           id?: string
+          mandate_status?: Database["public"]["Enums"]["documentary_status"]
           name?: string
+          notary_status?: Database["public"]["Enums"]["documentary_status"]
           owner_id?: string
+          testament_status?: Database["public"]["Enums"]["documentary_status"]
           updated_at?: string
         }
         Relationships: []
+      }
+      governance_responsibilities: {
+        Row: {
+          area: Database["public"]["Enums"]["governance_area"]
+          circle_id: string
+          created_at: string
+          description: string | null
+          id: string
+          member_id: string
+          status: Database["public"]["Enums"]["governance_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          area: Database["public"]["Enums"]["governance_area"]
+          circle_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          member_id: string
+          status?: Database["public"]["Enums"]["governance_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          area?: Database["public"]["Enums"]["governance_area"]
+          circle_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          member_id?: string
+          status?: Database["public"]["Enums"]["governance_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "governance_responsibilities_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invitations: {
         Row: {
@@ -175,6 +406,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "invitations_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_family_labels: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          label: Database["public"]["Enums"]["family_label"]
+          member_id: string
+          note: string | null
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          label: Database["public"]["Enums"]["family_label"]
+          member_id: string
+          note?: string | null
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          label?: Database["public"]["Enums"]["family_label"]
+          member_id?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_family_labels_circle_id_fkey"
             columns: ["circle_id"]
             isOneToOne: false
             referencedRelation: "family_circles"
@@ -311,6 +577,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_executor_workspace: {
+        Args: { _circle_id: string; _user_id: string }
+        Returns: boolean
+      }
       get_circle_role: {
         Args: { _circle_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -333,11 +603,84 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "family_manager" | "contributor" | "viewer"
+      app_role:
+        | "owner"
+        | "family_manager"
+        | "contributor"
+        | "viewer"
+        | "family_member"
+        | "heir"
+        | "proposed_executor"
+        | "verified_executor"
+      checklist_category:
+        | "legal"
+        | "identity"
+        | "financial"
+        | "insurance"
+        | "property"
+        | "digital_estate"
+        | "final_wishes"
+        | "contacts"
+        | "executor_readiness"
+      checklist_status:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "needs_review"
+        | "blocked"
+      death_status: "not_reported" | "reported" | "manually_verified"
+      document_visibility:
+        | "private_owner"
+        | "managers_only"
+        | "family_circle"
+        | "heirs_only"
+        | "executor_workspace"
+        | "verified_executor_only"
+      documentary_status:
+        | "unknown"
+        | "declared"
+        | "located"
+        | "professionally_confirmed"
+      dossier_readiness_status:
+        | "initial"
+        | "in_progress"
+        | "partial"
+        | "ready_for_professional_review"
+        | "executor_ready"
+      family_label:
+        | "protected_person"
+        | "family_manager_label"
+        | "caregiver"
+        | "heir_label"
+        | "trusted_contact"
+        | "proposed_executor_label"
+        | "testament_named_executor"
+        | "external_professional"
+      governance_area:
+        | "documents"
+        | "legal_follow_up"
+        | "insurance"
+        | "finances"
+        | "digital_assets"
+        | "property"
+        | "medical_directives"
+        | "funeral_wishes"
+        | "notary_contact"
+      governance_status:
+        | "assigned"
+        | "in_progress"
+        | "completed"
+        | "needs_attention"
       invitation_status: "pending" | "accepted" | "declined" | "expired"
       memory_type: "photo" | "video" | "audio" | "text"
       memory_visibility: "circle" | "managers" | "private"
       vault_visibility: "owner" | "managers" | "circle"
+      verification_status:
+        | "unreviewed"
+        | "identified"
+        | "needs_update"
+        | "needs_professional_review"
+        | "document_verified"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -465,11 +808,94 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "family_manager", "contributor", "viewer"],
+      app_role: [
+        "owner",
+        "family_manager",
+        "contributor",
+        "viewer",
+        "family_member",
+        "heir",
+        "proposed_executor",
+        "verified_executor",
+      ],
+      checklist_category: [
+        "legal",
+        "identity",
+        "financial",
+        "insurance",
+        "property",
+        "digital_estate",
+        "final_wishes",
+        "contacts",
+        "executor_readiness",
+      ],
+      checklist_status: [
+        "not_started",
+        "in_progress",
+        "completed",
+        "needs_review",
+        "blocked",
+      ],
+      death_status: ["not_reported", "reported", "manually_verified"],
+      document_visibility: [
+        "private_owner",
+        "managers_only",
+        "family_circle",
+        "heirs_only",
+        "executor_workspace",
+        "verified_executor_only",
+      ],
+      documentary_status: [
+        "unknown",
+        "declared",
+        "located",
+        "professionally_confirmed",
+      ],
+      dossier_readiness_status: [
+        "initial",
+        "in_progress",
+        "partial",
+        "ready_for_professional_review",
+        "executor_ready",
+      ],
+      family_label: [
+        "protected_person",
+        "family_manager_label",
+        "caregiver",
+        "heir_label",
+        "trusted_contact",
+        "proposed_executor_label",
+        "testament_named_executor",
+        "external_professional",
+      ],
+      governance_area: [
+        "documents",
+        "legal_follow_up",
+        "insurance",
+        "finances",
+        "digital_assets",
+        "property",
+        "medical_directives",
+        "funeral_wishes",
+        "notary_contact",
+      ],
+      governance_status: [
+        "assigned",
+        "in_progress",
+        "completed",
+        "needs_attention",
+      ],
       invitation_status: ["pending", "accepted", "declined", "expired"],
       memory_type: ["photo", "video", "audio", "text"],
       memory_visibility: ["circle", "managers", "private"],
       vault_visibility: ["owner", "managers", "circle"],
+      verification_status: [
+        "unreviewed",
+        "identified",
+        "needs_update",
+        "needs_professional_review",
+        "document_verified",
+      ],
     },
   },
 } as const
