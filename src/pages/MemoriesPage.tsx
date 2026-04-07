@@ -280,7 +280,6 @@ const MemoriesPage: React.FC = () => {
                             loading="lazy"
                           />
                         )}
-                        )}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Badge variant="outline" className="text-xs">
                             {typeLabels[memory.type]}
