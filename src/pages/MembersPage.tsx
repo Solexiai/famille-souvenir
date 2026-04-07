@@ -45,6 +45,7 @@ const MembersPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [members, setMembers] = useState<CircleMember[]>([]);
+  const [memberLabels, setMemberLabels] = useState<MemberFamilyLabel[]>([]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -53,6 +54,7 @@ const MembersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [isManager, setIsManager] = useState(false);
 
   const loadData = async () => {
     if (!user) return;
