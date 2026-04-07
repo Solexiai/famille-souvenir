@@ -44,7 +44,7 @@ const visibilityLabels: Record<MemoryVisibility, string> = {
 const MemoriesPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
-  const [memories, setMemories] = useState<Memory[]>([]);
+  const [memories, setMemories] = useState<(Memory & { signedUrl?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -67,7 +67,23 @@ const MemoriesPage: React.FC = () => {
       .select('*')
       .eq('circle_id', c.id)
       .order('created_at', { ascending: false });
-    setMemories((data as Memory[]) || []);
+    
+    const rawMemories = (data as Memory[]) || [];
+    
+    // Generate signed URLs for media
+    const memoriesWithUrls = await Promise.all(
+      rawMemories.map(async (m) => {
+        if (m.media_url && (m.type === 'photo' || m.type === 'video' || m.type === 'audio')) {
+          const { data: signedData } = await supabase.storage
+            .from('memories-media')
+            .createSignedUrl(m.media_url, 3600);
+          return { ...m, signedUrl: signedData?.signedUrl || undefined };
+        }
+        return m;
+      })
+    );
+    
+    setMemories(memoriesWithUrls);
     setLoading(false);
   };
 
