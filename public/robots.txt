@@ -1,14 +1,14 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /circle
+Disallow: /settings
+Disallow: /executor
+Disallow: /vault
+Disallow: /governance
+Disallow: /checklist
+Disallow: /documents
+Disallow: /memories
+Disallow: /onboarding
+
+Sitemap: https://solexi.ai/sitemap.xml
