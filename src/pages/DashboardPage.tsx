@@ -146,14 +146,21 @@ const DashboardPage: React.FC = () => {
                   {checklistSummary.needsReview > 0 && (
                     <div className="flex items-center gap-2 text-sm text-amber-600">
                       <AlertTriangle className="h-4 w-4" />
-                      {checklistSummary.needsReview} élément{checklistSummary.needsReview > 1 ? 's' : ''} à vérifier
+                      {checklistSummary.needsReview} à vérifier
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Documentary status summary */}
+                  {checklistSummary.blocked > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      {checklistSummary.blocked} bloqué{checklistSummary.blocked > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  {checklistSummary.proReview > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <AlertTriangle className="h-4 w-4" />
+                      {checklistSummary.proReview} revue pro requise
+                    </div>
+                  )}
             <Card className="shadow-card">
               <CardHeader className="pb-3">
                 <CardTitle className="font-heading text-lg flex items-center gap-2">
