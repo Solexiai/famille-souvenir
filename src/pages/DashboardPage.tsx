@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck } from 'lucide-react';
-import type { FamilyCircle, ChecklistItem, DocumentaryStatus, AppRole } from '@/types/database';
+import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole } from '@/types/database';
 
 const docStatusLabel = (s: DocumentaryStatus) => {
   const m: Record<DocumentaryStatus, string> = { unknown: 'Inconnu', declared: 'Déclaré', located: 'Localisé', professionally_confirmed: 'Confirmé' };
@@ -27,6 +27,7 @@ const DashboardPage: React.FC = () => {
   const [memberCount, setMemberCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
+  const [govSummary, setGovSummary] = useState({ total: 0, completed: 0, blocked: 0, needsAttention: 0 });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
@@ -42,11 +43,12 @@ const DashboardPage: React.FC = () => {
         const c = circles[0] as FamilyCircle;
         setCircle(c);
 
-        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }] = await Promise.all([
+        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }, { data: govData }] = await Promise.all([
           supabase.from('circle_members').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('documents').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('checklist_items').select('*').eq('circle_id', c.id),
           supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1),
+          supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id),
         ]);
         setMemberCount(mc || 0);
         setDocCount(dc || 0);
@@ -58,6 +60,14 @@ const DashboardPage: React.FC = () => {
           needsReview: items.filter(i => i.status === 'needs_review').length,
           blocked: items.filter(i => i.status === 'blocked').length,
           proReview: items.filter(i => i.requires_professional_review && i.status !== 'completed').length,
+        });
+        const govItems = (govData as GovernanceResponsibility[]) || [];
+        setGovSummary({
+          total: govItems.length,
+          completed: govItems.filter(i => i.status === 'completed').length,
+          blocked: govItems.filter(i => i.status === 'blocked').length,
+          needsAttention: govItems.filter(i => i.status === 'needs_attention').length,
+        });
         });
       }
       setLoading(false);
