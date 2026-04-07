@@ -333,11 +333,84 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "owner" | "family_manager" | "contributor" | "viewer"
+      app_role:
+        | "owner"
+        | "family_manager"
+        | "contributor"
+        | "viewer"
+        | "family_member"
+        | "heir"
+        | "proposed_executor"
+        | "verified_executor"
+      checklist_category:
+        | "legal"
+        | "identity"
+        | "financial"
+        | "insurance"
+        | "property"
+        | "digital_estate"
+        | "final_wishes"
+        | "contacts"
+        | "executor_readiness"
+      checklist_status:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "needs_review"
+        | "blocked"
+      death_status: "not_reported" | "reported" | "manually_verified"
+      document_visibility:
+        | "private_owner"
+        | "managers_only"
+        | "family_circle"
+        | "heirs_only"
+        | "executor_workspace"
+        | "verified_executor_only"
+      documentary_status:
+        | "unknown"
+        | "declared"
+        | "located"
+        | "professionally_confirmed"
+      dossier_readiness_status:
+        | "initial"
+        | "in_progress"
+        | "partial"
+        | "ready_for_professional_review"
+        | "executor_ready"
+      family_label:
+        | "protected_person"
+        | "family_manager_label"
+        | "caregiver"
+        | "heir_label"
+        | "trusted_contact"
+        | "proposed_executor_label"
+        | "testament_named_executor"
+        | "external_professional"
+      governance_area:
+        | "documents"
+        | "legal_follow_up"
+        | "insurance"
+        | "finances"
+        | "digital_assets"
+        | "property"
+        | "medical_directives"
+        | "funeral_wishes"
+        | "notary_contact"
+      governance_status:
+        | "assigned"
+        | "in_progress"
+        | "completed"
+        | "needs_attention"
       invitation_status: "pending" | "accepted" | "declined" | "expired"
       memory_type: "photo" | "video" | "audio" | "text"
       memory_visibility: "circle" | "managers" | "private"
       vault_visibility: "owner" | "managers" | "circle"
+      verification_status:
+        | "unreviewed"
+        | "identified"
+        | "needs_update"
+        | "needs_professional_review"
+        | "document_verified"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -465,11 +538,94 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "family_manager", "contributor", "viewer"],
+      app_role: [
+        "owner",
+        "family_manager",
+        "contributor",
+        "viewer",
+        "family_member",
+        "heir",
+        "proposed_executor",
+        "verified_executor",
+      ],
+      checklist_category: [
+        "legal",
+        "identity",
+        "financial",
+        "insurance",
+        "property",
+        "digital_estate",
+        "final_wishes",
+        "contacts",
+        "executor_readiness",
+      ],
+      checklist_status: [
+        "not_started",
+        "in_progress",
+        "completed",
+        "needs_review",
+        "blocked",
+      ],
+      death_status: ["not_reported", "reported", "manually_verified"],
+      document_visibility: [
+        "private_owner",
+        "managers_only",
+        "family_circle",
+        "heirs_only",
+        "executor_workspace",
+        "verified_executor_only",
+      ],
+      documentary_status: [
+        "unknown",
+        "declared",
+        "located",
+        "professionally_confirmed",
+      ],
+      dossier_readiness_status: [
+        "initial",
+        "in_progress",
+        "partial",
+        "ready_for_professional_review",
+        "executor_ready",
+      ],
+      family_label: [
+        "protected_person",
+        "family_manager_label",
+        "caregiver",
+        "heir_label",
+        "trusted_contact",
+        "proposed_executor_label",
+        "testament_named_executor",
+        "external_professional",
+      ],
+      governance_area: [
+        "documents",
+        "legal_follow_up",
+        "insurance",
+        "finances",
+        "digital_assets",
+        "property",
+        "medical_directives",
+        "funeral_wishes",
+        "notary_contact",
+      ],
+      governance_status: [
+        "assigned",
+        "in_progress",
+        "completed",
+        "needs_attention",
+      ],
       invitation_status: ["pending", "accepted", "declined", "expired"],
       memory_type: ["photo", "video", "audio", "text"],
       memory_visibility: ["circle", "managers", "private"],
       vault_visibility: ["owner", "managers", "circle"],
+      verification_status: [
+        "unreviewed",
+        "identified",
+        "needs_update",
+        "needs_professional_review",
+        "document_verified",
+      ],
     },
   },
 } as const
