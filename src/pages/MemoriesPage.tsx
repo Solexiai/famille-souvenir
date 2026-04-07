@@ -272,13 +272,14 @@ const MemoriesPage: React.FC = () => {
                       </div>
                       <div className="flex-1 space-y-2">
                         <p className="text-foreground">{memory.caption}</p>
-                        {memory.media_url && memory.type === 'photo' && (
+                        {memory.signedUrl && memory.type === 'photo' && (
                           <img
-                            src={memory.media_url}
+                            src={memory.signedUrl}
                             alt={memory.caption}
                             className="rounded-lg max-h-80 object-cover"
                             loading="lazy"
                           />
+                        )}
                         )}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Badge variant="outline" className="text-xs">
