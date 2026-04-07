@@ -56,6 +56,8 @@ const DashboardPage: React.FC = () => {
           total: items.length,
           completed: items.filter(i => i.status === 'completed').length,
           needsReview: items.filter(i => i.status === 'needs_review').length,
+          blocked: items.filter(i => i.status === 'blocked').length,
+          proReview: items.filter(i => i.requires_professional_review && i.status !== 'completed').length,
         });
       }
       setLoading(false);
