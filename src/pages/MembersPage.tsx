@@ -14,7 +14,10 @@ import type { CircleMember, FamilyCircle, AppRole } from '@/types/database';
 import { z } from 'zod';
 
 const inviteSchema = z.object({
+  firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
+  lastName: z.string().trim().min(1, 'Le nom est requis').max(50),
   email: z.string().trim().email('Adresse email invalide'),
+  phone: z.string().trim().max(20).optional().or(z.literal('')),
 });
 
 const roleLabels: Record<AppRole, string> = {
@@ -35,7 +38,10 @@ const MembersPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [members, setMembers] = useState<CircleMember[]>([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState<AppRole>('viewer');
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
@@ -76,7 +82,7 @@ const MembersPage: React.FC = () => {
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = inviteSchema.safeParse({ email });
+    const result = inviteSchema.safeParse({ firstName, lastName, email, phone });
     if (!result.success) {
       toast.error(result.error.errors[0].message);
       return;
@@ -94,8 +100,11 @@ const MembersPage: React.FC = () => {
     if (error) {
       toast.error("Erreur lors de l'envoi de l'invitation.");
     } else {
-      toast.success(`Invitation envoyée à ${email}`);
+      toast.success(`Invitation envoyée à ${firstName} ${lastName} (${email})`);
+      setFirstName('');
+      setLastName('');
       setEmail('');
+      setPhone('');
     }
     setInviting(false);
   };
@@ -172,6 +181,30 @@ const MembersPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleInvite} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteFirstName">Prénom</Label>
+                    <Input
+                      id="inviteFirstName"
+                      type="text"
+                      placeholder="Jean"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="inviteLastName">Nom</Label>
+                    <Input
+                      id="inviteLastName"
+                      type="text"
+                      placeholder="Dupont"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="inviteEmail">Adresse email</Label>
                   <Input
@@ -181,6 +214,16 @@ const MembersPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="invitePhone">Numéro de téléphone</Label>
+                  <Input
+                    id="invitePhone"
+                    type="tel"
+                    placeholder="+33 6 12 34 56 78"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
