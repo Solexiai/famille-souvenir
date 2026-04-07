@@ -12,13 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, Plus, Briefcase, AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react';
-import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem } from '@/types/database';
+import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem, GovernanceResponsibility } from '@/types/database';
 
 const ExecutorPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [notes, setNotes] = useState<ExecutorWorkspaceNote[]>([]);
-  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0 });
+  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0 });
+  const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
   const [loading, setLoading] = useState(true);
   const [isManager, setIsManager] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -34,9 +35,10 @@ const ExecutorPage: React.FC = () => {
     setCircle(c);
     setIsManager(c.owner_id === user.id);
 
-    const [{ data: notesData }, { data: checklistData }] = await Promise.all([
+    const [{ data: notesData }, { data: checklistData }, { data: govData }] = await Promise.all([
       supabase.from('executor_workspace_notes').select('*').eq('circle_id', c.id).order('created_at', { ascending: false }),
       supabase.from('checklist_items').select('*').eq('circle_id', c.id),
+      supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id).order('area'),
     ]);
     setNotes((notesData as ExecutorWorkspaceNote[]) || []);
 
@@ -45,7 +47,11 @@ const ExecutorPage: React.FC = () => {
       total: items.length,
       completed: items.filter(i => i.status === 'completed').length,
       needsReview: items.filter(i => i.status === 'needs_review').length,
+      blocked: items.filter(i => i.status === 'blocked').length,
     });
+    // Show governance items that are not completed (relevant for executor coordination)
+    const activeGov = ((govData as GovernanceResponsibility[]) || []).filter(g => g.status !== 'completed');
+    setGovItems(activeGov);
     setLoading(false);
   };
 
