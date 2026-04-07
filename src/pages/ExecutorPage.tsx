@@ -21,6 +21,9 @@ const ExecutorPage: React.FC = () => {
   const [notes, setNotes] = useState<ExecutorWorkspaceNote[]>([]);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0 });
   const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
+  const [members, setMembers] = useState<CircleMember[]>([]);
+  const [labels, setLabels] = useState<MemberFamilyLabel[]>([]);
+  const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
   const [loading, setLoading] = useState(true);
   const [isManager, setIsManager] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -36,11 +39,24 @@ const ExecutorPage: React.FC = () => {
     setCircle(c);
     setIsManager(c.owner_id === user.id);
 
-    const [{ data: notesData }, { data: checklistData }, { data: govData }] = await Promise.all([
+    const [{ data: notesData }, { data: checklistData }, { data: govData }, { data: labelsData }, { data: membersRaw }] = await Promise.all([
       supabase.from('executor_workspace_notes').select('*').eq('circle_id', c.id).order('created_at', { ascending: false }),
       supabase.from('checklist_items').select('*').eq('circle_id', c.id),
       supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id).order('area'),
+      supabase.from('member_family_labels').select('*').eq('circle_id', c.id),
+      supabase.from('circle_members').select('*').eq('circle_id', c.id),
     ]);
+    setLabels((labelsData as MemberFamilyLabel[]) || []);
+
+    // Load profiles for members
+    const rawMembers = (membersRaw as CircleMember[]) || [];
+    const membersWithProfiles = await Promise.all(
+      rawMembers.map(async (m) => {
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('user_id', m.user_id).single();
+        return { ...m, profiles: profileData } as CircleMember;
+      })
+    );
+    setMembers(membersWithProfiles);
     setNotes((notesData as ExecutorWorkspaceNote[]) || []);
 
     const items = (checklistData as ChecklistItem[]) || [];
