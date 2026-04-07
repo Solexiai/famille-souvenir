@@ -68,7 +68,6 @@ const DashboardPage: React.FC = () => {
           blocked: govItems.filter(i => i.status === 'blocked').length,
           needsAttention: govItems.filter(i => i.status === 'needs_attention').length,
         });
-        });
       }
       setLoading(false);
     };
