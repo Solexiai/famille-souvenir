@@ -13,4 +13,5 @@ App does NOT replace law/notary/executor. No fake legal authority. No auto-assig
 - [Roles & access](mem://features/roles) — Role-based access with security definer functions, RLS policies, 3-layer model (app roles, family labels, documentary status)
 - [MVP scope](mem://constraints/scope) — v2 boundaries, forbidden features, legal constraints
 - [Family labels](mem://features/family-labels) — FamilyLabelsManager, ExecutorDesignation components, 3-tier executor designation
-- [Members module](mem://features/members) — MemberCard, MembersList, InviteMemberForm, InvitationsList components, extended profiles with contact fields
+- [Members module](mem://features/members) — MemberCard, MembersList, InviteMemberForm, InvitationsList, extended profiles with contact fields
+- [Invitation workflow](mem://features/invitations) — manage-invitation edge function, AcceptInvitationPage, token validation, profile linking

@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Loader2, UserPlus } from 'lucide-react';
+import { Loader2, UserPlus, Copy, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import type { AppRole } from '@/types/database';
@@ -37,6 +38,8 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
   const [role, setRole] = useState<AppRole>('family_member');
   const [invitationMessage, setInvitationMessage] = useState('');
   const [inviting, setInviting] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,8 +49,9 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       return;
     }
     setInviting(true);
+    setLastInviteLink(null);
 
-    const { error } = await supabase.from('invitations').insert({
+    const { data: inserted, error } = await supabase.from('invitations').insert({
       circle_id: circleId,
       email: result.data.email,
       role,
@@ -58,11 +62,16 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       city: result.data.city || '',
       relationship_label: result.data.relationshipLabel || '',
       invitation_message: result.data.invitationMessage || '',
-    });
+    }).select('token').single();
 
     if (error) {
       toast.error("Erreur lors de l'envoi de l'invitation.");
     } else {
+      // Build invitation link
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/invitation/accept?token=${inserted.token}`;
+      setLastInviteLink(link);
+
       // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
@@ -71,7 +80,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
         details: { email: result.data.email, role, name: `${result.data.firstName} ${result.data.lastName}` },
       });
 
-      toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
+      toast.success(`Invitation créée pour ${result.data.firstName} ${result.data.lastName}`);
       setFirstName('');
       setLastName('');
       setEmail('');
@@ -82,6 +91,15 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       onInviteSent();
     }
     setInviting(false);
+  };
+
+  const copyLink = () => {
+    if (lastInviteLink) {
+      navigator.clipboard.writeText(lastInviteLink);
+      setLinkCopied(true);
+      toast.success('Lien copié !');
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
   };
 
   return (
@@ -141,8 +159,24 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
           </div>
           <Button type="submit" disabled={inviting} className="w-full">
             {inviting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Envoyer l'invitation
+            Créer l'invitation
           </Button>
+
+          {lastInviteLink && (
+            <Alert className="border-accent/30 bg-accent/5">
+              <CheckCircle className="h-4 w-4 text-accent" />
+              <AlertDescription className="space-y-2">
+                <p className="text-sm font-medium text-foreground">Invitation créée avec succès !</p>
+                <p className="text-xs text-muted-foreground">Partagez ce lien avec la personne invitée :</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs bg-secondary rounded px-2 py-1.5 truncate">{lastInviteLink}</code>
+                  <Button type="button" variant="outline" size="sm" onClick={copyLink}>
+                    {linkCopied ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
         </form>
       </CardContent>
     </Card>
