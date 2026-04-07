@@ -387,33 +387,57 @@ export type Database = {
       invitations: {
         Row: {
           circle_id: string
+          city: string | null
           created_at: string
           email: string
           expires_at: string
+          first_name: string | null
           id: string
+          invitation_message: string | null
           invited_by: string
+          last_name: string | null
+          phone: string | null
+          relationship_label: string | null
+          resent_at: string | null
+          resent_count: number
           role: Database["public"]["Enums"]["app_role"]
           status: Database["public"]["Enums"]["invitation_status"]
           token: string
         }
         Insert: {
           circle_id: string
+          city?: string | null
           created_at?: string
           email: string
           expires_at?: string
+          first_name?: string | null
           id?: string
+          invitation_message?: string | null
           invited_by: string
+          last_name?: string | null
+          phone?: string | null
+          relationship_label?: string | null
+          resent_at?: string | null
+          resent_count?: number
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["invitation_status"]
           token?: string
         }
         Update: {
           circle_id?: string
+          city?: string | null
           created_at?: string
           email?: string
           expires_at?: string
+          first_name?: string | null
           id?: string
+          invitation_message?: string | null
           invited_by?: string
+          last_name?: string | null
+          phone?: string | null
+          relationship_label?: string | null
+          resent_at?: string | null
+          resent_count?: number
           role?: Database["public"]["Enums"]["app_role"]
           status?: Database["public"]["Enums"]["invitation_status"]
           token?: string
@@ -510,31 +534,61 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          city: string | null
+          contact_preference: string | null
           created_at: string
           email: string
+          first_name: string
           full_name: string
           id: string
+          is_emergency_contact: boolean
+          is_visible_to_family: boolean
           language: string
+          last_name: string
+          notes: string | null
+          phone: string | null
+          relationship_label: string | null
+          secondary_phone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          city?: string | null
+          contact_preference?: string | null
           created_at?: string
           email?: string
+          first_name?: string
           full_name?: string
           id?: string
+          is_emergency_contact?: boolean
+          is_visible_to_family?: boolean
           language?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string | null
+          relationship_label?: string | null
+          secondary_phone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          city?: string | null
+          contact_preference?: string | null
           created_at?: string
           email?: string
+          first_name?: string
           full_name?: string
           id?: string
+          is_emergency_contact?: boolean
+          is_visible_to_family?: boolean
           language?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string | null
+          relationship_label?: string | null
+          secondary_phone?: string | null
           updated_at?: string
           user_id?: string
         }
