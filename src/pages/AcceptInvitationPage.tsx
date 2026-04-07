@@ -126,7 +126,7 @@ const AcceptInvitationPage: React.FC = () => {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-card">
           <CardContent className="py-12 flex flex-col items-center gap-4 text-center">
-            <CheckCircle className="h-12 w-12 text-green-600" />
+            <CheckCircle className="h-12 w-12 text-accent" />
             <p className="text-foreground font-medium">{success}</p>
             <p className="text-sm text-muted-foreground">Redirection vers le tableau de bord…</p>
           </CardContent>
