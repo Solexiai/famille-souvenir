@@ -171,30 +171,36 @@ const MembersPage: React.FC = () => {
           <CardContent className="space-y-3">
             {members.map((m) => {
               const RoleIcon = roleIcons[m.role];
+              const mLabels = memberLabels.filter(l => l.member_id === m.id);
               return (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border border-border p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
-                      <span className="text-sm font-medium text-secondary-foreground">
-                        {(m.profiles?.full_name || m.profiles?.email || '?')[0].toUpperCase()}
-                      </span>
+                <div key={m.id} className="rounded-lg border border-border p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
+                        <span className="text-sm font-medium text-secondary-foreground">
+                          {(m.profiles?.full_name || m.profiles?.email || '?')[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          {m.profiles?.full_name || m.profiles?.email || 'Membre'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{m.profiles?.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {m.profiles?.full_name || m.profiles?.email || 'Membre'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{m.profiles?.email}</p>
-                    </div>
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <RoleIcon className="h-3 w-3" />
+                      {roleLabels[m.role]}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <RoleIcon className="h-3 w-3" />
-                    {roleLabels[m.role]}
-                  </Badge>
+                  {mLabels.length > 0 && (
+                    <div className="ml-13 pl-13">
+                      <FamilyLabelsForMember labels={mLabels} />
+                    </div>
+                  )}
                 </div>
               );
             })}
-          </CardContent>
-        </Card>
 
         {/* Invite form — visible to owner and managers */}
         {isOwner && (
