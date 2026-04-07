@@ -215,7 +215,7 @@ const ChecklistPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-foreground">{item.title}</p>
                           {item.requires_professional_review && (
-                            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" title="À revoir avec un professionnel" />
+                            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
                           )}
                         </div>
                         {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}

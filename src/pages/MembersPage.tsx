@@ -23,15 +23,19 @@ const inviteSchema = z.object({
 const roleLabels: Record<AppRole, string> = {
   owner: 'Propriétaire',
   family_manager: 'Gestionnaire',
-  contributor: 'Contributeur',
-  viewer: 'Lecteur',
+  family_member: 'Membre',
+  heir: 'Héritier',
+  proposed_executor: 'Exécuteur pressenti',
+  verified_executor: 'Exécuteur documenté',
 };
 
 const roleIcons: Record<AppRole, React.FC<{ className?: string }>> = {
   owner: Crown,
   family_manager: Shield,
-  contributor: Edit,
-  viewer: Eye,
+  family_member: Edit,
+  heir: Eye,
+  proposed_executor: Eye,
+  verified_executor: Shield,
 };
 
 const MembersPage: React.FC = () => {
@@ -42,7 +46,7 @@ const MembersPage: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<AppRole>('viewer');
+  const [role, setRole] = useState<AppRole>('family_member');
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
@@ -234,8 +238,8 @@ const MembersPage: React.FC = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="family_manager">Gestionnaire</SelectItem>
-                      <SelectItem value="contributor">Contributeur</SelectItem>
-                      <SelectItem value="viewer">Lecteur</SelectItem>
+                      <SelectItem value="family_member">Membre</SelectItem>
+                      <SelectItem value="heir">Héritier</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

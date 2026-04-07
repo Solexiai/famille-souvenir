@@ -16,6 +16,10 @@ import DashboardPage from "./pages/DashboardPage";
 import CirclePage from "./pages/CirclePage";
 import MembersPage from "./pages/MembersPage";
 import MemoriesPage from "./pages/MemoriesPage";
+import DocumentsPage from "./pages/DocumentsPage";
+import GovernancePage from "./pages/GovernancePage";
+import ChecklistPage from "./pages/ChecklistPage";
+import ExecutorPage from "./pages/ExecutorPage";
 import VaultPage from "./pages/VaultPage";
 import SettingsPage from "./pages/SettingsPage";
 import PrivacyPage from "./pages/PrivacyPage";
@@ -48,7 +52,11 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/circle" element={<ProtectedRoute><CirclePage /></ProtectedRoute>} />
             <Route path="/circle/members" element={<ProtectedRoute><MembersPage /></ProtectedRoute>} />
+            <Route path="/governance" element={<ProtectedRoute><GovernancePage /></ProtectedRoute>} />
+            <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+            <Route path="/checklist" element={<ProtectedRoute><ChecklistPage /></ProtectedRoute>} />
             <Route path="/memories" element={<ProtectedRoute><MemoriesPage /></ProtectedRoute>} />
+            <Route path="/executor" element={<ProtectedRoute><ExecutorPage /></ProtectedRoute>} />
             <Route path="/vault" element={<ProtectedRoute><VaultPage /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
