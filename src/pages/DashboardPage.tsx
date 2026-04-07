@@ -6,8 +6,19 @@ import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, Plus, UserPlus, Settings, AlertTriangle } from 'lucide-react';
-import type { FamilyCircle, ChecklistItem } from '@/types/database';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck } from 'lucide-react';
+import type { FamilyCircle, ChecklistItem, DocumentaryStatus, AppRole } from '@/types/database';
+
+const docStatusLabel = (s: DocumentaryStatus) => {
+  const m: Record<DocumentaryStatus, string> = { unknown: 'Inconnu', declared: 'Déclaré', located: 'Localisé', professionally_confirmed: 'Confirmé' };
+  return m[s] || s;
+};
+const docStatusColor = (s: DocumentaryStatus) => {
+  if (s === 'unknown') return 'bg-muted text-muted-foreground';
+  if (s === 'declared') return 'bg-amber-100 text-amber-800';
+  if (s === 'located') return 'bg-blue-100 text-blue-800';
+  return 'bg-green-100 text-green-800';
+};
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -18,6 +29,7 @@ const DashboardPage: React.FC = () => {
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0 });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
+  const [userRole, setUserRole] = useState<AppRole | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -30,13 +42,15 @@ const DashboardPage: React.FC = () => {
         const c = circles[0] as FamilyCircle;
         setCircle(c);
 
-        const [{ count: mc }, { count: dc }, { data: clData }] = await Promise.all([
+        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }] = await Promise.all([
           supabase.from('circle_members').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('documents').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('checklist_items').select('*').eq('circle_id', c.id),
+          supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1),
         ]);
         setMemberCount(mc || 0);
         setDocCount(dc || 0);
+        if (memberData && memberData.length > 0) setUserRole(memberData[0].role as AppRole);
         const items = (clData as ChecklistItem[]) || [];
         setChecklistSummary({
           total: items.length,
@@ -62,9 +76,11 @@ const DashboardPage: React.FC = () => {
     { label: 'Gouvernance', icon: Shield, action: () => navigate('/governance') },
     { label: 'Checklist', icon: CheckSquare, action: () => navigate('/checklist') },
     { label: 'Souvenirs', icon: Image, action: () => navigate('/memories') },
-    { label: 'Exécuteur', icon: Briefcase, action: () => navigate('/executor') },
-    { label: 'Membres', icon: UserPlus, action: () => navigate('/circle/members') },
+    { label: 'Exécuteur', icon: Briefcase, action: () => navigate('/executor'), roles: ['owner', 'family_manager', 'proposed_executor', 'verified_executor'] as AppRole[] },
+    { label: 'Membres', icon: UserPlus, action: () => navigate('/circle/members'), roles: ['owner', 'family_manager'] as AppRole[] },
   ];
+
+  const visibleActions = quickActions.filter(a => !a.roles || !userRole || a.roles.includes(userRole));
 
   return (
     <AppLayout>
@@ -135,9 +151,44 @@ const DashboardPage: React.FC = () => {
               </Card>
             </div>
 
+            {/* Documentary status summary */}
+            <Card className="shadow-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-heading text-lg flex items-center gap-2">
+                  <FileCheck className="h-5 w-5 text-accent" />
+                  Préparation documentaire
+                </CardTitle>
+                <CardDescription>
+                  Vue d'ensemble des statuts déclarés. Indicatif — ne constitue pas une validation juridique.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: 'Testament', value: circle.testament_status },
+                    { label: 'Mandat', value: circle.mandate_status },
+                    { label: 'Notaire', value: circle.notary_status },
+                    { label: 'Bénéficiaires', value: circle.beneficiary_designation_status },
+                  ].map((item) => (
+                    <div key={item.label} className="text-center space-y-1">
+                      <p className="text-xs text-muted-foreground">{item.label}</p>
+                      <Badge className={`text-xs ${docStatusColor(item.value as DocumentaryStatus)}`}>
+                        {docStatusLabel(item.value as DocumentaryStatus)}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 text-right">
+                  <Button variant="link" size="sm" onClick={() => navigate('/circle')} className="text-xs">
+                    Gérer les statuts →
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Quick actions */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {quickActions.map((action) => {
+              {visibleActions.map((action) => {
                 const Icon = action.icon;
                 return (
                   <Card key={action.label} className="shadow-soft cursor-pointer hover:shadow-card transition-shadow" onClick={action.action}>
