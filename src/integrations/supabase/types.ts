@@ -334,8 +334,12 @@ export type Database = {
           circle_id: string
           created_at: string
           description: string | null
+          due_date: string | null
           id: string
+          linked_checklist_item: string | null
+          linked_document: string | null
           member_id: string
+          note: string | null
           status: Database["public"]["Enums"]["governance_status"]
           title: string
           updated_at: string
@@ -345,8 +349,12 @@ export type Database = {
           circle_id: string
           created_at?: string
           description?: string | null
+          due_date?: string | null
           id?: string
+          linked_checklist_item?: string | null
+          linked_document?: string | null
           member_id: string
+          note?: string | null
           status?: Database["public"]["Enums"]["governance_status"]
           title: string
           updated_at?: string
@@ -356,8 +364,12 @@ export type Database = {
           circle_id?: string
           created_at?: string
           description?: string | null
+          due_date?: string | null
           id?: string
+          linked_checklist_item?: string | null
+          linked_document?: string | null
           member_id?: string
+          note?: string | null
           status?: Database["public"]["Enums"]["governance_status"]
           title?: string
           updated_at?: string
@@ -670,9 +682,11 @@ export type Database = {
         | "funeral_wishes"
         | "notary_contact"
       governance_status:
+        | "not_started"
         | "assigned"
         | "in_progress"
         | "completed"
+        | "blocked"
         | "needs_attention"
       invitation_status: "pending" | "accepted" | "declined" | "expired"
       memory_type: "photo" | "video" | "audio" | "text"
@@ -883,9 +897,11 @@ export const Constants = {
         "notary_contact",
       ],
       governance_status: [
+        "not_started",
         "assigned",
         "in_progress",
         "completed",
+        "blocked",
         "needs_attention",
       ],
       invitation_status: ["pending", "accepted", "declined", "expired"],

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck } from 'lucide-react';
-import type { FamilyCircle, ChecklistItem, DocumentaryStatus, AppRole } from '@/types/database';
+import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole } from '@/types/database';
 
 const docStatusLabel = (s: DocumentaryStatus) => {
   const m: Record<DocumentaryStatus, string> = { unknown: 'Inconnu', declared: 'Déclaré', located: 'Localisé', professionally_confirmed: 'Confirmé' };
@@ -27,6 +27,7 @@ const DashboardPage: React.FC = () => {
   const [memberCount, setMemberCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
+  const [govSummary, setGovSummary] = useState({ total: 0, completed: 0, blocked: 0, needsAttention: 0 });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
@@ -42,11 +43,12 @@ const DashboardPage: React.FC = () => {
         const c = circles[0] as FamilyCircle;
         setCircle(c);
 
-        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }] = await Promise.all([
+        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }, { data: govData }] = await Promise.all([
           supabase.from('circle_members').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('documents').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('checklist_items').select('*').eq('circle_id', c.id),
           supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1),
+          supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id),
         ]);
         setMemberCount(mc || 0);
         setDocCount(dc || 0);
@@ -58,6 +60,13 @@ const DashboardPage: React.FC = () => {
           needsReview: items.filter(i => i.status === 'needs_review').length,
           blocked: items.filter(i => i.status === 'blocked').length,
           proReview: items.filter(i => i.requires_professional_review && i.status !== 'completed').length,
+        });
+        const govItems = (govData as GovernanceResponsibility[]) || [];
+        setGovSummary({
+          total: govItems.length,
+          completed: govItems.filter(i => i.status === 'completed').length,
+          blocked: govItems.filter(i => i.status === 'blocked').length,
+          needsAttention: govItems.filter(i => i.status === 'needs_attention').length,
         });
       }
       setLoading(false);
@@ -199,6 +208,41 @@ const DashboardPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Governance summary */}
+            {govSummary.total > 0 && (
+              <Card className="shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-heading text-lg flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-accent" />
+                    Gouvernance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Responsabilités</span>
+                    <span className="text-sm font-medium">{govSummary.completed}/{govSummary.total} complétées</span>
+                  </div>
+                  {govSummary.blocked > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      {govSummary.blocked} bloquée{govSummary.blocked > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  {govSummary.needsAttention > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-amber-600">
+                      <AlertTriangle className="h-4 w-4" />
+                      {govSummary.needsAttention} attention requise
+                    </div>
+                  )}
+                  <div className="text-right">
+                    <Button variant="link" size="sm" onClick={() => navigate('/governance')} className="text-xs">
+                      Voir la gouvernance →
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Quick actions */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

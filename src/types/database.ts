@@ -6,7 +6,7 @@ export type VerificationStatus = 'unreviewed' | 'identified' | 'needs_update' | 
 export type ChecklistStatus = 'not_started' | 'in_progress' | 'completed' | 'needs_review' | 'blocked';
 export type ChecklistCategory = 'legal' | 'identity' | 'financial' | 'insurance' | 'property' | 'digital_estate' | 'final_wishes' | 'contacts' | 'executor_readiness';
 export type GovernanceArea = 'documents' | 'legal_follow_up' | 'insurance' | 'finances' | 'digital_assets' | 'property' | 'medical_directives' | 'funeral_wishes' | 'notary_contact';
-export type GovernanceStatus = 'assigned' | 'in_progress' | 'completed' | 'needs_attention';
+export type GovernanceStatus = 'not_started' | 'assigned' | 'in_progress' | 'completed' | 'blocked' | 'needs_attention';
 export type DeathStatus = 'not_reported' | 'reported' | 'manually_verified';
 export type DossierReadinessStatus = 'initial' | 'in_progress' | 'partial' | 'ready_for_professional_review' | 'executor_ready';
 export type DocumentaryStatus = 'unknown' | 'declared' | 'located' | 'professionally_confirmed';
@@ -129,6 +129,10 @@ export interface GovernanceResponsibility {
   title: string;
   description: string;
   status: GovernanceStatus;
+  due_date: string | null;
+  linked_checklist_item: string | null;
+  linked_document: string | null;
+  note: string;
   created_at: string;
   updated_at: string;
 }

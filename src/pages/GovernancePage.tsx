@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/AppLayout';
@@ -10,9 +10,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
 import { toast } from 'sonner';
-import { Loader2, Plus, Users, Shield, Briefcase } from 'lucide-react';
-import type { FamilyCircle, GovernanceResponsibility, GovernanceArea, GovernanceStatus, CircleMember } from '@/types/database';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import {
+  Loader2, Plus, Shield, User, Filter, CalendarIcon, FileText, CheckSquare,
+  ChevronDown, ChevronRight, Ban, AlertTriangle
+} from 'lucide-react';
+import type {
+  FamilyCircle, GovernanceResponsibility, GovernanceArea, GovernanceStatus,
+  CircleMember, AppRole, ChecklistItem, Document as DocType
+} from '@/types/database';
+import { hasPermission } from '@/components/PermissionMatrix';
 
 const areaLabels: Record<GovernanceArea, string> = {
   documents: 'Documents',
@@ -26,18 +38,27 @@ const areaLabels: Record<GovernanceArea, string> = {
   notary_contact: 'Contact notaire',
 };
 
+const areaOrder: GovernanceArea[] = [
+  'documents', 'legal_follow_up', 'insurance', 'finances', 'digital_assets',
+  'property', 'medical_directives', 'funeral_wishes', 'notary_contact',
+];
+
 const statusLabels: Record<GovernanceStatus, string> = {
+  not_started: 'Non commencé',
   assigned: 'Assigné',
   in_progress: 'En cours',
   completed: 'Complété',
+  blocked: 'Bloqué',
   needs_attention: 'Attention requise',
 };
 
 const statusColors: Record<GovernanceStatus, string> = {
+  not_started: 'bg-muted text-muted-foreground',
   assigned: 'bg-secondary text-secondary-foreground',
   in_progress: 'bg-primary/10 text-primary',
   completed: 'bg-green-100 text-green-800',
-  needs_attention: 'bg-destructive/10 text-destructive',
+  blocked: 'bg-destructive/10 text-destructive',
+  needs_attention: 'bg-amber-100 text-amber-800',
 };
 
 const GovernancePage: React.FC = () => {
@@ -45,15 +66,32 @@ const GovernancePage: React.FC = () => {
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [items, setItems] = useState<GovernanceResponsibility[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
+  const [checklists, setChecklists] = useState<ChecklistItem[]>([]);
+  const [documents, setDocuments] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isManager, setIsManager] = useState(false);
+  const [userRole, setUserRole] = useState<AppRole | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editItem, setEditItem] = useState<GovernanceResponsibility | null>(null);
   const [saving, setSaving] = useState(false);
+  const [collapsedAreas, setCollapsedAreas] = useState<Set<string>>(new Set());
 
+  // Filters
+  const [filterArea, setFilterArea] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterMember, setFilterMember] = useState<string>('all');
+
+  // Form
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [area, setArea] = useState<GovernanceArea>('documents');
   const [memberId, setMemberId] = useState('');
+  const [formStatus, setFormStatus] = useState<GovernanceStatus>('assigned');
+  const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [linkedChecklist, setLinkedChecklist] = useState('');
+  const [linkedDoc, setLinkedDoc] = useState('');
+  const [note, setNote] = useState('');
+
+  const canEdit = hasPermission(userRole, 'governance.edit');
 
   const loadData = async () => {
     if (!user) return;
@@ -61,88 +99,199 @@ const GovernancePage: React.FC = () => {
     if (!circles || circles.length === 0) { setLoading(false); return; }
     const c = circles[0] as FamilyCircle;
     setCircle(c);
-    setIsManager(c.owner_id === user.id);
 
-    const [{ data: govData }, { data: memberData }] = await Promise.all([
-      supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id).order('created_at', { ascending: false }),
+    const [{ data: govData }, { data: memberData }, { data: clData }, { data: docData }, { data: roleData }] = await Promise.all([
+      supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id).order('area').order('created_at'),
       supabase.from('circle_members').select('*').eq('circle_id', c.id),
+      supabase.from('checklist_items').select('id,title').eq('circle_id', c.id).order('title'),
+      supabase.from('documents').select('id,title').eq('circle_id', c.id).order('title'),
+      supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1),
     ]);
-    setItems((govData as GovernanceResponsibility[]) || []);
 
-    if (memberData) {
-      const membersWithProfiles = await Promise.all(
-        memberData.map(async (m: any) => {
-          const { data: p } = await supabase.from('profiles').select('*').eq('user_id', m.user_id).single();
+    setItems((govData as GovernanceResponsibility[]) || []);
+    setChecklists((clData as ChecklistItem[]) || []);
+    setDocuments((docData as DocType[]) || []);
+    if (roleData && roleData.length > 0) setUserRole(roleData[0].role as AppRole);
+
+    // Load profiles for members
+    const rawMembers = (memberData as CircleMember[]) || [];
+    if (rawMembers.length > 0) {
+      const enriched = await Promise.all(
+        rawMembers.map(async (m) => {
+          const { data: p } = await supabase.from('profiles').select('full_name,email').eq('user_id', m.user_id).single();
           return { ...m, profiles: p } as CircleMember;
         })
       );
-      setMembers(membersWithProfiles);
+      setMembers(enriched);
     }
     setLoading(false);
   };
 
   useEffect(() => { loadData(); }, [user]);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setTitle(''); setDescription(''); setArea('documents'); setMemberId('');
+    setFormStatus('assigned'); setDueDate(undefined); setLinkedChecklist('');
+    setLinkedDoc(''); setNote(''); setEditItem(null);
+  };
+
+  const openEdit = (item: GovernanceResponsibility) => {
+    setEditItem(item);
+    setTitle(item.title);
+    setDescription(item.description || '');
+    setArea(item.area);
+    setMemberId(item.member_id);
+    setFormStatus(item.status);
+    setDueDate(item.due_date ? new Date(item.due_date) : undefined);
+    setLinkedChecklist(item.linked_checklist_item || '');
+    setLinkedDoc(item.linked_document || '');
+    setNote(item.note || '');
+    setDialogOpen(true);
+  };
+
+  const auditLog = async (action: string, details: Record<string, unknown>) => {
+    if (!circle || !user) return;
+    await supabase.from('audit_logs').insert({
+      user_id: user.id, circle_id: circle.id, action, details: details as any,
+    });
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!circle || !user || !memberId) return;
+    if (!circle || !user || !title.trim() || !memberId) return;
     setSaving(true);
-    const { error } = await supabase.from('governance_responsibilities').insert({
+
+    const payload = {
       circle_id: circle.id,
       member_id: memberId,
       area,
-      title,
+      title: title.trim(),
       description,
-    });
-    if (error) { toast.error('Erreur lors de la création.'); }
+      status: formStatus,
+      due_date: dueDate ? format(dueDate, 'yyyy-MM-dd') : null,
+      linked_checklist_item: linkedChecklist || null,
+      linked_document: linkedDoc || null,
+      note,
+    };
+
+    if (editItem) {
+      const { error } = await supabase.from('governance_responsibilities').update(payload as any).eq('id', editItem.id);
+      if (error) { toast.error('Erreur lors de la mise à jour.'); }
+      else {
+        toast.success('Responsabilité mise à jour.');
+        if (editItem.status !== formStatus) await auditLog('governance_status_change', { id: editItem.id, old: editItem.status, new: formStatus });
+        if (editItem.member_id !== memberId) await auditLog('governance_assignment_change', { id: editItem.id, old: editItem.member_id, new: memberId });
+      }
+    } else {
+      const { data: newItem, error } = await supabase.from('governance_responsibilities').insert(payload as any).select().single();
+      if (error) { toast.error('Erreur lors de la création.'); }
+      else {
+        toast.success('Responsabilité ajoutée.');
+        await auditLog('governance_created', { id: newItem?.id, title: title.trim(), area });
+      }
+    }
+
+    resetForm();
+    setDialogOpen(false);
+    loadData();
+    setSaving(false);
+  };
+
+  const handleQuickStatus = async (item: GovernanceResponsibility, newStatus: GovernanceStatus) => {
+    const { error } = await supabase.from('governance_responsibilities').update({ status: newStatus } as any).eq('id', item.id);
+    if (error) toast.error('Erreur.');
     else {
-      toast.success('Responsabilité ajoutée.');
-      setTitle(''); setDescription(''); setArea('documents'); setMemberId('');
-      setDialogOpen(false);
+      await auditLog('governance_status_change', { id: item.id, old: item.status, new: newStatus });
       loadData();
     }
-    setSaving(false);
+  };
+
+  const handleDelete = async (item: GovernanceResponsibility) => {
+    if (!confirm('Supprimer cette responsabilité ?')) return;
+    const { error } = await supabase.from('governance_responsibilities').delete().eq('id', item.id);
+    if (error) toast.error('Erreur.');
+    else {
+      toast.success('Responsabilité supprimée.');
+      await auditLog('governance_deleted', { id: item.id, title: item.title });
+      loadData();
+    }
+  };
+
+  // Derived data
+  const filtered = useMemo(() => {
+    let result = [...items];
+    if (filterArea !== 'all') result = result.filter(i => i.area === filterArea);
+    if (filterStatus !== 'all') result = result.filter(i => i.status === filterStatus);
+    if (filterMember !== 'all') {
+      if (filterMember === 'unassigned') result = result.filter(i => !i.member_id);
+      else result = result.filter(i => i.member_id === filterMember);
+    }
+    return result;
+  }, [items, filterArea, filterStatus, filterMember]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, GovernanceResponsibility[]> = {};
+    for (const item of filtered) {
+      if (!g[item.area]) g[item.area] = [];
+      g[item.area].push(item);
+    }
+    return g;
+  }, [filtered]);
+
+  const stats = useMemo(() => ({
+    total: items.length,
+    assigned: items.filter(i => i.member_id).length,
+    blocked: items.filter(i => i.status === 'blocked').length,
+    needsAttention: items.filter(i => i.status === 'needs_attention').length,
+    completed: items.filter(i => i.status === 'completed').length,
+  }), [items]);
+
+  const getMemberName = (id: string) => {
+    const m = members.find(mb => mb.user_id === id);
+    return m?.profiles?.full_name || m?.profiles?.email || 'Membre';
+  };
+
+  const toggleArea = (a: string) => {
+    setCollapsedAreas(prev => {
+      const s = new Set(prev);
+      s.has(a) ? s.delete(a) : s.add(a);
+      return s;
+    });
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
   if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button></div></AppLayout>;
 
-  const getMemberName = (id: string) => {
-    const m = members.find(m => m.user_id === id);
-    return m?.profiles?.full_name || m?.profiles?.email || 'Membre';
-  };
-
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
+      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+        {/* Header */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
               <Shield className="h-6 w-6 text-accent" />
               Gouvernance familiale
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Coordination des responsabilités et suivi des domaines importants.
+              Coordination des responsabilités et suivi des domaines importants. Ne constitue pas une délégation légale.
             </p>
           </div>
-          {isManager && (
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          {canEdit && (
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
               <DialogTrigger asChild>
                 <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
+              <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="font-heading">Assigner une responsabilité</DialogTitle>
+                  <DialogTitle className="font-heading">{editItem ? 'Modifier la responsabilité' : 'Assigner une responsabilité'}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleCreate} className="space-y-4">
+                <form onSubmit={handleSave} className="space-y-4">
                   <div className="space-y-2">
                     <Label>Domaine</Label>
                     <Select value={area} onValueChange={(v) => setArea(v as GovernanceArea)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {Object.entries(areaLabels).map(([k, v]) => (
-                          <SelectItem key={k} value={k}>{v}</SelectItem>
-                        ))}
+                        {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
@@ -152,14 +301,15 @@ const GovernancePage: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>Description</Label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails de la responsabilité..." />
+                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails de la responsabilité..." rows={2} />
                   </div>
                   <div className="space-y-2">
                     <Label>Responsable</Label>
-                    <Select value={memberId} onValueChange={setMemberId}>
+                    <Select value={memberId || 'none'} onValueChange={(v) => setMemberId(v === 'none' ? '' : v)}>
                       <SelectTrigger><SelectValue placeholder="Choisir un membre" /></SelectTrigger>
                       <SelectContent>
-                        {members.map((m) => (
+                        <SelectItem value="none">Non attribué</SelectItem>
+                        {members.map(m => (
                           <SelectItem key={m.user_id} value={m.user_id}>
                             {m.profiles?.full_name || m.profiles?.email || 'Membre'}
                           </SelectItem>
@@ -167,9 +317,57 @@ const GovernancePage: React.FC = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button type="submit" className="w-full" disabled={saving}>
+                  <div className="space-y-2">
+                    <Label>Statut</Label>
+                    <Select value={formStatus} onValueChange={(v) => setFormStatus(v as GovernanceStatus)}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Échéance</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {dueDate ? format(dueDate, 'PPP', { locale: fr }) : 'Pas d\'échéance'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus className={cn("p-3 pointer-events-auto")} />
+                      </PopoverContent>
+                    </Popover>
+                    {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">Retirer</Button>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Élément checklist lié</Label>
+                    <Select value={linkedChecklist || 'none'} onValueChange={(v) => setLinkedChecklist(v === 'none' ? '' : v)}>
+                      <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucun</SelectItem>
+                        {checklists.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.title}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Document lié</Label>
+                    <Select value={linkedDoc || 'none'} onValueChange={(v) => setLinkedDoc(v === 'none' ? '' : v)}>
+                      <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Aucun</SelectItem>
+                        {documents.map(d => <SelectItem key={d.id} value={d.id}>{d.title}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Note</Label>
+                    <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Remarques, contexte..." rows={2} />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={saving || !memberId}>
                     {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Assigner
+                    {editItem ? 'Enregistrer' : 'Assigner'}
                   </Button>
                 </form>
               </DialogContent>
@@ -177,38 +375,162 @@ const GovernancePage: React.FC = () => {
           )}
         </div>
 
-        {items.length === 0 ? (
+        {/* Summary cards */}
+        {stats.total > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card className="shadow-soft"><CardContent className="py-4 text-center">
+              <p className="text-2xl font-semibold text-foreground">{stats.assigned}</p>
+              <p className="text-xs text-muted-foreground">Responsabilités assignées</p>
+            </CardContent></Card>
+            <Card className="shadow-soft"><CardContent className="py-4 text-center">
+              <p className="text-2xl font-semibold text-foreground">{stats.completed}</p>
+              <p className="text-xs text-muted-foreground">Complétées</p>
+            </CardContent></Card>
+            <Card className="shadow-soft"><CardContent className="py-4 text-center">
+              <p className="text-2xl font-semibold text-destructive">{stats.blocked}</p>
+              <p className="text-xs text-muted-foreground">Bloquées</p>
+            </CardContent></Card>
+            <Card className="shadow-soft"><CardContent className="py-4 text-center">
+              <p className="text-2xl font-semibold text-amber-600">{stats.needsAttention}</p>
+              <p className="text-xs text-muted-foreground">Attention requise</p>
+            </CardContent></Card>
+          </div>
+        )}
+
+        {/* Filters */}
+        {stats.total > 0 && (
+          <Card className="shadow-soft">
+            <CardContent className="py-3 flex flex-wrap gap-3 items-center">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={filterArea} onValueChange={setFilterArea}>
+                <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Domaine" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les domaines</SelectItem>
+                  {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={filterMember} onValueChange={setFilterMember}>
+                <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Responsable" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les membres</SelectItem>
+                  {members.map(m => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.profiles?.full_name || 'Membre'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Items grouped by area */}
+        {filtered.length === 0 ? (
           <Card className="shadow-soft">
             <CardContent className="py-12 text-center">
-              <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucune responsabilité assignée.</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Organisez la coordination familiale en assignant des responsabilités à chaque membre.
+              <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">
+                {items.length === 0
+                  ? 'Aucune responsabilité assignée.'
+                  : 'Aucun élément correspondant aux filtres.'}
               </p>
+              {items.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Organisez la coordination familiale en assignant des responsabilités à chaque membre.
+                </p>
+              )}
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {items.map((item) => (
-              <Card key={item.id} className="shadow-soft">
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-foreground">{item.title}</p>
-                      {item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">{areaLabels[item.area]}</Badge>
-                        <Badge className={`text-xs ${statusColors[item.status]}`}>{statusLabels[item.status]}</Badge>
-                        <span className="text-xs text-muted-foreground">
-                          <Users className="h-3 w-3 inline mr-1" />
-                          {getMemberName(item.member_id)}
-                        </span>
+          <div className="space-y-4">
+            {areaOrder.filter(a => grouped[a]).map(a => {
+              const areaItems = grouped[a];
+              const isCollapsed = collapsedAreas.has(a);
+              const areaCompleted = areaItems.filter(i => i.status === 'completed').length;
+              return (
+                <Card key={a} className="shadow-soft">
+                  <CardHeader className="pb-2 cursor-pointer" onClick={() => toggleArea(a)}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {isCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                        <CardTitle className="font-heading text-base">{areaLabels[a as GovernanceArea]}</CardTitle>
                       </div>
+                      <Badge variant="outline" className="text-xs">{areaCompleted}/{areaItems.length}</Badge>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardHeader>
+                  {!isCollapsed && (
+                    <CardContent className="space-y-2 pt-0">
+                      {areaItems.map(item => (
+                        <div key={item.id} className="rounded-lg border border-border p-3 space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-medium text-foreground">{item.title}</p>
+                                {item.linked_document && (
+                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
+                                    <FileText className="h-3 w-3" />Doc
+                                  </span>
+                                )}
+                                {item.linked_checklist_item && (
+                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
+                                    <CheckSquare className="h-3 w-3" />Check
+                                  </span>
+                                )}
+                                {item.status === 'blocked' && <Ban className="h-3.5 w-3.5 text-destructive" />}
+                                {item.status === 'needs_attention' && <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />}
+                              </div>
+                              {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                              <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
+                                <span className="inline-flex items-center gap-1">
+                                  <User className="h-3 w-3" />
+                                  {getMemberName(item.member_id)}
+                                </span>
+                                {item.due_date && (
+                                  <span className="inline-flex items-center gap-1">
+                                    <CalendarIcon className="h-3 w-3" />
+                                    {new Date(item.due_date).toLocaleDateString('fr-FR')}
+                                  </span>
+                                )}
+                                {item.note && <span>💬 {item.note}</span>}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {canEdit ? (
+                                <>
+                                  <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as GovernanceStatus)}>
+                                    <SelectTrigger className="w-[130px] h-7 text-xs"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                      {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                    </SelectContent>
+                                  </Select>
+                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => openEdit(item)}>
+                                    Modifier
+                                  </Button>
+                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2 text-destructive" onClick={() => handleDelete(item)}>
+                                    ×
+                                  </Button>
+                                </>
+                              ) : (
+                                <Badge className={`text-xs ${statusColors[item.status]}`}>
+                                  {statusLabels[item.status]}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>

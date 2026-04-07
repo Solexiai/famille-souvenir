@@ -12,13 +12,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, Plus, Briefcase, AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react';
-import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem } from '@/types/database';
+import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem, GovernanceResponsibility } from '@/types/database';
 
 const ExecutorPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [notes, setNotes] = useState<ExecutorWorkspaceNote[]>([]);
-  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0 });
+  const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0 });
+  const [govItems, setGovItems] = useState<GovernanceResponsibility[]>([]);
   const [loading, setLoading] = useState(true);
   const [isManager, setIsManager] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -34,9 +35,10 @@ const ExecutorPage: React.FC = () => {
     setCircle(c);
     setIsManager(c.owner_id === user.id);
 
-    const [{ data: notesData }, { data: checklistData }] = await Promise.all([
+    const [{ data: notesData }, { data: checklistData }, { data: govData }] = await Promise.all([
       supabase.from('executor_workspace_notes').select('*').eq('circle_id', c.id).order('created_at', { ascending: false }),
       supabase.from('checklist_items').select('*').eq('circle_id', c.id),
+      supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id).order('area'),
     ]);
     setNotes((notesData as ExecutorWorkspaceNote[]) || []);
 
@@ -45,7 +47,11 @@ const ExecutorPage: React.FC = () => {
       total: items.length,
       completed: items.filter(i => i.status === 'completed').length,
       needsReview: items.filter(i => i.status === 'needs_review').length,
+      blocked: items.filter(i => i.status === 'blocked').length,
     });
+    // Show governance items that are not completed (relevant for executor coordination)
+    const activeGov = ((govData as GovernanceResponsibility[]) || []).filter(g => g.status !== 'completed');
+    setGovItems(activeGov);
     setLoading(false);
   };
 
@@ -172,12 +178,38 @@ const ExecutorPage: React.FC = () => {
                   <span className="text-sm">{checklistSummary.needsReview} à vérifier</span>
                 </div>
               )}
+              {checklistSummary.blocked > 0 && (
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-4 w-4 text-destructive" />
+                  <span className="text-sm">{checklistSummary.blocked} bloqué{checklistSummary.blocked > 1 ? 's' : ''}</span>
+                </div>
+              )}
               {checklistSummary.total === 0 && (
                 <span className="text-sm text-muted-foreground">Aucun élément dans la checklist.</span>
               )}
             </div>
           </CardContent>
         </Card>
+
+        {/* Governance coordination */}
+        {govItems.length > 0 && (
+          <Card className="shadow-soft">
+            <CardHeader>
+              <CardTitle className="font-heading text-base">Coordination — Responsabilités actives</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {govItems.map(g => (
+                <div key={g.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">{g.title}</p>
+                    {g.description && <p className="text-xs text-muted-foreground">{g.description}</p>}
+                  </div>
+                  <Badge variant="outline" className="text-xs">{g.status === 'blocked' ? 'Bloqué' : g.status === 'in_progress' ? 'En cours' : g.status === 'needs_attention' ? 'Attention' : g.status}</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Notes */}
         <div className="flex items-center justify-between">
