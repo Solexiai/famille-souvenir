@@ -90,7 +90,18 @@ const MembersPage: React.FC = () => {
       );
       setMembers(membersWithProfiles);
     }
+
+    // Load labels
+    const { data: labelsData } = await supabase.from('member_family_labels').select('*').eq('circle_id', c.id);
+    setMemberLabels((labelsData as MemberFamilyLabel[]) || []);
+
     setLoading(false);
+  };
+
+  const loadLabels = async () => {
+    if (!circle) return;
+    const { data } = await supabase.from('member_family_labels').select('*').eq('circle_id', circle.id);
+    setMemberLabels((data as MemberFamilyLabel[]) || []);
   };
 
   useEffect(() => { loadData(); }, [user]);
