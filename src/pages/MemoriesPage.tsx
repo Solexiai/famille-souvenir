@@ -130,8 +130,7 @@ const MemoriesPage: React.FC = () => {
         setCreating(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from('memories-media').getPublicUrl(filePath);
-      media_url = urlData.publicUrl;
+      media_url = filePath;
     }
 
     const { error } = await supabase.from('memories').insert({
