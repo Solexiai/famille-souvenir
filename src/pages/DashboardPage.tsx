@@ -209,6 +209,41 @@ const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Governance summary */}
+            {govSummary.total > 0 && (
+              <Card className="shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-heading text-lg flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-accent" />
+                    Gouvernance
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Responsabilités</span>
+                    <span className="text-sm font-medium">{govSummary.completed}/{govSummary.total} complétées</span>
+                  </div>
+                  {govSummary.blocked > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      {govSummary.blocked} bloquée{govSummary.blocked > 1 ? 's' : ''}
+                    </div>
+                  )}
+                  {govSummary.needsAttention > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-amber-600">
+                      <AlertTriangle className="h-4 w-4" />
+                      {govSummary.needsAttention} attention requise
+                    </div>
+                  )}
+                  <div className="text-right">
+                    <Button variant="link" size="sm" onClick={() => navigate('/governance')} className="text-xs">
+                      Voir la gouvernance →
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Quick actions */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {visibleActions.map((action) => {
