@@ -147,7 +147,7 @@ const ChecklistPage: React.FC = () => {
   const auditLog = async (action: string, details: Record<string, unknown>) => {
     if (!circle || !user) return;
     await supabase.from('audit_logs').insert({
-      user_id: user.id, circle_id: circle.id, action, details,
+      user_id: user.id, circle_id: circle.id, action, details: details as any,
     });
   };
 
