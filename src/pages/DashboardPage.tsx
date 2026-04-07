@@ -276,6 +276,46 @@ const DashboardPage: React.FC = () => {
               </Card>
             )}
 
+            {/* Executor designation summary */}
+            {(executorSummary.proposed || executorSummary.testamentNamed || executorSummary.verified) && (
+              <Card className="shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-heading text-lg flex items-center gap-2">
+                    <UserCheck className="h-5 w-5 text-accent" />
+                    Exécuteur — Résumé
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {executorSummary.proposed && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Exécuteur pressenti</span>
+                      <span className="text-sm font-medium">{executorSummary.proposed}</span>
+                    </div>
+                  )}
+                  {executorSummary.testamentNamed && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Nommé au testament</span>
+                      <span className="text-sm font-medium">{executorSummary.testamentNamed}</span>
+                    </div>
+                  )}
+                  {executorSummary.verified && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Accès vérifié</span>
+                      <Badge variant="outline" className="text-xs">{executorSummary.verified}</Badge>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground pt-1">
+                    À confirmer selon les documents et les vérifications applicables.
+                  </p>
+                  <div className="text-right">
+                    <Button variant="link" size="sm" onClick={() => navigate('/circle/members')} className="text-xs">
+                      Voir les désignations →
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Quick actions */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {visibleActions.map((action) => {
