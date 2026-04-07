@@ -70,6 +70,29 @@ const DashboardPage: React.FC = () => {
           blocked: govItems.filter(i => i.status === 'blocked').length,
           needsAttention: govItems.filter(i => i.status === 'needs_attention').length,
         });
+
+        // Load executor designation summary
+        const [{ data: labelsData }, { data: membersData }] = await Promise.all([
+          supabase.from('member_family_labels').select('*').eq('circle_id', c.id),
+          supabase.from('circle_members').select('*, profiles:profiles!circle_members_user_id_fkey(full_name, email)').eq('circle_id', c.id),
+        ]);
+        const allLabels = (labelsData as MemberFamilyLabel[]) || [];
+        const allMembers = (membersData || []) as any[];
+
+        const getMName = (memberId: string) => {
+          const m = allMembers.find((m: any) => m.id === memberId);
+          return m?.profiles?.full_name || m?.profiles?.email || null;
+        };
+
+        const proposedLabel = allLabels.find(l => l.label === 'proposed_executor_label');
+        const testamentLabel = allLabels.find(l => l.label === 'testament_named_executor');
+        const verifiedMember = allMembers.find((m: any) => m.role === 'verified_executor');
+
+        setExecutorSummary({
+          proposed: proposedLabel ? getMName(proposedLabel.member_id) : null,
+          testamentNamed: testamentLabel ? getMName(testamentLabel.member_id) : null,
+          verified: verifiedMember ? (verifiedMember.profiles?.full_name || verifiedMember.profiles?.email || 'Vérifié') : null,
+        });
       }
       setLoading(false);
     };
