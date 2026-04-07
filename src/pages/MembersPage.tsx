@@ -10,8 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, UserPlus, Shield, Eye, Edit, Crown } from 'lucide-react';
-import type { CircleMember, FamilyCircle, AppRole } from '@/types/database';
+import type { CircleMember, FamilyCircle, AppRole, MemberFamilyLabel } from '@/types/database';
 import { z } from 'zod';
+import { FamilyLabelsForMember } from '@/components/FamilyLabelsManager';
+import { FamilyLabelsManager } from '@/components/FamilyLabelsManager';
+import { ExecutorDesignation } from '@/components/ExecutorDesignation';
 
 const inviteSchema = z.object({
   firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
