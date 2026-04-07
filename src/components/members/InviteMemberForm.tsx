@@ -159,8 +159,24 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
           </div>
           <Button type="submit" disabled={inviting} className="w-full">
             {inviting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Envoyer l'invitation
+            Créer l'invitation
           </Button>
+
+          {lastInviteLink && (
+            <Alert className="border-accent/30 bg-accent/5">
+              <CheckCircle className="h-4 w-4 text-accent" />
+              <AlertDescription className="space-y-2">
+                <p className="text-sm font-medium text-foreground">Invitation créée avec succès !</p>
+                <p className="text-xs text-muted-foreground">Partagez ce lien avec la personne invitée :</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs bg-secondary rounded px-2 py-1.5 truncate">{lastInviteLink}</code>
+                  <Button type="button" variant="outline" size="sm" onClick={copyLink}>
+                    {linkCopied ? <CheckCircle className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
         </form>
       </CardContent>
     </Card>
