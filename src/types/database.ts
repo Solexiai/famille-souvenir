@@ -116,6 +116,7 @@ export interface ChecklistItem {
   linked_document_id: string | null;
   evidence_note: string;
   requires_professional_review: boolean;
+  blocked_reason: string;
   created_at: string;
   updated_at: string;
 }
