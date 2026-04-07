@@ -114,9 +114,15 @@ const DocumentsPage: React.FC = () => {
       file_size: file.size,
     });
 
-    if (error) toast.error("Erreur lors de l'enregistrement.");
+    if (error) toast.error("Erreur lors de l'enregistrement du document.");
     else {
-      toast.success('Document ajouté.');
+      // Audit log
+      await supabase.from('audit_logs').insert({
+        circle_id: circle.id, user_id: user.id,
+        action: 'document_uploaded',
+        details: { title: title.trim(), category, visibility, file_name: file.name },
+      });
+      toast.success('Document ajouté avec succès.');
       setTitle(''); setDescription(''); setCategory('other'); setVisibility('private_owner'); setFile(null);
       setDialogOpen(false);
       loadData();
