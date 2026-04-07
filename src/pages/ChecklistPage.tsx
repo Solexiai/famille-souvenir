@@ -115,7 +115,17 @@ const ChecklistPage: React.FC = () => {
     ]);
 
     setItems((itemData as ChecklistItem[]) || []);
-    setMembers((memberData as CircleMember[]) || []);
+    // Enrich members with profile names
+    const rawMembers = (memberData as CircleMember[]) || [];
+    if (rawMembers.length > 0) {
+      const profilePromises = rawMembers.map(async (m) => {
+        const { data: p } = await supabase.from('profiles').select('full_name,email').eq('user_id', m.user_id).single();
+        return { ...m, profiles: p } as CircleMember;
+      });
+      setMembers(await Promise.all(profilePromises));
+    } else {
+      setMembers([]);
+    }
     setDocuments((docData as DocType[]) || []);
     if (roleData && roleData.length > 0) setUserRole(roleData[0].role as AppRole);
     setLoading(false);
