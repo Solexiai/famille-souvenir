@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { Loader2, User, Shield, Download, Trash2 } from 'lucide-react';
+import { Loader2, User, Shield, Download, Trash2, Info } from 'lucide-react';
 import type { Profile, Consent } from '@/types/database';
 import {
   AlertDialog,
@@ -35,6 +36,8 @@ const SettingsPage: React.FC = () => {
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   useEffect(() => {
     if (!user) return;
@@ -75,7 +78,7 @@ const SettingsPage: React.FC = () => {
       .from('profiles')
       .update({ full_name: fullName, language })
       .eq('user_id', user.id);
-    if (error) toast.error('Erreur lors de la sauvegarde.');
+    if (error) toast.error('Erreur lors de la sauvegarde du profil.');
     else toast.success('Profil mis à jour.');
     setSaving(false);
   };
@@ -99,12 +102,76 @@ const SettingsPage: React.FC = () => {
     setSaving(false);
   };
 
-  const handleExportData = () => {
-    toast.info('Votre demande d\'export a été enregistrée. Vous recevrez un email.');
+  const handleExportData = async () => {
+    if (!user) return;
+    setExporting(true);
+
+    try {
+      // Export user's own data
+      const [
+        { data: profileData },
+        { data: consentsData },
+        { data: circlesData },
+        { data: membershipsData },
+        { data: documentsData },
+        { data: memoriesData },
+      ] = await Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', user.id),
+        supabase.from('consents').select('*').eq('user_id', user.id),
+        supabase.from('family_circles').select('*').eq('owner_id', user.id),
+        supabase.from('circle_members').select('*').eq('user_id', user.id),
+        supabase.from('documents').select('id, title, category, file_name, visibility, verification_status, created_at').eq('uploaded_by', user.id),
+        supabase.from('memories').select('id, type, caption, visibility, created_at').eq('author_id', user.id),
+      ]);
+
+      const exportData = {
+        exported_at: new Date().toISOString(),
+        profile: profileData,
+        consents: consentsData,
+        circles_owned: circlesData,
+        memberships: membershipsData,
+        documents_uploaded: documentsData,
+        memories_created: memoriesData,
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `solexi-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // Audit log
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        action: 'data_export_requested',
+        details: { timestamp: new Date().toISOString() },
+      });
+
+      toast.success('Vos données ont été exportées avec succès.');
+    } catch {
+      toast.error('Une erreur est survenue lors de l\'export.');
+    }
+
+    setExporting(false);
   };
 
   const handleDeleteAccount = async () => {
-    toast.info('Votre demande de suppression a été enregistrée. Nous vous contacterons.');
+    if (!user) return;
+    if (deleteConfirmText !== 'SUPPRIMER') {
+      toast.error('Veuillez taper SUPPRIMER pour confirmer.');
+      return;
+    }
+
+    // Audit log before sign out
+    await supabase.from('audit_logs').insert({
+      user_id: user.id,
+      action: 'account_deletion_requested',
+      details: { timestamp: new Date().toISOString(), email: user.email },
+    });
+
+    toast.info('Votre demande de suppression a été enregistrée. Vous serez contacté pour confirmation.');
     await signOut();
   };
 
@@ -201,12 +268,20 @@ const SettingsPage: React.FC = () => {
 
             <Separator />
 
+            {/* Data export */}
             <div className="space-y-4">
-              <Button variant="outline" className="w-full gap-2" onClick={handleExportData}>
-                <Download className="h-4 w-4" />
-                Exporter mes données
-              </Button>
+              <div className="space-y-2">
+                <Button variant="outline" className="w-full gap-2" onClick={handleExportData} disabled={exporting}>
+                  {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                  Exporter mes données
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Téléchargez une copie de vos données personnelles (profil, documents, souvenirs).
+                  Les données partagées du cercle familial ne sont pas incluses.
+                </p>
+              </div>
 
+              {/* Account deletion */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full gap-2">
@@ -216,19 +291,45 @@ const SettingsPage: React.FC = () => {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="font-heading">Êtes-vous sûr ?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Cette action est irréversible. Toutes vos données seront supprimées définitivement.
+                    <AlertDialogTitle className="font-heading">Demande de suppression de compte</AlertDialogTitle>
+                    <AlertDialogDescription className="space-y-3">
+                      <span className="block">
+                        Cette action demande la suppression de votre compte et de vos données personnelles.
+                      </span>
+                      <span className="block font-medium">
+                        Attention : si vous êtes propriétaire d'un cercle familial, les données partagées
+                        du cercle devront être transférées ou supprimées séparément.
+                      </span>
+                      <span className="block text-sm">
+                        Pour confirmer, tapez <strong>SUPPRIMER</strong> ci-dessous :
+                      </span>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
+                  <Input
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder="Tapez SUPPRIMER"
+                    className="mt-2"
+                  />
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteAccount}>
-                      Supprimer définitivement
+                    <AlertDialogCancel onClick={() => setDeleteConfirmText('')}>Annuler</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== 'SUPPRIMER'}
+                    >
+                      Confirmer la suppression
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
+
+              <Alert className="border-amber-200 bg-amber-50">
+                <Info className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="text-xs text-amber-800">
+                  La suppression de compte est soumise à vérification. Vos données partagées dans un
+                  cercle familial ne seront pas automatiquement supprimées pour protéger les autres membres.
+                </AlertDescription>
+              </Alert>
             </div>
           </CardContent>
         </Card>

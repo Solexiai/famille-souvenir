@@ -161,7 +161,7 @@ const MemoriesPage: React.FC = () => {
       }
 
       const ext = file.name.split('.').pop();
-      const filePath = `${circle.id}/${crypto.randomUUID()}.${ext}`;
+      const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from('memories-media')
         .upload(filePath, file);

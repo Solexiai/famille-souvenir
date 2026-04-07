@@ -98,9 +98,9 @@ const DocumentsPage: React.FC = () => {
     setUploading(true);
 
     const ext = file.name.split('.').pop();
-    const storagePath = `${circle.id}/${crypto.randomUUID()}.${ext}`;
+    const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, file);
-    if (uploadError) { toast.error("Erreur lors de l'envoi."); setUploading(false); return; }
+    if (uploadError) { toast.error("Erreur lors de l'envoi du fichier. Veuillez réessayer."); setUploading(false); return; }
 
     const { error } = await supabase.from('documents').insert({
       circle_id: circle.id,
@@ -114,9 +114,15 @@ const DocumentsPage: React.FC = () => {
       file_size: file.size,
     });
 
-    if (error) toast.error("Erreur lors de l'enregistrement.");
+    if (error) toast.error("Erreur lors de l'enregistrement du document.");
     else {
-      toast.success('Document ajouté.');
+      // Audit log
+      await supabase.from('audit_logs').insert({
+        circle_id: circle.id, user_id: user.id,
+        action: 'document_uploaded',
+        details: { title: title.trim(), category, visibility, file_name: file.name },
+      });
+      toast.success('Document ajouté avec succès.');
       setTitle(''); setDescription(''); setCategory('other'); setVisibility('private_owner'); setFile(null);
       setDialogOpen(false);
       loadData();
