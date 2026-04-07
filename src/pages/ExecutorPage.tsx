@@ -178,12 +178,38 @@ const ExecutorPage: React.FC = () => {
                   <span className="text-sm">{checklistSummary.needsReview} à vérifier</span>
                 </div>
               )}
+              {checklistSummary.blocked > 0 && (
+                <div className="flex items-center gap-2">
+                  <XCircle className="h-4 w-4 text-destructive" />
+                  <span className="text-sm">{checklistSummary.blocked} bloqué{checklistSummary.blocked > 1 ? 's' : ''}</span>
+                </div>
+              )}
               {checklistSummary.total === 0 && (
                 <span className="text-sm text-muted-foreground">Aucun élément dans la checklist.</span>
               )}
             </div>
           </CardContent>
         </Card>
+
+        {/* Governance coordination */}
+        {govItems.length > 0 && (
+          <Card className="shadow-soft">
+            <CardHeader>
+              <CardTitle className="font-heading text-base">Coordination — Responsabilités actives</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {govItems.map(g => (
+                <div key={g.id} className="flex items-center justify-between rounded-lg border border-border p-3">
+                  <div className="space-y-0.5">
+                    <p className="text-sm font-medium text-foreground">{g.title}</p>
+                    {g.description && <p className="text-xs text-muted-foreground">{g.description}</p>}
+                  </div>
+                  <Badge variant="outline" className="text-xs">{g.status === 'blocked' ? 'Bloqué' : g.status === 'in_progress' ? 'En cours' : g.status === 'needs_attention' ? 'Attention' : g.status}</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Notes */}
         <div className="flex items-center justify-between">
