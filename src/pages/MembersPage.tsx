@@ -63,7 +63,13 @@ const MembersPage: React.FC = () => {
     
     const c = circles[0] as FamilyCircle;
     setCircle(c);
-    setIsOwner(c.owner_id === user.id);
+    setIsManager(c.owner_id === user.id);
+
+    // Also check if user is family_manager
+    const { data: myRole } = await supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1);
+    if (myRole && myRole.length > 0 && (myRole[0].role === 'owner' || myRole[0].role === 'family_manager')) {
+      setIsManager(true);
+    }
 
     const { data: memberData } = await supabase
       .from('circle_members')
