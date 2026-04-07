@@ -72,9 +72,10 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
 
   const handleChange = async (field: keyof FamilyCircle, value: string) => {
     setSaving(field);
+    const updatePayload: Record<string, string> = { [field]: value };
     const { error } = await supabase
       .from('family_circles')
-      .update({ [field]: value })
+      .update(updatePayload as any)
       .eq('id', circle.id);
 
     if (error) {
