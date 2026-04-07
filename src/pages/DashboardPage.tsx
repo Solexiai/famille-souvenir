@@ -159,7 +159,8 @@ const DashboardPage: React.FC = () => {
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <AlertTriangle className="h-4 w-4" />
                       {checklistSummary.proReview} revue pro requise
-                    </div>
+                     </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
