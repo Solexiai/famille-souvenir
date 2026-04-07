@@ -38,6 +38,8 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
   const [role, setRole] = useState<AppRole>('family_member');
   const [invitationMessage, setInvitationMessage] = useState('');
   const [inviting, setInviting] = useState(false);
+  const [lastInviteLink, setLastInviteLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +49,9 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       return;
     }
     setInviting(true);
+    setLastInviteLink(null);
 
-    const { error } = await supabase.from('invitations').insert({
+    const { data: inserted, error } = await supabase.from('invitations').insert({
       circle_id: circleId,
       email: result.data.email,
       role,
@@ -59,11 +62,16 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       city: result.data.city || '',
       relationship_label: result.data.relationshipLabel || '',
       invitation_message: result.data.invitationMessage || '',
-    });
+    }).select('token').single();
 
     if (error) {
       toast.error("Erreur lors de l'envoi de l'invitation.");
     } else {
+      // Build invitation link
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/invitation/accept?token=${inserted.token}`;
+      setLastInviteLink(link);
+
       // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
@@ -72,7 +80,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
         details: { email: result.data.email, role, name: `${result.data.firstName} ${result.data.lastName}` },
       });
 
-      toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
+      toast.success(`Invitation créée pour ${result.data.firstName} ${result.data.lastName}`);
       setFirstName('');
       setLastName('');
       setEmail('');
@@ -83,6 +91,15 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       onInviteSent();
     }
     setInviting(false);
+  };
+
+  const copyLink = () => {
+    if (lastInviteLink) {
+      navigator.clipboard.writeText(lastInviteLink);
+      setLinkCopied(true);
+      toast.success('Lien copié !');
+      setTimeout(() => setLinkCopied(false), 2000);
+    }
   };
 
   return (
