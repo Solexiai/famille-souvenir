@@ -6,8 +6,9 @@ import { AppLayout } from '@/components/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck } from 'lucide-react';
-import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole } from '@/types/database';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck } from 'lucide-react';
+import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
+import { familyLabelsFr } from '@/components/FamilyLabelsManager';
 
 const docStatusLabel = (s: DocumentaryStatus) => {
   const m: Record<DocumentaryStatus, string> = { unknown: 'Inconnu', declared: 'Déclaré', located: 'Localisé', professionally_confirmed: 'Confirmé' };
@@ -28,6 +29,7 @@ const DashboardPage: React.FC = () => {
   const [docCount, setDocCount] = useState(0);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
   const [govSummary, setGovSummary] = useState({ total: 0, completed: 0, blocked: 0, needsAttention: 0 });
+  const [executorSummary, setExecutorSummary] = useState<{ proposed: string | null; testamentNamed: string | null; verified: string | null }>({ proposed: null, testamentNamed: null, verified: null });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
@@ -67,6 +69,36 @@ const DashboardPage: React.FC = () => {
           completed: govItems.filter(i => i.status === 'completed').length,
           blocked: govItems.filter(i => i.status === 'blocked').length,
           needsAttention: govItems.filter(i => i.status === 'needs_attention').length,
+        });
+
+        // Load executor designation summary
+        const [{ data: labelsData }, { data: membersRaw }] = await Promise.all([
+          supabase.from('member_family_labels').select('*').eq('circle_id', c.id),
+          supabase.from('circle_members').select('*').eq('circle_id', c.id),
+        ]);
+        const allLabels = (labelsData as MemberFamilyLabel[]) || [];
+        const allMembersRaw = (membersRaw as CircleMember[]) || [];
+
+        // Load profiles for members
+        const profileIds = allMembersRaw.map(m => m.user_id);
+        const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name, email').in('user_id', profileIds);
+        const profileMap = new Map((profilesData || []).map(p => [p.user_id, p]));
+
+        const getMName = (memberId: string) => {
+          const m = allMembersRaw.find(m => m.id === memberId);
+          if (!m) return null;
+          const p = profileMap.get(m.user_id);
+          return p?.full_name || p?.email || null;
+        };
+
+        const proposedLabel = allLabels.find(l => l.label === 'proposed_executor_label');
+        const testamentLabel = allLabels.find(l => l.label === 'testament_named_executor');
+        const verifiedMember = allMembersRaw.find(m => m.role === 'verified_executor');
+
+        setExecutorSummary({
+          proposed: proposedLabel ? getMName(proposedLabel.member_id) : null,
+          testamentNamed: testamentLabel ? getMName(testamentLabel.member_id) : null,
+          verified: verifiedMember ? (profileMap.get(verifiedMember.user_id)?.full_name || 'Vérifié') : null,
         });
       }
       setLoading(false);
@@ -238,6 +270,46 @@ const DashboardPage: React.FC = () => {
                   <div className="text-right">
                     <Button variant="link" size="sm" onClick={() => navigate('/governance')} className="text-xs">
                       Voir la gouvernance →
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Executor designation summary */}
+            {(executorSummary.proposed || executorSummary.testamentNamed || executorSummary.verified) && (
+              <Card className="shadow-card">
+                <CardHeader className="pb-3">
+                  <CardTitle className="font-heading text-lg flex items-center gap-2">
+                    <UserCheck className="h-5 w-5 text-accent" />
+                    Exécuteur — Résumé
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {executorSummary.proposed && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Exécuteur pressenti</span>
+                      <span className="text-sm font-medium">{executorSummary.proposed}</span>
+                    </div>
+                  )}
+                  {executorSummary.testamentNamed && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Nommé au testament</span>
+                      <span className="text-sm font-medium">{executorSummary.testamentNamed}</span>
+                    </div>
+                  )}
+                  {executorSummary.verified && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">Accès vérifié</span>
+                      <Badge variant="outline" className="text-xs">{executorSummary.verified}</Badge>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground pt-1">
+                    À confirmer selon les documents et les vérifications applicables.
+                  </p>
+                  <div className="text-right">
+                    <Button variant="link" size="sm" onClick={() => navigate('/circle/members')} className="text-xs">
+                      Voir les désignations →
                     </Button>
                   </div>
                 </CardContent>

@@ -10,8 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, UserPlus, Shield, Eye, Edit, Crown } from 'lucide-react';
-import type { CircleMember, FamilyCircle, AppRole } from '@/types/database';
+import type { CircleMember, FamilyCircle, AppRole, MemberFamilyLabel } from '@/types/database';
 import { z } from 'zod';
+import { FamilyLabelsForMember } from '@/components/FamilyLabelsManager';
+import { FamilyLabelsManager } from '@/components/FamilyLabelsManager';
+import { ExecutorDesignation } from '@/components/ExecutorDesignation';
 
 const inviteSchema = z.object({
   firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
@@ -42,6 +45,7 @@ const MembersPage: React.FC = () => {
   const { user } = useAuth();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [members, setMembers] = useState<CircleMember[]>([]);
+  const [memberLabels, setMemberLabels] = useState<MemberFamilyLabel[]>([]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -50,6 +54,7 @@ const MembersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [inviting, setInviting] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [isManager, setIsManager] = useState(false);
 
   const loadData = async () => {
     if (!user) return;
@@ -58,7 +63,13 @@ const MembersPage: React.FC = () => {
     
     const c = circles[0] as FamilyCircle;
     setCircle(c);
-    setIsOwner(c.owner_id === user.id);
+    setIsManager(c.owner_id === user.id);
+
+    // Also check if user is family_manager
+    const { data: myRole } = await supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1);
+    if (myRole && myRole.length > 0 && (myRole[0].role === 'owner' || myRole[0].role === 'family_manager')) {
+      setIsManager(true);
+    }
 
     const { data: memberData } = await supabase
       .from('circle_members')
@@ -79,7 +90,18 @@ const MembersPage: React.FC = () => {
       );
       setMembers(membersWithProfiles);
     }
+
+    // Load labels
+    const { data: labelsData } = await supabase.from('member_family_labels').select('*').eq('circle_id', c.id);
+    setMemberLabels((labelsData as MemberFamilyLabel[]) || []);
+
     setLoading(false);
+  };
+
+  const loadLabels = async () => {
+    if (!circle) return;
+    const { data } = await supabase.from('member_family_labels').select('*').eq('circle_id', circle.id);
+    setMemberLabels((data as MemberFamilyLabel[]) || []);
   };
 
   useEffect(() => { loadData(); }, [user]);
@@ -149,30 +171,53 @@ const MembersPage: React.FC = () => {
           <CardContent className="space-y-3">
             {members.map((m) => {
               const RoleIcon = roleIcons[m.role];
+              const mLabels = memberLabels.filter(l => l.member_id === m.id);
               return (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border border-border p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
-                      <span className="text-sm font-medium text-secondary-foreground">
-                        {(m.profiles?.full_name || m.profiles?.email || '?')[0].toUpperCase()}
-                      </span>
+                <div key={m.id} className="rounded-lg border border-border p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center">
+                        <span className="text-sm font-medium text-secondary-foreground">
+                          {(m.profiles?.full_name || m.profiles?.email || '?')[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          {m.profiles?.full_name || m.profiles?.email || 'Membre'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{m.profiles?.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
-                        {m.profiles?.full_name || m.profiles?.email || 'Membre'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{m.profiles?.email}</p>
-                    </div>
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <RoleIcon className="h-3 w-3" />
+                      {roleLabels[m.role]}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <RoleIcon className="h-3 w-3" />
-                    {roleLabels[m.role]}
-                  </Badge>
+                  {mLabels.length > 0 && (
+                    <div className="ml-13 pl-13">
+                      <FamilyLabelsForMember labels={mLabels} />
+                    </div>
+                  )}
                 </div>
               );
             })}
           </CardContent>
         </Card>
+
+        {/* Family labels */}
+        {circle && (
+          <FamilyLabelsManager
+            circleId={circle.id}
+            members={members}
+            canEdit={isManager}
+            onLabelsChange={loadLabels}
+          />
+        )}
+
+        {/* Executor designation */}
+        {circle && (
+          <ExecutorDesignation members={members} labels={memberLabels} />
+        )}
 
         {/* Invite form — visible to owner and managers */}
         {isOwner && (
