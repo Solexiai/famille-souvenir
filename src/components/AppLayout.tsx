@@ -26,30 +26,9 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLabelMap: Record<string, string> = {
-    home: t.dash_documents ? (() => {
-      // Use dash keys for nav labels
-      const m: Record<string, string> = {
-        home: t.dash_greeting ? t.dash_documents.split(' ')[0] : 'Home',
-        governance: t.dash_governance,
-        documents: t.dash_documents,
-        checklist: t.dash_checklist,
-        memories: t.dash_memories,
-        executor: terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1),
-        settings: t.settings_title,
-      };
-      return m.home;
-    })() : 'Home',
-  };
-
-  // Simpler approach: use a direct mapping from t keys
   const getLabel = (key: string): string => {
     switch (key) {
-      case 'home': {
-        // "Home" / "Accueil" / "Inicio" — use a simple map
-        const homeLabels: Record<string, string> = { fr: 'Accueil', en: 'Home', es: 'Inicio' };
-        return homeLabels[lang] ?? 'Home';
-      }
+      case 'home': return t.nav_home;
       case 'governance': return t.dash_governance;
       case 'documents': return t.dash_documents;
       case 'checklist': return t.dash_checklist;
