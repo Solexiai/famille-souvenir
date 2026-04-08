@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 import { Loader2, Plus, Briefcase, AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react';
 import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem, GovernanceResponsibility, CircleMember, MemberFamilyLabel } from '@/types/database';
 import { ExecutorDesignation } from '@/components/ExecutorDesignation';
+import { PlanGate } from '@/components/PlanGate';
+import { usePlan, hasPremiumFeature } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const ExecutorPage: React.FC = () => {
   const { user } = useAuth();
