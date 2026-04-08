@@ -36,9 +36,9 @@ const LandingPage: React.FC = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
+                {LANGUAGE_ORDER.map(l => (
+                  <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Link to="/pricing">

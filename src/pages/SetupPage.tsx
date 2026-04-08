@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { canadianProvinces, usStates, latamCountries, resolveJurisdiction } from '@/i18n/jurisdictions';
 import { CountryGroup, SupportedLanguage } from '@/i18n/types';
+import { LANGUAGE_ORDER, LANGUAGE_LABELS, COUNTRY_GROUP_ORDER } from '@/i18n/config';
 import { Globe, MapPin, Languages } from 'lucide-react';
 
 const SetupPage: React.FC = () => {

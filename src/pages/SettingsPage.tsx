@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, User, Shield, Download, Trash2, Info } from 'lucide-react';
 import type { Profile, Consent } from '@/types/database';
+import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 import {
   AlertDialog,
   AlertDialogAction,
