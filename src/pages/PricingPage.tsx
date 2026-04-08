@@ -1,42 +1,85 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Check, Shield } from 'lucide-react';
 
-const PricingPage: React.FC = () => (
-  <div className="min-h-screen bg-background">
-    <header className="border-b border-border">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-heading text-xl font-semibold text-foreground">Solexi.ai</span>
-          <span className="text-sm text-muted-foreground">Famille</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <Link to="/login"><Button variant="ghost">Se connecter</Button></Link>
-          <Link to="/signup"><Button>Créer un compte</Button></Link>
+const PricingPage: React.FC = () => {
+  const { t } = useLocale();
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border">
+        <div className="container flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="font-heading text-xl font-semibold text-foreground">{t.app_name}</span>
+            <span className="text-sm text-muted-foreground">{t.app_tagline}</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/login"><Button variant="ghost">{t.sign_in}</Button></Link>
+            <Link to="/signup"><Button>{t.sign_up}</Button></Link>
+          </div>
         </div>
-      </div>
-    </header>
-    <main className="container max-w-3xl py-20 text-center">
-      <h1 className="font-heading text-3xl font-semibold text-foreground mb-4">Tarification</h1>
-      <p className="text-muted-foreground mb-12 text-lg">
-        Solexi.ai Famille est actuellement en accès anticipé. Profitez de toutes les fonctionnalités gratuitement.
-      </p>
-      <div className="rounded-xl border border-border bg-card p-8 shadow-card text-center mx-auto max-w-sm">
-        <h2 className="font-heading text-2xl font-semibold text-foreground">Accès anticipé</h2>
-        <p className="mt-2 text-4xl font-bold text-accent">Gratuit</p>
-        <ul className="mt-6 space-y-3 text-sm text-muted-foreground text-left">
-          <li>✓ 1 cercle familial</li>
-          <li>✓ Souvenirs illimités</li>
-          <li>✓ Coffre-fort sécurisé</li>
-          <li>✓ Invitations de membres</li>
-          <li>✓ Gestion des rôles</li>
-        </ul>
-        <Link to="/signup">
-          <Button className="w-full mt-8" size="lg">Commencer</Button>
-        </Link>
-      </div>
-    </main>
-  </div>
-);
+      </header>
+
+      <main className="container max-w-4xl py-16 md:py-20">
+        <div className="text-center mb-12">
+          <h1 className="font-heading text-3xl md:text-4xl font-semibold text-foreground mb-4">{t.pricing_title}</h1>
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t.pricing_subtitle}</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          {/* Free Plan */}
+          <div className="rounded-xl border border-border bg-card p-8 shadow-card flex flex-col">
+            <h2 className="font-heading text-2xl font-semibold text-foreground">{t.pricing_free_title}</h2>
+            <p className="mt-2 text-3xl font-bold text-accent">{t.free}</p>
+            <ul className="mt-6 space-y-3 text-sm text-muted-foreground flex-1">
+              {t.pricing_free_features.map((f, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <Link to="/signup">
+              <Button variant="outline" className="w-full mt-8" size="lg">{t.pricing_cta_free}</Button>
+            </Link>
+          </div>
+
+          {/* Annual Plan */}
+          <div className="rounded-xl border-2 border-accent bg-card p-8 shadow-elevated flex flex-col relative">
+            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">
+              {t.pricing_founder_badge}
+            </Badge>
+            <h2 className="font-heading text-2xl font-semibold text-foreground">{t.pricing_annual_title}</h2>
+            <p className="mt-2 text-3xl font-bold text-accent line-through opacity-50">{t.pricing_annual_price}</p>
+            <p className="text-lg font-semibold text-foreground">{t.pricing_founder_note}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t.pricing_annual_price_note}</p>
+            <ul className="mt-6 space-y-3 text-sm text-muted-foreground flex-1">
+              {t.pricing_annual_features.map((f, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <Link to="/signup">
+              <Button className="w-full mt-8" size="lg">{t.pricing_cta_annual}</Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-12 text-center">
+          <p className="text-xs text-muted-foreground max-w-xl mx-auto flex items-center justify-center gap-2">
+            <Shield className="h-4 w-4 shrink-0" />
+            {t.pricing_disclaimer}
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+};
 
 export default PricingPage;
