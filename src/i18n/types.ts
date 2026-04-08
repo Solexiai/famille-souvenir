@@ -44,6 +44,28 @@ export interface Translations {
   landing_privacy: string;
   landing_terms: string;
   landing_pricing: string;
+  landing_trust_security: string;
+  landing_trust_privacy: string;
+  landing_trust_jurisdiction: string;
+  landing_trust_multilingual: string;
+  landing_how_tag: string;
+  landing_how_title: string;
+  landing_how_1_title: string;
+  landing_how_1_desc: string;
+  landing_how_2_title: string;
+  landing_how_2_desc: string;
+  landing_how_3_title: string;
+  landing_how_3_desc: string;
+  landing_how_4_title: string;
+  landing_how_4_desc: string;
+  landing_val_1_title: string;
+  landing_val_1_desc: string;
+  landing_val_2_title: string;
+  landing_val_2_desc: string;
+  landing_val_3_title: string;
+  landing_val_3_desc: string;
+  landing_val_4_title: string;
+  landing_val_4_desc: string;
 
   // Pricing
   pricing_title: string;
