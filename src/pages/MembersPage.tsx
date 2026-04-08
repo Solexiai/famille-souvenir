@@ -11,6 +11,9 @@ import { InviteMemberForm } from '@/components/members/InviteMemberForm';
 import { InvitationsList } from '@/components/members/InvitationsList';
 import { FamilyLabelsManager } from '@/components/FamilyLabelsManager';
 import { ExecutorDesignation } from '@/components/ExecutorDesignation';
+import { LimitWarning } from '@/components/PlanGate';
+import { usePlan, FREE_LIMITS, isOverFreeLimit } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const MembersPage: React.FC = () => {
   const { user } = useAuth();
