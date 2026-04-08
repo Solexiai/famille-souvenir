@@ -3,6 +3,7 @@ import { Translations } from '../types';
 const fr: Translations = {
   app_name: 'Solexi.ai',
   app_tagline: 'Famille',
+  nav_home: 'Accueil',
   sign_in: 'Se connecter',
   sign_up: 'Créer un compte',
   sign_out: 'Déconnexion',

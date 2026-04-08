@@ -7,6 +7,7 @@ export interface Translations {
   // Nav & common
   app_name: string;
   app_tagline: string;
+  nav_home: string;
   sign_in: string;
   sign_up: string;
   sign_out: string;

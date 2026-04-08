@@ -5,16 +5,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
 import {
-  Home,
-  Shield,
-  FolderOpen,
-  CheckSquare,
-  Image,
-  Briefcase,
-  Settings,
-  LogOut,
-  Menu,
-  X,
+  Home, Shield, FolderOpen, CheckSquare, Image, Briefcase, Settings, LogOut, Menu, X,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,12 +19,6 @@ const navKeys = [
   { href: '/settings', labelKey: 'settings', icon: Settings },
 ] as const;
 
-const navLabels: Record<string, Record<string, string>> = {
-  fr: { home: 'Accueil', governance: 'Gouvernance', documents: 'Documents', checklist: 'Checklist', memories: 'Souvenirs', executor: 'Exécuteur', settings: 'Paramètres' },
-  en: { home: 'Home', governance: 'Governance', documents: 'Documents', checklist: 'Checklist', memories: 'Memories', executor: 'Executor', settings: 'Settings' },
-  es: { home: 'Inicio', governance: 'Gobernanza', documents: 'Documentos', checklist: 'Lista', memories: 'Recuerdos', executor: 'Albacea', settings: 'Ajustes' },
-};
-
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { signOut } = useAuth();
   const { t, lang, terms } = useLocale();
@@ -41,11 +26,17 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const labels = navLabels[lang] ?? navLabels.fr;
-  // Override executor label with terminology-aware term
-  const getLabel = (key: string) => {
-    if (key === 'executor') return terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1);
-    return labels[key] ?? key;
+  const getLabel = (key: string): string => {
+    switch (key) {
+      case 'home': return t.nav_home;
+      case 'governance': return t.dash_governance;
+      case 'documents': return t.dash_documents;
+      case 'checklist': return t.dash_checklist;
+      case 'memories': return t.dash_memories;
+      case 'executor': return terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1);
+      case 'settings': return t.settings_title;
+      default: return key;
+    }
   };
 
   const handleSignOut = async () => {
