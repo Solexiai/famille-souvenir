@@ -95,7 +95,7 @@ const SetupPage: React.FC = () => {
                 <SelectValue placeholder={t.setup_country_group} />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(t.setup_country_group_options) as CountryGroup[]).map(g => (
+                {COUNTRY_GROUP_ORDER.map(g => (
                   <SelectItem key={g} value={g}>{t.setup_country_group_options[g]}</SelectItem>
                 ))}
               </SelectContent>
@@ -132,8 +132,8 @@ const SetupPage: React.FC = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(t.setup_language_options) as SupportedLanguage[]).map(l => (
-                    <SelectItem key={l} value={l}>{t.setup_language_options[l]}</SelectItem>
+                  {LANGUAGE_ORDER.map(l => (
+                    <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
