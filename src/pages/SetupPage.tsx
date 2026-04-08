@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { canadianProvinces, usStates, latamCountries, resolveJurisdiction } from '@/i18n/jurisdictions';
 import { CountryGroup, SupportedLanguage } from '@/i18n/types';
+import { LANGUAGE_ORDER, LANGUAGE_LABELS, COUNTRY_GROUP_ORDER } from '@/i18n/config';
 import { Globe, MapPin, Languages } from 'lucide-react';
 
 const SetupPage: React.FC = () => {
@@ -94,7 +95,7 @@ const SetupPage: React.FC = () => {
                 <SelectValue placeholder={t.setup_country_group} />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(t.setup_country_group_options) as CountryGroup[]).map(g => (
+                {COUNTRY_GROUP_ORDER.map(g => (
                   <SelectItem key={g} value={g}>{t.setup_country_group_options[g]}</SelectItem>
                 ))}
               </SelectContent>
@@ -131,8 +132,8 @@ const SetupPage: React.FC = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(t.setup_language_options) as SupportedLanguage[]).map(l => (
-                    <SelectItem key={l} value={l}>{t.setup_language_options[l]}</SelectItem>
+                  {LANGUAGE_ORDER.map(l => (
+                    <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

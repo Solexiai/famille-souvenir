@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Shield, Users, FileText, CheckSquare, AlertTriangle } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { SupportedLanguage } from '@/i18n/types';
+import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 
 const LandingPage: React.FC = () => {
   const { user } = useAuth();
@@ -35,9 +36,9 @@ const LandingPage: React.FC = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Español</SelectItem>
+                {LANGUAGE_ORDER.map(l => (
+                  <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <Link to="/pricing">

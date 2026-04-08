@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Loader2, User, Shield, Download, Trash2, Info } from 'lucide-react';
 import type { Profile, Consent } from '@/types/database';
+import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -212,8 +213,9 @@ const SettingsPage: React.FC = () => {
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
+                  {LANGUAGE_ORDER.map(l => (
+                    <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
