@@ -59,19 +59,19 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-8 bg-secondary/30">
-      <div className="container max-w-3xl text-center">
+    <section className="py-6 md:py-8 bg-secondary/30">
+      <div className="container max-w-3xl text-center px-4">
         {/* Stars */}
-        <div className="flex justify-center gap-1 mb-6">
+        <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className="h-5 w-5 fill-accent text-accent" />
+            <Star key={i} className="h-4 w-4 md:h-5 md:w-5 fill-accent text-accent" />
           ))}
         </div>
 
         {/* Quote */}
-        <div className="relative min-h-[140px] flex items-center justify-center">
-          <Quote className="absolute -top-2 left-0 h-8 w-8 text-accent/20" />
-          <p className="font-heading text-lg md:text-xl text-foreground leading-relaxed italic px-8">
+        <div className="relative min-h-[100px] md:min-h-[140px] flex items-center justify-center">
+          <Quote className="absolute -top-2 left-0 h-6 w-6 md:h-8 md:w-8 text-accent/20" />
+          <p className="font-heading text-base md:text-xl text-foreground leading-relaxed italic px-6 md:px-8">
             «&nbsp;{t.quote}&nbsp;»
           </p>
         </div>
