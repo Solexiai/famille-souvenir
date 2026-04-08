@@ -157,6 +157,7 @@ const DocumentsPage: React.FC = () => {
               Centre documentaire structuré et sécurisé.
             </p>
           </div>
+          <LimitWarning current={documents.length} max={FREE_LIMITS.maxDocuments} label={t.plan_gate_document_limit} />
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
