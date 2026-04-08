@@ -59,19 +59,19 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-8 bg-secondary/30">
-      <div className="container max-w-3xl text-center">
+    <section className="py-6 md:py-8 bg-secondary/30">
+      <div className="container max-w-3xl text-center px-4">
         {/* Stars */}
-        <div className="flex justify-center gap-1 mb-6">
+        <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className="h-5 w-5 fill-accent text-accent" />
+            <Star key={i} className="h-4 w-4 md:h-5 md:w-5 fill-accent text-accent" />
           ))}
         </div>
 
         {/* Quote */}
-        <div className="relative min-h-[140px] flex items-center justify-center">
-          <Quote className="absolute -top-2 left-0 h-8 w-8 text-accent/20" />
-          <p className="font-heading text-lg md:text-xl text-foreground leading-relaxed italic px-8">
+        <div className="relative min-h-[100px] md:min-h-[140px] flex items-center justify-center">
+          <Quote className="absolute -top-2 left-0 h-6 w-6 md:h-8 md:w-8 text-accent/20" />
+          <p className="font-heading text-base md:text-xl text-foreground leading-relaxed italic px-6 md:px-8">
             «&nbsp;{t.quote}&nbsp;»
           </p>
         </div>
@@ -83,7 +83,7 @@ const TestimonialsCarousel: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="mt-8 flex items-center justify-center gap-4">
+        <div className="mt-4 md:mt-6 flex items-center justify-center gap-3 md:gap-4">
           <button
             onClick={prev}
             className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
@@ -158,13 +158,13 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* ─── Header ─── */}
       <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-14 md:h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-heading text-xl font-semibold text-primary-foreground">{t.app_name}</span>
+            <span className="font-heading text-lg md:text-xl font-semibold text-primary-foreground">{t.app_name}</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-24 h-9 text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
+              <SelectTrigger className="w-20 md:w-24 h-8 md:h-9 text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -174,12 +174,12 @@ const LandingPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Link to="/login">
-              <Button variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <Button variant="ghost" size="sm" className="text-xs md:text-sm text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 px-2 md:px-4">
                 {t.sign_in}
               </Button>
             </Link>
-            <Link to="/signup">
-              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Link to="/signup" className="hidden sm:block">
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xs md:text-sm">
                 {t.sign_up}
               </Button>
             </Link>
@@ -189,7 +189,7 @@ const LandingPage: React.FC = () => {
 
       {/* ─── Hero ─── */}
       <section
-        className="relative pt-32 pb-10 md:pt-40 md:pb-14 overflow-hidden"
+        className="relative pt-24 pb-8 md:pt-40 md:pb-14 overflow-hidden"
         style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="absolute inset-0 bg-primary/80" />
