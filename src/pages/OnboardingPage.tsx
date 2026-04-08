@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocale } from '@/contexts/LocaleContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Heart } from 'lucide-react';
 
 const OnboardingPage: React.FC = () => {
   const { user } = useAuth();
+  const { t, jurisdictionPack, countryGroup } = useLocale();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [fullName, setFullName] = useState('');
   const [circleName, setCircleName] = useState('');
+  const [purpose, setPurpose] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    // Check if user already has a circle
     const check = async () => {
       const { data } = await supabase
         .from('family_circles')
@@ -27,8 +29,8 @@ const OnboardingPage: React.FC = () => {
         .limit(1);
       if (data && data.length > 0) {
         navigate('/dashboard');
+        return;
       }
-      // Pre-fill name
       const { data: profile } = await supabase
         .from('profiles')
         .select('full_name')
@@ -50,17 +52,41 @@ const OnboardingPage: React.FC = () => {
     setStep(2);
   };
 
-  const handleStep2 = async () => {
-    if (!circleName.trim() || !user) return;
+  const handleStep2 = () => {
+    if (!circleName.trim()) return;
+    setStep(3);
+  };
+
+  const handleStep3 = async () => {
+    if (!user || !circleName.trim()) return;
     setSaving(true);
+
+    // Resolve jurisdiction from context for the circle
+    const profileData = await supabase
+      .from('profiles')
+      .select('country_group, country_code, region_code, jurisdiction_pack, currency_code')
+      .eq('user_id', user.id)
+      .single();
+
+    const p = profileData.data;
+
     const { data, error } = await supabase
       .from('family_circles')
-      .insert({ name: circleName.trim(), owner_id: user.id })
+      .insert({
+        name: circleName.trim(),
+        owner_id: user.id,
+        country_group: p?.country_group ?? null,
+        country_code: p?.country_code ?? null,
+        region_code: p?.region_code ?? null,
+        jurisdiction_pack: p?.jurisdiction_pack ?? null,
+        legal_terms_pack: p?.jurisdiction_pack ? `${p.jurisdiction_pack}_pack` : null,
+        currency_code: p?.currency_code ?? 'CAD',
+      })
       .select()
       .single();
 
     if (error || !data) {
-      toast.error('Erreur lors de la création du cercle.');
+      toast.error('Error creating circle.');
       setSaving(false);
       return;
     }
@@ -69,37 +95,37 @@ const OnboardingPage: React.FC = () => {
       .from('circle_members')
       .insert({ circle_id: data.id, user_id: user.id, role: 'owner' as const });
 
-    toast.success('Bienvenue dans votre espace familial !');
+    toast.success(t.onboarding_create_space + ' ✓');
     navigate('/dashboard');
   };
+
+  const totalSteps = 3;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-8 text-center">
-          <h1 className="font-heading text-3xl font-semibold text-foreground">Bienvenue</h1>
-          <p className="mt-2 text-muted-foreground">Configurons votre espace en quelques étapes.</p>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">{t.onboarding_welcome}</h1>
+          <p className="mt-2 text-muted-foreground flex items-center justify-center gap-2">
+            <Heart className="h-4 w-4 text-accent" />
+            {t.onboarding_emotional_tagline}
+          </p>
         </div>
 
         {step === 1 && (
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="font-heading text-lg">Étape 1 — Votre identité</CardTitle>
-              <CardDescription>Comment souhaitez-vous être identifié(e) ?</CardDescription>
+              <CardTitle className="font-heading text-lg">{t.onboarding_step_identity}</CardTitle>
+              <CardDescription>{t.onboarding_step_identity_desc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Nom complet</Label>
-                <Input
-                  id="fullName"
-                  placeholder="Jean Dupont"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
+                <Label htmlFor="fullName">{t.onboarding_full_name}</Label>
+                <Input id="fullName" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
               <Button onClick={handleStep1} className="w-full" size="lg" disabled={saving || !fullName.trim()}>
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                Continuer
+                {t.continue_btn}
               </Button>
             </CardContent>
           </Card>
@@ -108,30 +134,62 @@ const OnboardingPage: React.FC = () => {
         {step === 2 && (
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="font-heading text-lg">Étape 2 — Votre cercle</CardTitle>
-              <CardDescription>Donnez un nom à votre cercle familial.</CardDescription>
+              <CardTitle className="font-heading text-lg">{t.onboarding_step_circle}</CardTitle>
+              <CardDescription>{t.onboarding_step_circle_desc}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="circleName">Nom du cercle</Label>
-                <Input
-                  id="circleName"
-                  placeholder="Famille Dupont"
-                  value={circleName}
-                  onChange={(e) => setCircleName(e.target.value)}
-                />
+                <Label htmlFor="circleName">{t.onboarding_circle_name}</Label>
+                <Input id="circleName" placeholder="Famille Dupont" value={circleName} onChange={(e) => setCircleName(e.target.value)} />
               </div>
-              <Button onClick={handleStep2} className="w-full" size="lg" disabled={saving || !circleName.trim()}>
-                {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                Créer mon espace
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">{t.back}</Button>
+                <Button onClick={handleStep2} className="flex-1" size="lg" disabled={!circleName.trim()}>
+                  {t.continue_btn}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {step === 3 && (
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="font-heading text-lg">{t.onboarding_step_purpose}</CardTitle>
+              <CardDescription>{t.onboarding_step_purpose_desc}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-2">
+                {t.onboarding_purpose_options.map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setPurpose(opt.value)}
+                    className={`rounded-lg border p-3 text-left text-sm transition-colors ${
+                      purpose === opt.value
+                        ? 'border-accent bg-secondary text-foreground'
+                        : 'border-border bg-card text-muted-foreground hover:border-accent/50'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setStep(2)} className="flex-1">{t.back}</Button>
+                <Button onClick={handleStep3} className="flex-1" size="lg" disabled={saving || !purpose}>
+                  {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {t.onboarding_create_space}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
 
         <div className="mt-6 flex justify-center gap-2">
-          <div className={`h-2 w-8 rounded-full ${step >= 1 ? 'bg-accent' : 'bg-muted'}`} />
-          <div className={`h-2 w-8 rounded-full ${step >= 2 ? 'bg-accent' : 'bg-muted'}`} />
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div key={i} className={`h-2 w-8 rounded-full ${step >= i + 1 ? 'bg-accent' : 'bg-muted'}`} />
+          ))}
         </div>
       </div>
     </div>

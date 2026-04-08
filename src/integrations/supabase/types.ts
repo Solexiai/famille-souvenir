@@ -283,46 +283,64 @@ export type Database = {
       family_circles: {
         Row: {
           beneficiary_designation_status: Database["public"]["Enums"]["documentary_status"]
+          country_code: string | null
+          country_group: string | null
           created_at: string
           critical_documents_status: string
+          currency_code: string | null
           death_status: Database["public"]["Enums"]["death_status"]
           description: string | null
           dossier_readiness_status: Database["public"]["Enums"]["dossier_readiness_status"]
           id: string
+          jurisdiction_pack: string | null
+          legal_terms_pack: string | null
           mandate_status: Database["public"]["Enums"]["documentary_status"]
           name: string
           notary_status: Database["public"]["Enums"]["documentary_status"]
           owner_id: string
+          region_code: string | null
           testament_status: Database["public"]["Enums"]["documentary_status"]
           updated_at: string
         }
         Insert: {
           beneficiary_designation_status?: Database["public"]["Enums"]["documentary_status"]
+          country_code?: string | null
+          country_group?: string | null
           created_at?: string
           critical_documents_status?: string
+          currency_code?: string | null
           death_status?: Database["public"]["Enums"]["death_status"]
           description?: string | null
           dossier_readiness_status?: Database["public"]["Enums"]["dossier_readiness_status"]
           id?: string
+          jurisdiction_pack?: string | null
+          legal_terms_pack?: string | null
           mandate_status?: Database["public"]["Enums"]["documentary_status"]
           name: string
           notary_status?: Database["public"]["Enums"]["documentary_status"]
           owner_id: string
+          region_code?: string | null
           testament_status?: Database["public"]["Enums"]["documentary_status"]
           updated_at?: string
         }
         Update: {
           beneficiary_designation_status?: Database["public"]["Enums"]["documentary_status"]
+          country_code?: string | null
+          country_group?: string | null
           created_at?: string
           critical_documents_status?: string
+          currency_code?: string | null
           death_status?: Database["public"]["Enums"]["death_status"]
           description?: string | null
           dossier_readiness_status?: Database["public"]["Enums"]["dossier_readiness_status"]
           id?: string
+          jurisdiction_pack?: string | null
+          legal_terms_pack?: string | null
           mandate_status?: Database["public"]["Enums"]["documentary_status"]
           name?: string
           notary_status?: Database["public"]["Enums"]["documentary_status"]
           owner_id?: string
+          region_code?: string | null
           testament_status?: Database["public"]["Enums"]["documentary_status"]
           updated_at?: string
         }
@@ -531,22 +549,64 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          circle_id: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          circle_id?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           city: string | null
           contact_preference: string | null
+          country_code: string | null
+          country_group: string | null
           created_at: string
+          currency_code: string | null
           email: string
           first_name: string
           full_name: string
           id: string
           is_emergency_contact: boolean
           is_visible_to_family: boolean
+          jurisdiction_pack: string | null
           language: string
           last_name: string
           notes: string | null
           phone: string | null
+          preferred_language: string | null
+          region_code: string | null
           relationship_label: string | null
           secondary_phone: string | null
           updated_at: string
@@ -556,17 +616,23 @@ export type Database = {
           avatar_url?: string | null
           city?: string | null
           contact_preference?: string | null
+          country_code?: string | null
+          country_group?: string | null
           created_at?: string
+          currency_code?: string | null
           email?: string
           first_name?: string
           full_name?: string
           id?: string
           is_emergency_contact?: boolean
           is_visible_to_family?: boolean
+          jurisdiction_pack?: string | null
           language?: string
           last_name?: string
           notes?: string | null
           phone?: string | null
+          preferred_language?: string | null
+          region_code?: string | null
           relationship_label?: string | null
           secondary_phone?: string | null
           updated_at?: string
@@ -576,19 +642,70 @@ export type Database = {
           avatar_url?: string | null
           city?: string | null
           contact_preference?: string | null
+          country_code?: string | null
+          country_group?: string | null
           created_at?: string
+          currency_code?: string | null
           email?: string
           first_name?: string
           full_name?: string
           id?: string
           is_emergency_contact?: boolean
           is_visible_to_family?: boolean
+          jurisdiction_pack?: string | null
           language?: string
           last_name?: string
           notes?: string | null
           phone?: string | null
+          preferred_language?: string | null
+          region_code?: string | null
           relationship_label?: string | null
           secondary_phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          billing_cycle: string | null
+          cancelled_at: string | null
+          created_at: string
+          founder_discount_applied: boolean
+          id: string
+          plan: string
+          renewal_date: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_cycle?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          founder_discount_applied?: boolean
+          id?: string
+          plan?: string
+          renewal_date?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_cycle?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          founder_discount_applied?: boolean
+          id?: string
+          plan?: string
+          renewal_date?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string
           updated_at?: string
           user_id?: string
         }
