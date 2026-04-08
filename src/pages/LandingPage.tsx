@@ -83,7 +83,7 @@ const TestimonialsCarousel: React.FC = () => {
         </div>
 
         {/* Navigation */}
-        <div className="mt-8 flex items-center justify-center gap-4">
+        <div className="mt-4 md:mt-6 flex items-center justify-center gap-3 md:gap-4">
           <button
             onClick={prev}
             className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
