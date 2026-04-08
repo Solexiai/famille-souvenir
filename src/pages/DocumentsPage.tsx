@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
+import { LimitWarning } from '@/components/PlanGate';
+import { usePlan, FREE_LIMITS, isOverFreeLimit } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const categories = [
   { value: 'identity', label: 'Identité' },
