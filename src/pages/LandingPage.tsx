@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import {
   Shield, Users, FileText, CheckSquare, Lock, Globe, Languages,
-  ArrowRight, Heart, Scale, Briefcase, Eye,
+  ArrowRight, Heart, Scale, Briefcase, Eye, Star, ChevronLeft, ChevronRight, Quote,
 } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { SupportedLanguage } from '@/i18n/types';
@@ -133,8 +133,11 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* ─── Testimonials Carousel ─── */}
+      <TestimonialsCarousel />
+
       {/* ─── Feature Cards Grid (Medvi-style) ─── */}
-      <section className="container -mt-12 relative z-20 pb-8">
+      <section className="container relative z-20 pb-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {featureCards.map((card, i) => (
             <Link
