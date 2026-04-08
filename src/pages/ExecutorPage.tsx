@@ -148,6 +148,11 @@ const ExecutorPage: React.FC = () => {
         {/* Executor designation */}
         <ExecutorDesignation members={members} labels={labels} />
 
+        {/* Gate advanced executor features behind annual plan */}
+        {!hasPremiumFeature(plan, 'advancedExecutor') ? (
+          <PlanGate featureName={t.plan_gate_executor} reason={t.plan_gate_reason_executor} />
+        ) : (
+        <>
         {/* Readiness overview */}
         <Card className="shadow-card">
           <CardHeader>
