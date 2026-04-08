@@ -59,7 +59,7 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-16 bg-secondary/30">
+    <section className="py-8 bg-secondary/30">
       <div className="container max-w-3xl text-center">
         {/* Stars */}
         <div className="flex justify-center gap-1 mb-6">
@@ -189,7 +189,7 @@ const LandingPage: React.FC = () => {
 
       {/* ─── Hero ─── */}
       <section
-        className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden"
+        className="relative pt-32 pb-10 md:pt-40 md:pb-14 overflow-hidden"
         style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="absolute inset-0 bg-primary/80" />
