@@ -59,7 +59,7 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-16 bg-secondary/30">
+    <section className="py-8 bg-secondary/30">
       <div className="container max-w-3xl text-center">
         {/* Stars */}
         <div className="flex justify-center gap-1 mb-6">
