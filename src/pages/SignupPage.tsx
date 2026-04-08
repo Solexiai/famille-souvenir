@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,28 +10,29 @@ import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 
-const signupSchema = z.object({
-  fullName: z.string().trim().min(2, 'Le nom doit contenir au moins 2 caractères').max(100),
-  email: z.string().trim().email('Adresse email invalide').max(255),
-  password: z.string()
-    .min(8, 'Le mot de passe doit contenir au moins 8 caractères')
-    .regex(/[A-Z]/, 'Le mot de passe doit contenir au moins une majuscule')
-    .regex(/[a-z]/, 'Le mot de passe doit contenir au moins une minuscule')
-    .regex(/[0-9]/, 'Le mot de passe doit contenir au moins un chiffre'),
-  confirmPassword: z.string(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Les mots de passe ne correspondent pas',
-  path: ['confirmPassword'],
-});
-
 const SignupPage: React.FC = () => {
   const { signUp } = useAuth();
+  const { t } = useLocale();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const signupSchema = z.object({
+    fullName: z.string().trim().min(2, t.auth_validation_name_min).max(100),
+    email: z.string().trim().email(t.auth_validation_email).max(255),
+    password: z.string()
+      .min(8, t.auth_validation_password_min)
+      .regex(/[A-Z]/, t.auth_validation_password_upper)
+      .regex(/[a-z]/, t.auth_validation_password_lower)
+      .regex(/[0-9]/, t.auth_validation_password_digit),
+    confirmPassword: z.string(),
+  }).refine(data => data.password === data.confirmPassword, {
+    message: t.auth_validation_password_mismatch,
+    path: ['confirmPassword'],
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ const SignupPage: React.FC = () => {
     const { error } = await signUp(email, password, fullName);
     setLoading(false);
     if (error) {
-      toast.error("Erreur lors de la création du compte. Veuillez réessayer.");
+      toast.error(t.auth_signup_error);
     } else {
       setSuccess(true);
     }
@@ -54,15 +56,12 @@ const SignupPage: React.FC = () => {
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <Card className="w-full max-w-md shadow-card animate-fade-in">
           <CardHeader>
-            <CardTitle className="font-heading text-xl">Vérifiez votre email</CardTitle>
+            <CardTitle className="font-heading text-xl">{t.auth_verify_email_title}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              Un email de confirmation a été envoyé à <strong>{email}</strong>.
-              Cliquez sur le lien pour activer votre compte.
-            </p>
+            <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.auth_verify_email_desc.replace('{email}', email) }} />
             <Link to="/login">
-              <Button variant="outline" className="w-full">Retour à la connexion</Button>
+              <Button variant="outline" className="w-full">{t.auth_back_to_login}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -74,18 +73,18 @@ const SignupPage: React.FC = () => {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-8 text-center">
-          <h1 className="font-heading text-3xl font-semibold text-foreground">Solexi.ai Famille</h1>
-          <p className="mt-2 text-muted-foreground">Créez votre espace familial</p>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">{t.app_name} {t.app_tagline}</h1>
+          <p className="mt-2 text-muted-foreground">{t.auth_signup_desc}</p>
         </div>
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="font-heading text-xl">Créer un compte</CardTitle>
-            <CardDescription>Rejoignez votre cercle familial</CardDescription>
+            <CardTitle className="font-heading text-xl">{t.auth_signup_title}</CardTitle>
+            <CardDescription>{t.auth_signup_desc}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Nom complet</Label>
+                <Label htmlFor="fullName">{t.auth_full_name}</Label>
                 <Input
                   id="fullName"
                   placeholder="Jean Dupont"
@@ -96,11 +95,11 @@ const SignupPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Adresse email</Label>
+                <Label htmlFor="email">{t.auth_email}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="votre@email.com"
+                  placeholder="email@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
@@ -108,7 +107,7 @@ const SignupPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password">{t.auth_password}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -118,12 +117,10 @@ const SignupPage: React.FC = () => {
                   autoComplete="new-password"
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  Min. 8 caractères, une majuscule, une minuscule, un chiffre
-                </p>
+                <p className="text-xs text-muted-foreground">{t.auth_password_hint}</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword">{t.auth_confirm_password}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -136,13 +133,13 @@ const SignupPage: React.FC = () => {
               </div>
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-                Créer mon compte
+                {t.auth_submit_signup}
               </Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Déjà un compte ?{' '}
+              {t.auth_has_account}{' '}
               <Link to="/login" className="text-accent hover:underline">
-                Se connecter
+                {t.sign_in}
               </Link>
             </p>
           </CardContent>
