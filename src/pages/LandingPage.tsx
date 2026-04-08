@@ -162,7 +162,7 @@ const LandingPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="font-heading text-xl font-semibold text-primary-foreground">{t.app_name}</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
               <SelectTrigger className="w-24 h-9 text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
                 <SelectValue />
@@ -173,11 +173,6 @@ const LandingPage: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Link to="/pricing">
-              <Button variant="ghost" size="sm" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                {t.landing_pricing}
-              </Button>
-            </Link>
             <Link to="/login">
               <Button variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
                 {t.sign_in}
