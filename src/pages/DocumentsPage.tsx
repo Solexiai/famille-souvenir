@@ -64,6 +64,8 @@ const verificationColors: Record<VerificationStatus, string> = {
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
+  const { plan } = usePlan();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [documents, setDocuments] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
