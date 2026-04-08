@@ -92,6 +92,16 @@ export interface Translations {
   plan_upgrade_desc: string;
   plan_annual_label: string;
   plan_free_label: string;
+  plan_gate_executor: string;
+  plan_gate_export: string;
+  plan_gate_advanced_checklist: string;
+  plan_gate_advanced_governance: string;
+  plan_gate_member_limit: string;
+  plan_gate_document_limit: string;
+  plan_gate_reason_executor: string;
+  plan_gate_reason_export: string;
+  plan_gate_reason_checklist: string;
+  plan_gate_reason_governance: string;
 
   // Legal disclaimers
   disclaimer_jurisdiction: string;

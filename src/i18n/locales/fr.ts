@@ -121,6 +121,16 @@ const fr: Translations = {
   plan_upgrade_desc: 'Passez au plan annuel pour accéder à cette fonctionnalité.',
   plan_annual_label: 'Famille (Annuel)',
   plan_free_label: 'Gratuit',
+  plan_gate_executor: 'Espace exécuteur avancé',
+  plan_gate_export: 'Export du dossier',
+  plan_gate_advanced_checklist: 'Checklist avancée',
+  plan_gate_advanced_governance: 'Gouvernance avancée',
+  plan_gate_member_limit: 'Limite de membres atteinte',
+  plan_gate_document_limit: 'Limite de documents atteinte',
+  plan_gate_reason_executor: 'L\'espace exécuteur complet est disponible avec le plan Famille annuel.',
+  plan_gate_reason_export: 'L\'export structuré du dossier familial est disponible avec le plan Famille annuel.',
+  plan_gate_reason_checklist: 'Les catégories de checklist avancées sont disponibles avec le plan Famille annuel.',
+  plan_gate_reason_governance: 'La gouvernance détaillée et les responsabilités avancées sont disponibles avec le plan Famille annuel.',
 
   // Legal disclaimers
   disclaimer_jurisdiction: 'Selon votre juridiction, les exigences peuvent varier.',
