@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import {
   Shield, Users, FileText, CheckSquare, Lock, Globe, Languages,
-  ArrowRight, Heart, Scale, Briefcase, Eye,
+  ArrowRight, Heart, Scale, Briefcase, Eye, Star, ChevronLeft, ChevronRight, Quote,
 } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { SupportedLanguage } from '@/i18n/types';
@@ -16,6 +16,105 @@ import imgCircle from '@/assets/landing-circle.jpg';
 import imgDocuments from '@/assets/landing-documents.jpg';
 import imgChecklist from '@/assets/landing-checklist.jpg';
 import imgPrivacy from '@/assets/landing-privacy.jpg';
+
+const testimonials = [
+  {
+    quote: "J'ai enfin fait ce que je remettais depuis des années. En dix minutes, c'était fait. Un énorme poids de moins — et une paix immense.",
+    name: 'Marie T.',
+    age: '67 ans',
+    location: 'Québec, QC',
+  },
+  {
+    quote: "Quand mon père est tombé malade, on savait exactement quoi faire. Tout était là, clair, organisé. Solexi nous a épargnés d'un chaos insupportable.",
+    name: 'Jean-François L.',
+    age: '45 ans',
+    location: 'Ottawa, ON',
+  },
+  {
+    quote: "Plus simple qu'un formulaire d'impôt. Et infiniment plus important. Je le recommande à toute personne qui aime quelqu'un.",
+    name: 'Sylvie M.',
+    age: '58 ans',
+    location: 'Montréal, QC',
+  },
+  {
+    quote: "Ma famille vit entre Montréal et Miami. Solexi nous a permis de tout centraliser, peu importe la juridiction. C'est exactement ce qu'il nous fallait.",
+    name: 'Carlos R.',
+    age: '52 ans',
+    location: 'Miami, FL',
+  },
+];
+
+const TestimonialsCarousel: React.FC = () => {
+  const [current, setCurrent] = useState(0);
+  const total = testimonials.length;
+
+  const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total]);
+
+  useEffect(() => {
+    const timer = setInterval(next, 6000);
+    return () => clearInterval(timer);
+  }, [next]);
+
+  const t = testimonials[current];
+
+  return (
+    <section className="py-16 bg-secondary/30">
+      <div className="container max-w-3xl text-center">
+        {/* Stars */}
+        <div className="flex justify-center gap-1 mb-6">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star key={i} className="h-5 w-5 fill-accent text-accent" />
+          ))}
+        </div>
+
+        {/* Quote */}
+        <div className="relative min-h-[140px] flex items-center justify-center">
+          <Quote className="absolute -top-2 left-0 h-8 w-8 text-accent/20" />
+          <p className="font-heading text-lg md:text-xl text-foreground leading-relaxed italic px-8">
+            «&nbsp;{t.quote}&nbsp;»
+          </p>
+        </div>
+
+        {/* Author */}
+        <div className="mt-6">
+          <p className="font-semibold text-foreground">{t.name}</p>
+          <p className="text-sm text-muted-foreground">{t.age} · {t.location}</p>
+        </div>
+
+        {/* Navigation */}
+        <div className="mt-8 flex items-center justify-center gap-4">
+          <button
+            onClick={prev}
+            className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
+            aria-label="Précédent"
+          >
+            <ChevronLeft className="h-4 w-4 text-foreground" />
+          </button>
+          <div className="flex gap-2">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === current ? 'w-6 bg-accent' : 'w-2 bg-border'
+                }`}
+                aria-label={`Témoignage ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={next}
+            className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
+            aria-label="Suivant"
+          >
+            <ChevronRight className="h-4 w-4 text-foreground" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const LandingPage: React.FC = () => {
   const { user } = useAuth();
@@ -133,8 +232,11 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* ─── Testimonials Carousel ─── */}
+      <TestimonialsCarousel />
+
       {/* ─── Feature Cards Grid (Medvi-style) ─── */}
-      <section className="container -mt-12 relative z-20 pb-8">
+      <section className="container relative z-20 pb-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {featureCards.map((card, i) => (
             <Link
