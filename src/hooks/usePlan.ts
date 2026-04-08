@@ -15,13 +15,28 @@ interface PlanState {
 
 // Free plan limits
 export const FREE_LIMITS = {
+  maxCircles: 1,
   maxMembers: 5,
   maxDocuments: 10,
   maxMemories: 20,
+  advancedChecklist: false,
+  advancedGovernance: false,
   advancedExport: false,
   advancedExecutor: false,
   advancedReminders: false,
-  advancedGovernance: false,
+};
+
+// Annual plan unlocks
+export const ANNUAL_UNLOCKS = {
+  maxCircles: 3,
+  maxMembers: 50,
+  maxDocuments: 500,
+  maxMemories: 1000,
+  advancedChecklist: true,
+  advancedGovernance: true,
+  advancedExport: true,
+  advancedExecutor: true,
+  advancedReminders: true,
 };
 
 export function usePlan(): PlanState {
@@ -66,7 +81,14 @@ export function usePlan(): PlanState {
   return state;
 }
 
-export function isPremiumFeature(plan: PlanType, feature: keyof typeof FREE_LIMITS): boolean {
+/** Check if a numeric limit is exceeded on free plan */
+export function isOverFreeLimit(plan: PlanType, limitKey: 'maxMembers' | 'maxDocuments' | 'maxMemories' | 'maxCircles', currentCount: number): boolean {
+  if (plan === 'annual_family') return false;
+  return currentCount >= FREE_LIMITS[limitKey];
+}
+
+/** Check if a boolean premium feature is available */
+export function hasPremiumFeature(plan: PlanType, feature: 'advancedChecklist' | 'advancedGovernance' | 'advancedExport' | 'advancedExecutor' | 'advancedReminders'): boolean {
   if (plan === 'annual_family') return true;
-  return !!FREE_LIMITS[feature];
+  return FREE_LIMITS[feature];
 }

@@ -13,6 +13,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
+import { LimitWarning } from '@/components/PlanGate';
+import { usePlan, FREE_LIMITS, isOverFreeLimit } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const categories = [
   { value: 'identity', label: 'Identité' },
@@ -61,6 +64,8 @@ const verificationColors: Record<VerificationStatus, string> = {
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
+  const { plan } = usePlan();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [documents, setDocuments] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -152,6 +157,7 @@ const DocumentsPage: React.FC = () => {
               Centre documentaire structuré et sécurisé.
             </p>
           </div>
+          <LimitWarning current={documents.length} max={FREE_LIMITS.maxDocuments} label={t.plan_gate_document_limit} />
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>

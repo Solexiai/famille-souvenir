@@ -11,9 +11,14 @@ import { InviteMemberForm } from '@/components/members/InviteMemberForm';
 import { InvitationsList } from '@/components/members/InvitationsList';
 import { FamilyLabelsManager } from '@/components/FamilyLabelsManager';
 import { ExecutorDesignation } from '@/components/ExecutorDesignation';
+import { LimitWarning } from '@/components/PlanGate';
+import { usePlan, FREE_LIMITS, isOverFreeLimit } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const MembersPage: React.FC = () => {
   const { user } = useAuth();
+  const { plan } = usePlan();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [members, setMembers] = useState<CircleMember[]>([]);
   const [memberLabels, setMemberLabels] = useState<MemberFamilyLabel[]>([]);
@@ -30,13 +35,11 @@ const MembersPage: React.FC = () => {
     const c = circles[0] as FamilyCircle;
     setCircle(c);
 
-    // Get current user role
     const { data: myRole } = await supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1);
     const role = myRole?.[0]?.role as AppRole | undefined;
     setCurrentUserRole(role || null);
     setIsManager(c.owner_id === user.id || role === 'owner' || role === 'family_manager');
 
-    // Load members with profiles
     const { data: memberData } = await supabase.from('circle_members').select('*').eq('circle_id', c.id);
     if (memberData) {
       const membersWithProfiles = await Promise.all(
@@ -48,7 +51,6 @@ const MembersPage: React.FC = () => {
       setMembers(membersWithProfiles);
     }
 
-    // Load labels
     const { data: labelsData } = await supabase.from('member_family_labels').select('*').eq('circle_id', c.id);
     setMemberLabels((labelsData as MemberFamilyLabel[]) || []);
     setLoading(false);
@@ -83,10 +85,14 @@ const MembersPage: React.FC = () => {
     );
   }
 
+  const memberLimitReached = isOverFreeLimit(plan, 'maxMembers', members.length);
+
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         <h1 className="font-heading text-2xl font-semibold text-foreground">Membres du cercle</h1>
+
+        <LimitWarning current={members.length} max={FREE_LIMITS.maxMembers} label={t.plan_gate_member_limit} />
 
         <Tabs defaultValue="members" className="space-y-4">
           <TabsList>
@@ -107,6 +113,14 @@ const MembersPage: React.FC = () => {
           <TabsContent value="invitations" className="space-y-4">
             {isManager && user && (
               <>
+                {memberLimitReached && (
+                  <div className="rounded-lg border border-dashed border-accent/40 bg-secondary/50 p-4 text-center">
+                    <p className="text-sm text-muted-foreground">{t.plan_gate_member_limit}</p>
+                    <Button size="sm" variant="outline" className="mt-2" onClick={() => window.location.href = '/pricing'}>
+                      {t.upgrade}
+                    </Button>
+                  </div>
+                )}
                 <InviteMemberForm
                   circleId={circle.id}
                   userId={user.id}

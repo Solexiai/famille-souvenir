@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Shield } from 'lucide-react';
+import { Check, Shield, X } from 'lucide-react';
 
 const PricingPage: React.FC = () => {
   const { t } = useLocale();
+
+  const freeFeatures = t.pricing_free_features;
+  const annualFeatures = t.pricing_annual_features;
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,7 +38,7 @@ const PricingPage: React.FC = () => {
             <h2 className="font-heading text-2xl font-semibold text-foreground">{t.pricing_free_title}</h2>
             <p className="mt-2 text-3xl font-bold text-accent">{t.free}</p>
             <ul className="mt-6 space-y-3 text-sm text-muted-foreground flex-1">
-              {t.pricing_free_features.map((f, i) => (
+              {freeFeatures.map((f, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
                   <span>{f}</span>
@@ -53,11 +56,11 @@ const PricingPage: React.FC = () => {
               {t.pricing_founder_badge}
             </Badge>
             <h2 className="font-heading text-2xl font-semibold text-foreground">{t.pricing_annual_title}</h2>
-            <p className="mt-2 text-3xl font-bold text-accent line-through opacity-50">{t.pricing_annual_price}</p>
+            <p className="mt-2 text-3xl font-bold text-muted-foreground line-through opacity-50">{t.pricing_annual_price}</p>
             <p className="text-lg font-semibold text-foreground">{t.pricing_founder_note}</p>
             <p className="text-xs text-muted-foreground mt-1">{t.pricing_annual_price_note}</p>
             <ul className="mt-6 space-y-3 text-sm text-muted-foreground flex-1">
-              {t.pricing_annual_features.map((f, i) => (
+              {annualFeatures.map((f, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-accent mt-0.5 shrink-0" />
                   <span>{f}</span>
@@ -70,11 +73,14 @@ const PricingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mt-12 text-center">
-          <p className="text-xs text-muted-foreground max-w-xl mx-auto flex items-center justify-center gap-2">
+        {/* Disclaimers */}
+        <div className="mt-12 space-y-3 text-center max-w-xl mx-auto">
+          <p className="text-xs text-muted-foreground flex items-center justify-center gap-2">
             <Shield className="h-4 w-4 shrink-0" />
             {t.pricing_disclaimer}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t.disclaimer_jurisdiction}
           </p>
         </div>
       </main>

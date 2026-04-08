@@ -14,9 +14,14 @@ import { toast } from 'sonner';
 import { Loader2, Plus, Briefcase, AlertTriangle, CheckCircle, XCircle, Info } from 'lucide-react';
 import type { FamilyCircle, ExecutorWorkspaceNote, ChecklistItem, GovernanceResponsibility, CircleMember, MemberFamilyLabel } from '@/types/database';
 import { ExecutorDesignation } from '@/components/ExecutorDesignation';
+import { PlanGate } from '@/components/PlanGate';
+import { usePlan, hasPremiumFeature } from '@/hooks/usePlan';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const ExecutorPage: React.FC = () => {
   const { user } = useAuth();
+  const { plan } = usePlan();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [notes, setNotes] = useState<ExecutorWorkspaceNote[]>([]);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0 });
@@ -143,6 +148,11 @@ const ExecutorPage: React.FC = () => {
         {/* Executor designation */}
         <ExecutorDesignation members={members} labels={labels} />
 
+        {/* Gate advanced executor features behind annual plan */}
+        {!hasPremiumFeature(plan, 'advancedExecutor') ? (
+          <PlanGate featureName={t.plan_gate_executor} reason={t.plan_gate_reason_executor} />
+        ) : (
+        <>
         {/* Readiness overview */}
         <Card className="shadow-card">
           <CardHeader>
@@ -281,6 +291,8 @@ const ExecutorPage: React.FC = () => {
               </Card>
             ))}
           </div>
+        )}
+        </>
         )}
       </div>
     </AppLayout>
