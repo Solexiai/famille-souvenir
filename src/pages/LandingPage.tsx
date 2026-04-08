@@ -3,10 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, FileText, CheckSquare, AlertTriangle } from 'lucide-react';
+import {
+  Shield, Users, FileText, CheckSquare, Lock, Globe, Languages,
+  ArrowRight, Heart, Scale, Briefcase, Eye,
+} from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { SupportedLanguage } from '@/i18n/types';
 import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
+
+import heroBg from '@/assets/landing-hero-bg.jpg';
+import imgCircle from '@/assets/landing-circle.jpg';
+import imgDocuments from '@/assets/landing-documents.jpg';
+import imgChecklist from '@/assets/landing-checklist.jpg';
+import imgPrivacy from '@/assets/landing-privacy.jpg';
 
 const LandingPage: React.FC = () => {
   const { user } = useAuth();
@@ -18,21 +27,45 @@ const LandingPage: React.FC = () => {
     return null;
   }
 
-  const icons = [Users, FileText, CheckSquare, Shield];
+  const featureCards = [
+    { img: imgCircle, label: t.landing_features[0]?.title ?? 'Cercle familial', href: '/setup' },
+    { img: imgDocuments, label: t.landing_features[1]?.title ?? 'Documents', href: '/setup' },
+    { img: imgChecklist, label: t.landing_features[2]?.title ?? 'Préparation', href: '/setup' },
+    { img: imgPrivacy, label: t.landing_features[3]?.title ?? 'Vie privée', href: '/setup' },
+  ];
+
+  const trustItems = [
+    { icon: Shield, label: t.landing_trust_security ?? 'Sécurité avancée' },
+    { icon: Lock, label: t.landing_trust_privacy ?? 'Vie privée totale' },
+    { icon: Globe, label: t.landing_trust_jurisdiction ?? 'Multi-juridiction' },
+    { icon: Languages, label: t.landing_trust_multilingual ?? 'Multilingue' },
+  ];
+
+  const howItWorks = [
+    { icon: Users, title: t.landing_how_1_title ?? 'Créez votre cercle', desc: t.landing_how_1_desc ?? 'Invitez vos proches dans un espace privé et sécurisé.' },
+    { icon: FileText, title: t.landing_how_2_title ?? 'Organisez vos documents', desc: t.landing_how_2_desc ?? 'Centralisez les documents importants avec contrôle de visibilité.' },
+    { icon: CheckSquare, title: t.landing_how_3_title ?? 'Structurez la préparation', desc: t.landing_how_3_desc ?? 'Suivez les étapes avec des checklists et la gouvernance familiale.' },
+    { icon: Briefcase, title: t.landing_how_4_title ?? 'Préparez la transmission', desc: t.landing_how_4_desc ?? 'Désignez un exécuteur et assurez la continuité.' },
+  ];
+
+  const valueProps = [
+    { icon: Shield, title: t.landing_val_1_title ?? 'Chiffrement et sécurité', desc: t.landing_val_1_desc ?? 'Vos données sont protégées par un chiffrement de niveau bancaire.' },
+    { icon: Eye, title: t.landing_val_2_title ?? 'Contrôle de visibilité', desc: t.landing_val_2_desc ?? 'Chaque document a son propre niveau de partage.' },
+    { icon: Scale, title: t.landing_val_3_title ?? 'Adapté à votre juridiction', desc: t.landing_val_3_desc ?? 'Terminologie et checklists adaptées à votre région.' },
+    { icon: Heart, title: t.landing_val_4_title ?? 'Support continu', desc: t.landing_val_4_desc ?? 'Accompagnement à chaque étape de la préparation.' },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
+      {/* ─── Header ─── */}
+      <header className="absolute top-0 left-0 right-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-heading text-xl font-semibold text-foreground">{t.app_name}</span>
-            <span className="text-sm text-muted-foreground">{t.app_tagline}</span>
+            <span className="font-heading text-xl font-semibold text-primary-foreground">{t.app_name}</span>
           </div>
           <div className="flex items-center gap-3">
-            {/* Language switcher */}
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-24 h-9 text-xs">
+              <SelectTrigger className="w-24 h-9 text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -42,86 +75,281 @@ const LandingPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Link to="/pricing">
-              <Button variant="ghost" size="sm">{t.landing_pricing}</Button>
+              <Button variant="ghost" size="sm" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+                {t.landing_pricing}
+              </Button>
             </Link>
             <Link to="/login">
-              <Button variant="ghost">{t.sign_in}</Button>
+              <Button variant="ghost" className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+                {t.sign_in}
+              </Button>
             </Link>
             <Link to="/signup">
-              <Button>{t.sign_up}</Button>
+              <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                {t.sign_up}
+              </Button>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="container py-16 md:py-20 text-center">
-        <div className="mx-auto max-w-2xl animate-fade-in">
-          <h1 className="font-heading text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-            {t.landing_hero_title}
+      {/* ─── Hero ─── */}
+      <section
+        className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden"
+        style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="absolute inset-0 bg-primary/80" />
+        <div className="container relative z-10 text-center">
+          <p className="text-sm font-medium text-accent mb-4 tracking-widest uppercase">
+            {t.app_name}
+          </p>
+          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-semibold text-primary-foreground leading-[1.1] max-w-4xl mx-auto">
+            {t.landing_hero_title.split(',').length > 1 ? (
+              <>
+                {t.landing_hero_title.split(',')[0]},
+                <br />
+                <span className="text-accent">{t.landing_hero_title.split(',').slice(1).join(',').trim() || ''}</span>
+              </>
+            ) : (
+              <>{t.landing_hero_title}</>
+            )}
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+          <p className="mt-6 text-lg md:text-xl text-primary-foreground/70 max-w-2xl mx-auto leading-relaxed">
             {t.landing_hero_subtitle}
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/setup">
-              <Button size="xl">{t.landing_cta_start}</Button>
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2">
+                {t.landing_cta_start}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
             </Link>
             <Link to="/login">
-              <Button variant="outline" size="lg">{t.landing_cta_login}</Button>
+              <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-base px-8 py-6">
+                {t.landing_cta_login}
+              </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="container pb-16">
-        <div className="text-center mb-10">
-          <h2 className="font-heading text-2xl font-semibold text-foreground">{t.landing_why_title}</h2>
-          <p className="mt-2 text-muted-foreground">{t.landing_why_subtitle}</p>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {t.landing_features.map((feature, i) => {
-            const Icon = icons[i] ?? Shield;
-            return (
-              <div key={i} className="rounded-xl border border-border bg-card p-6 shadow-soft text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary">
-                  <Icon className="h-6 w-6 text-accent" />
+      {/* ─── Feature Cards Grid (Medvi-style) ─── */}
+      <section className="container -mt-12 relative z-20 pb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {featureCards.map((card, i) => (
+            <Link
+              key={i}
+              to={card.href}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-card hover:shadow-elevated transition-all duration-300"
+            >
+              <div className="aspect-square overflow-hidden">
+                <img
+                  src={card.img}
+                  alt={card.label}
+                  loading="lazy"
+                  width={640}
+                  height={640}
+                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-card/95 to-transparent">
+                <div className="flex items-center justify-between">
+                  <span className="font-heading text-sm md:text-base font-medium text-foreground">
+                    {card.label}
+                  </span>
+                  <ArrowRight className="h-4 w-4 text-accent group-hover:translate-x-1 transition-transform" />
                 </div>
-                <h3 className="font-heading text-lg font-medium text-foreground">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Trust Ticker (Marquee) ─── */}
+      <section className="border-y border-border py-4 overflow-hidden bg-secondary/30">
+        <div className="marquee-track flex items-center gap-12 whitespace-nowrap">
+          {[...trustItems, ...trustItems, ...trustItems].map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <div key={i} className="flex items-center gap-2 text-muted-foreground shrink-0">
+                <Icon className="h-4 w-4 text-accent" />
+                <span className="text-xs font-medium uppercase tracking-wider">{item.label}</span>
               </div>
             );
           })}
         </div>
       </section>
 
-      {/* Why now */}
-      <section className="container pb-16">
-        <div className="mx-auto max-w-xl bg-secondary/50 rounded-xl p-8 border border-border">
-          <h2 className="font-heading text-xl font-semibold text-foreground text-center mb-6 flex items-center justify-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-accent" />
-            {t.landing_why_now_title}
+      {/* ─── Alternating Feature Sections ─── */}
+      <section className="py-20">
+        {t.landing_features.map((feature, i) => {
+          const images = [imgCircle, imgDocuments, imgChecklist, imgPrivacy];
+          const icons = [Users, FileText, CheckSquare, Shield];
+          const Icon = icons[i] ?? Shield;
+          const isReversed = i % 2 !== 0;
+
+          return (
+            <div
+              key={i}
+              className={`container py-12 flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12`}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <Icon className="h-5 w-5 text-accent" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-accent">
+                    {t.app_name}
+                  </span>
+                </div>
+                <h2 className="font-heading text-3xl md:text-4xl font-semibold text-foreground leading-tight">
+                  {feature.title}
+                </h2>
+                <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
+                  {feature.description}
+                </p>
+                <Link to="/setup" className="mt-6 inline-block">
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
+                    {t.landing_cta_start}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="flex-1 max-w-md">
+                <img
+                  src={images[i]}
+                  alt={feature.title}
+                  loading="lazy"
+                  width={640}
+                  height={640}
+                  className="rounded-2xl shadow-card w-full"
+                />
+              </div>
+            </div>
+          );
+        })}
+      </section>
+
+      {/* ─── How It Works ─── */}
+      <section className="bg-primary py-20">
+        <div className="container text-center">
+          <p className="text-xs font-medium uppercase tracking-wider text-accent mb-4">
+            {t.landing_how_tag ?? 'Comment ça marche'}
+          </p>
+          <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary-foreground mb-12">
+            {t.landing_how_title ?? 'Une approche structurée, étape par étape'}
           </h2>
-          <ul className="space-y-4">
-            {t.landing_why_now_items.map((item, i) => (
-              <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                <span className="mt-0.5 h-2 w-2 rounded-full bg-accent shrink-0" />
-                {item}
-              </li>
-            ))}
-          </ul>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {howItWorks.map((step, i) => {
+              const Icon = step.icon;
+              return (
+                <div key={i} className="text-left">
+                  <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-accent/20 mb-4">
+                    <Icon className="h-6 w-6 text-accent" />
+                  </div>
+                  <h3 className="font-heading text-lg font-medium text-primary-foreground mb-2">{step.title}</h3>
+                  <p className="text-sm text-primary-foreground/60 leading-relaxed">{step.desc}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8">
-        <div className="container flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+      {/* ─── Value Props Grid ─── */}
+      <section className="py-20">
+        <div className="container">
+          <div className="text-center mb-12">
+            <p className="text-xs font-medium uppercase tracking-wider text-accent mb-4">
+              {t.landing_why_title}
+            </p>
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-foreground">
+              {t.landing_why_subtitle}
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {valueProps.map((prop, i) => {
+              const Icon = prop.icon;
+              return (
+                <div key={i} className="rounded-2xl border border-border bg-card p-8 shadow-soft">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+                      <Icon className="h-6 w-6 text-accent" />
+                    </div>
+                    <h3 className="font-heading text-lg font-medium text-foreground">{prop.title}</h3>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed">{prop.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Why Now ─── */}
+      <section className="bg-secondary/50 py-20">
+        <div className="container">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-foreground mb-8">
+              {t.landing_why_now_title}
+            </h2>
+            <ul className="space-y-4 text-left">
+              {t.landing_why_now_items.map((item, i) => (
+                <li key={i} className="flex items-start gap-4 text-muted-foreground">
+                  <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-accent shrink-0" />
+                  <span className="text-base leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+            <Link to="/setup" className="mt-10 inline-block">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2 px-8">
+                {t.landing_cta_start}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Final CTA ─── */}
+      <section
+        className="relative py-24 overflow-hidden"
+        style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
+        <div className="absolute inset-0 bg-primary/85" />
+        <div className="container relative z-10 text-center">
+          <h2 className="font-heading text-3xl md:text-5xl font-semibold text-primary-foreground mb-6">
+            {t.landing_hero_title}
+          </h2>
+          <p className="text-primary-foreground/70 text-lg mb-10 max-w-xl mx-auto">
+            {t.landing_hero_subtitle}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/setup">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2">
+                {t.landing_cta_start}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/pricing">
+              <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-base px-8 py-6">
+                {t.landing_pricing}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="border-t border-border py-10 bg-card">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-heading text-lg font-semibold text-foreground">{t.app_name}</span>
+            <span className="text-muted-foreground">{t.app_tagline}</span>
+          </div>
           <p>{t.landing_footer_rights.replace('{year}', String(new Date().getFullYear()))}</p>
-          <div className="flex gap-4">
-            <Link to="/privacy" className="hover:text-foreground">{t.landing_privacy}</Link>
-            <Link to="/terms" className="hover:text-foreground">{t.landing_terms}</Link>
-            <Link to="/pricing" className="hover:text-foreground">{t.landing_pricing}</Link>
+          <div className="flex gap-6">
+            <Link to="/privacy" className="hover:text-foreground transition-colors">{t.landing_privacy}</Link>
+            <Link to="/terms" className="hover:text-foreground transition-colors">{t.landing_terms}</Link>
+            <Link to="/pricing" className="hover:text-foreground transition-colors">{t.landing_pricing}</Link>
           </div>
         </div>
       </footer>

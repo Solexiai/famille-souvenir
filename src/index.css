@@ -115,3 +115,12 @@
     box-shadow: var(--shadow-elevated);
   }
 }
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+
+.marquee-track {
+  animation: marquee-scroll 30s linear infinite;
+}
