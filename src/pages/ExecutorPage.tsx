@@ -20,6 +20,8 @@ import { useLocale } from '@/contexts/LocaleContext';
 
 const ExecutorPage: React.FC = () => {
   const { user } = useAuth();
+  const { plan } = usePlan();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [notes, setNotes] = useState<ExecutorWorkspaceNote[]>([]);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0 });
