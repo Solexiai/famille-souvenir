@@ -116,8 +116,8 @@ const TestimonialsCarousel: React.FC = () => {
   );
 };
 
-
-  const LandingPage: React.FC = () => {
+const LandingPage: React.FC = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { t, lang, setLang } = useLocale();
 
