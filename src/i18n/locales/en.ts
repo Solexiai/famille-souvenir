@@ -54,7 +54,7 @@ const en: Translations = {
   landing_trust_multilingual: 'Multilingual',
   landing_how_tag: 'How it works',
   landing_how_title: 'A structured approach, step by step',
-  landing_how_1_title: 'Create your circle',
+  landing_how_1_title: 'Create your family succession',
   landing_how_1_desc: 'Invite your loved ones into a private, secure space.',
   landing_how_2_title: 'Organize your documents',
   landing_how_2_desc: 'Centralize important documents with visibility controls.',
