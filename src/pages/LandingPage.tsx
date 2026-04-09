@@ -155,7 +155,19 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-6 md:py-8 bg-secondary/30">
+    <section className="py-6 md:py-8 relative overflow-hidden">
+      {/* Blurred background photo */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={t.photo}
+          alt=""
+          className="w-full h-full object-cover blur-[6px] scale-110 opacity-20"
+          loading="lazy"
+          width={512}
+          height={512}
+        />
+        <div className="absolute inset-0 bg-secondary/60" />
+      </div>
       <div className="container max-w-3xl text-center px-4">
         <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
