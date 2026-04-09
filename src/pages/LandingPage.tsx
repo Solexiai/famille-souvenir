@@ -13,11 +13,6 @@ import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 
 import logoSolexi from '@/assets/logo-solexi.png';
 import heroBg from '@/assets/landing-hero-bg.jpg';
-import founderImg from '@/assets/solexi-founder.png';
-import imgCircle from '@/assets/landing-circle.jpg';
-import imgDocuments from '@/assets/landing-documents.jpg';
-import imgChecklist from '@/assets/landing-checklist.jpg';
-import imgPrivacy from '@/assets/landing-privacy.jpg';
 
 // Testimonial portraits
 import frMarie from '@/assets/testimonials/fr-marie.jpg';
@@ -238,12 +233,6 @@ const LandingPage: React.FC = () => {
     return null;
   }
 
-  const featureCards = [
-    { img: imgCircle, label: t.landing_features[0]?.title ?? 'Cercle familial', href: '/setup' },
-    { img: imgDocuments, label: t.landing_features[1]?.title ?? 'Documents', href: '/setup' },
-    { img: imgChecklist, label: t.landing_features[2]?.title ?? 'Préparation', href: '/setup' },
-    { img: imgPrivacy, label: t.landing_features[3]?.title ?? 'Vie privée', href: '/setup' },
-  ];
 
   const trustItems = [
     { icon: Shield, label: t.landing_trust_security ?? 'Sécurité avancée' },
@@ -365,38 +354,6 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Feature Cards Grid (Medvi-style) ─── */}
-      <section className="container relative z-20 pb-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {featureCards.map((card, i) => (
-            <Link
-              key={i}
-              to={card.href}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-card hover:shadow-elevated transition-all duration-300"
-            >
-              <div className="aspect-square overflow-hidden">
-                <img
-                  src={card.img}
-                  alt={card.label}
-                  loading="lazy"
-                  width={640}
-                  height={640}
-                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-card/95 to-transparent">
-                <div className="flex items-center justify-between">
-                  <span className="font-heading text-sm md:text-base font-medium text-foreground">
-                    {card.label}
-                  </span>
-                  <ArrowRight className="h-4 w-4 text-accent group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* ─── Trust Ticker (Marquee) ─── */}
       <section className="border-y border-border py-4 overflow-hidden bg-secondary/30">
         <div className="marquee-track flex items-center gap-12 whitespace-nowrap">
@@ -412,53 +369,6 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Alternating Feature Sections ─── */}
-      <section className="py-20">
-        {t.landing_features.map((feature, i) => {
-          const images = [imgCircle, imgDocuments, imgChecklist, imgPrivacy];
-          const icons = [Users, FileText, CheckSquare, Shield];
-          const Icon = icons[i] ?? Shield;
-          const isReversed = i % 2 !== 0;
-
-          return (
-            <div
-              key={i}
-              className={`container py-12 flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12`}
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-4">
-                  <Icon className="h-5 w-5 text-accent" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-accent">
-                    {t.app_name}
-                  </span>
-                </div>
-                <h2 className="font-heading text-3xl md:text-4xl font-semibold text-foreground leading-tight">
-                  {feature.title}
-                </h2>
-                <p className="mt-4 text-muted-foreground leading-relaxed text-lg">
-                  {feature.description}
-                </p>
-                <Link to="/setup" className="mt-6 inline-block">
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2">
-                    {t.landing_cta_start}
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-              <div className="flex-1 max-w-md">
-                <img
-                  src={images[i]}
-                  alt={feature.title}
-                  loading="lazy"
-                  width={640}
-                  height={640}
-                  className="rounded-2xl shadow-card w-full"
-                />
-              </div>
-            </div>
-          );
-        })}
-      </section>
 
       {/* ─── How It Works ─── */}
       <section className="bg-primary py-20">
