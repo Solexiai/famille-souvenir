@@ -182,7 +182,15 @@ const TestimonialsCarousel: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <img
+            src={t.photo}
+            alt={t.name}
+            className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-2 border-accent shadow-md"
+            loading="lazy"
+            width={64}
+            height={64}
+          />
           <p className="font-semibold text-foreground">{t.name}</p>
           <p className="text-sm text-muted-foreground">{t.age} · {t.location}</p>
         </div>
