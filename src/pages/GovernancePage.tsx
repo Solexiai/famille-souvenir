@@ -264,169 +264,173 @@ const GovernancePage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in px-1">
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
-              <Shield className="h-6 w-6 text-accent" />
-              Gouvernance familiale
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Coordination des responsabilités et suivi des domaines importants. Ne constitue pas une délégation légale.
-            </p>
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
+                <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
+                Gouvernance
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
+                Coordination des responsabilités familiales.
+              </p>
+            </div>
+            {canEdit && (
+              <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 shrink-0"><Plus className="h-4 w-4" />Ajouter</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="font-heading">{editItem ? 'Modifier la responsabilité' : 'Assigner une responsabilité'}</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleSave} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>Domaine</Label>
+                      <Select value={area} onValueChange={(v) => setArea(v as GovernanceArea)}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Titre</Label>
+                      <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Suivi du notaire" required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails..." rows={2} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Responsable</Label>
+                      <Select value={memberId || 'none'} onValueChange={(v) => setMemberId(v === 'none' ? '' : v)}>
+                        <SelectTrigger><SelectValue placeholder="Choisir un membre" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Non attribué</SelectItem>
+                          {members.map(m => (
+                            <SelectItem key={m.user_id} value={m.user_id}>
+                              {m.profiles?.full_name || m.profiles?.email || 'Membre'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Statut</Label>
+                      <Select value={formStatus} onValueChange={(v) => setFormStatus(v as GovernanceStatus)}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Échéance</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dueDate ? format(dueDate, 'PPP', { locale: fr }) : 'Pas d\'échéance'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus className={cn("p-3 pointer-events-auto")} />
+                        </PopoverContent>
+                      </Popover>
+                      {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">Retirer</Button>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Checklist lié</Label>
+                      <Select value={linkedChecklist || 'none'} onValueChange={(v) => setLinkedChecklist(v === 'none' ? '' : v)}>
+                        <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Aucun</SelectItem>
+                          {checklists.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.title}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Document lié</Label>
+                      <Select value={linkedDoc || 'none'} onValueChange={(v) => setLinkedDoc(v === 'none' ? '' : v)}>
+                        <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Aucun</SelectItem>
+                          {documents.map(d => <SelectItem key={d.id} value={d.id}>{d.title}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Note</Label>
+                      <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Remarques..." rows={2} />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={saving || !memberId}>
+                      {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                      {editItem ? 'Enregistrer' : 'Assigner'}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
           </div>
-          {canEdit && (
-            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-              <DialogTrigger asChild>
-                <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="font-heading">{editItem ? 'Modifier la responsabilité' : 'Assigner une responsabilité'}</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleSave} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Domaine</Label>
-                    <Select value={area} onValueChange={(v) => setArea(v as GovernanceArea)}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Titre</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Suivi du notaire" required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails de la responsabilité..." rows={2} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Responsable</Label>
-                    <Select value={memberId || 'none'} onValueChange={(v) => setMemberId(v === 'none' ? '' : v)}>
-                      <SelectTrigger><SelectValue placeholder="Choisir un membre" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Non attribué</SelectItem>
-                        {members.map(m => (
-                          <SelectItem key={m.user_id} value={m.user_id}>
-                            {m.profiles?.full_name || m.profiles?.email || 'Membre'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Statut</Label>
-                    <Select value={formStatus} onValueChange={(v) => setFormStatus(v as GovernanceStatus)}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Échéance</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dueDate ? format(dueDate, 'PPP', { locale: fr }) : 'Pas d\'échéance'}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus className={cn("p-3 pointer-events-auto")} />
-                      </PopoverContent>
-                    </Popover>
-                    {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">Retirer</Button>}
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Élément checklist lié</Label>
-                    <Select value={linkedChecklist || 'none'} onValueChange={(v) => setLinkedChecklist(v === 'none' ? '' : v)}>
-                      <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Aucun</SelectItem>
-                        {checklists.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.title}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Document lié</Label>
-                    <Select value={linkedDoc || 'none'} onValueChange={(v) => setLinkedDoc(v === 'none' ? '' : v)}>
-                      <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Aucun</SelectItem>
-                        {documents.map(d => <SelectItem key={d.id} value={d.id}>{d.title}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Note</Label>
-                    <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Remarques, contexte..." rows={2} />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={saving || !memberId}>
-                    {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {editItem ? 'Enregistrer' : 'Assigner'}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-          )}
         </div>
 
         {/* Summary cards */}
         {stats.total > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.assigned}</p>
-              <p className="text-xs text-muted-foreground">Responsabilités assignées</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.completed}</p>
-              <p className="text-xs text-muted-foreground">Complétées</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-destructive">{stats.blocked}</p>
-              <p className="text-xs text-muted-foreground">Bloquées</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-amber-600">{stats.needsAttention}</p>
-              <p className="text-xs text-muted-foreground">Attention requise</p>
-            </CardContent></Card>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            {[
+              { value: stats.assigned, label: 'Assignées', color: 'text-foreground' },
+              { value: stats.completed, label: 'Complétées', color: 'text-green-600' },
+              { value: stats.blocked, label: 'Bloquées', color: 'text-destructive' },
+              { value: stats.needsAttention, label: 'Attention', color: 'text-amber-600' },
+            ].map((s) => (
+              <Card key={s.label} className="shadow-soft">
+                <CardContent className="p-3 sm:py-4 text-center">
+                  <p className={`text-xl sm:text-2xl font-semibold ${s.color}`}>{s.value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">{s.label}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
 
         {/* Filters */}
         {stats.total > 0 && (
           <Card className="shadow-soft">
-            <CardContent className="py-3 flex flex-wrap gap-3 items-center">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={filterArea} onValueChange={setFilterArea}>
-                <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Domaine" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les domaines</SelectItem>
-                  {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={filterMember} onValueChange={setFilterMember}>
-                <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Responsable" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les membres</SelectItem>
-                  {members.map(m => (
-                    <SelectItem key={m.user_id} value={m.user_id}>
-                      {m.profiles?.full_name || 'Membre'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <span className="text-xs font-medium text-muted-foreground">Filtres</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <Select value={filterArea} onValueChange={setFilterArea}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Domaine" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les domaines</SelectItem>
+                    {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filterMember} onValueChange={setFilterMember}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Responsable" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les membres</SelectItem>
+                    {members.map(m => (
+                      <SelectItem key={m.user_id} value={m.user_id}>
+                        {m.profiles?.full_name || 'Membre'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -435,95 +439,103 @@ const GovernancePage: React.FC = () => {
         {filtered.length === 0 ? (
           <Card className="shadow-soft">
             <CardContent className="py-12 text-center">
-              <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
+              <Shield className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">
                 {items.length === 0
                   ? 'Aucune responsabilité assignée.'
                   : 'Aucun élément correspondant aux filtres.'}
               </p>
               {items.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Organisez la coordination familiale en assignant des responsabilités à chaque membre.
+                <p className="text-xs text-muted-foreground mt-1">
+                  Assignez des responsabilités à chaque membre.
                 </p>
               )}
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {areaOrder.filter(a => grouped[a]).map(a => {
               const areaItems = grouped[a];
               const isCollapsed = collapsedAreas.has(a);
               const areaCompleted = areaItems.filter(i => i.status === 'completed').length;
               return (
-                <Card key={a} className="shadow-soft">
-                  <CardHeader className="pb-2 cursor-pointer" onClick={() => toggleArea(a)}>
+                <Card key={a} className="shadow-soft overflow-hidden">
+                  <CardHeader className="p-3 sm:p-4 pb-2 cursor-pointer" onClick={() => toggleArea(a)}>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {isCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                        <CardTitle className="font-heading text-base">{areaLabels[a as GovernanceArea]}</CardTitle>
+                      <div className="flex items-center gap-2 min-w-0">
+                        {isCollapsed
+                          ? <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                          : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+                        <CardTitle className="font-heading text-sm sm:text-base truncate">{areaLabels[a as GovernanceArea]}</CardTitle>
                       </div>
-                      <Badge variant="outline" className="text-xs">{areaCompleted}/{areaItems.length}</Badge>
+                      <Badge variant="outline" className="text-[10px] sm:text-xs shrink-0 ml-2">{areaCompleted}/{areaItems.length}</Badge>
                     </div>
                   </CardHeader>
                   {!isCollapsed && (
-                    <CardContent className="space-y-2 pt-0">
+                    <CardContent className="p-3 sm:p-4 pt-0 space-y-2">
                       {areaItems.map(item => (
-                        <div key={item.id} className="rounded-lg border border-border p-3 space-y-2">
+                        <div key={item.id} className="rounded-lg border border-border bg-background p-3 space-y-2.5">
+                          {/* Title row */}
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="text-sm font-medium text-foreground">{item.title}</p>
-                                {item.linked_document && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
-                                    <FileText className="h-3 w-3" />Doc
-                                  </span>
-                                )}
-                                {item.linked_checklist_item && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
-                                    <CheckSquare className="h-3 w-3" />Check
-                                  </span>
-                                )}
-                                {item.status === 'blocked' && <Ban className="h-3.5 w-3.5 text-destructive" />}
-                                {item.status === 'needs_attention' && <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />}
-                              </div>
-                              {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
-                              <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
-                                <span className="inline-flex items-center gap-1">
-                                  <User className="h-3 w-3" />
-                                  {getMemberName(item.member_id)}
-                                </span>
-                                {item.due_date && (
-                                  <span className="inline-flex items-center gap-1">
-                                    <CalendarIcon className="h-3 w-3" />
-                                    {new Date(item.due_date).toLocaleDateString('fr-FR')}
-                                  </span>
-                                )}
-                                {item.note && <span>💬 {item.note}</span>}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              {canEdit ? (
-                                <>
-                                  <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as GovernanceStatus)}>
-                                    <SelectTrigger className="w-[130px] h-7 text-xs"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                      {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                                    </SelectContent>
-                                  </Select>
-                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => openEdit(item)}>
-                                    Modifier
-                                  </Button>
-                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2 text-destructive" onClick={() => handleDelete(item)}>
-                                    ×
-                                  </Button>
-                                </>
-                              ) : (
-                                <Badge className={`text-xs ${statusColors[item.status]}`}>
-                                  {statusLabels[item.status]}
-                                </Badge>
-                              )}
-                            </div>
+                            <p className="text-sm font-medium text-foreground leading-snug flex-1 min-w-0 break-words">
+                              {item.title}
+                            </p>
+                            <Badge className={`text-[10px] px-1.5 py-0.5 shrink-0 ${statusColors[item.status]}`}>
+                              {statusLabels[item.status]}
+                            </Badge>
                           </div>
+
+                          {/* Description */}
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground leading-relaxed break-words">{item.description}</p>
+                          )}
+
+                          {/* Meta row */}
+                          <div className="flex items-center gap-x-3 gap-y-1 flex-wrap text-xs text-muted-foreground">
+                            <span className="inline-flex items-center gap-1">
+                              <User className="h-3 w-3 shrink-0" />
+                              <span className="truncate max-w-[120px]">{getMemberName(item.member_id)}</span>
+                            </span>
+                            {item.due_date && (
+                              <span className="inline-flex items-center gap-1">
+                                <CalendarIcon className="h-3 w-3 shrink-0" />
+                                {new Date(item.due_date).toLocaleDateString('fr-FR')}
+                              </span>
+                            )}
+                            {item.linked_document && (
+                              <span className="inline-flex items-center gap-1 text-primary">
+                                <FileText className="h-3 w-3" />Doc
+                              </span>
+                            )}
+                            {item.linked_checklist_item && (
+                              <span className="inline-flex items-center gap-1 text-primary">
+                                <CheckSquare className="h-3 w-3" />Check
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Note */}
+                          {item.note && (
+                            <p className="text-xs text-muted-foreground/80 italic break-words">💬 {item.note}</p>
+                          )}
+
+                          {/* Actions */}
+                          {canEdit && (
+                            <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+                              <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as GovernanceStatus)}>
+                                <SelectTrigger className="h-7 text-[11px] flex-1 max-w-[160px]"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Button variant="outline" size="sm" className="text-xs h-7 px-2.5" onClick={() => openEdit(item)}>
+                                Modifier
+                              </Button>
+                              <Button variant="ghost" size="sm" className="text-xs h-7 px-2 text-destructive hover:text-destructive" onClick={() => handleDelete(item)}>
+                                ×
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </CardContent>
