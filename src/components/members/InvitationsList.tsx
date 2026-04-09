@@ -115,21 +115,23 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
           const EffectiveIcon = effectiveConfig.icon;
 
           return (
-            <div key={inv.id} className="rounded-lg border border-border p-4 space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
-                  <p className="text-xs text-muted-foreground">{inv.email}</p>
+            <div key={inv.id} className="rounded-lg border border-border p-3 sm:p-4 space-y-3">
+              {/* Top: info + status */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div className="min-w-0 space-y-0.5">
+                  <p className="text-sm font-medium text-foreground">{displayName}</p>
+                  <p className="text-xs text-muted-foreground break-all">{inv.email}</p>
                   {inv.relationship_label && (
                     <p className="text-xs text-muted-foreground">{inv.relationship_label}</p>
                   )}
                 </div>
-                <Badge variant={effectiveConfig.variant} className="flex items-center gap-1 shrink-0">
+                <Badge variant={effectiveConfig.variant} className="flex items-center gap-1 shrink-0 self-start sm:self-center text-xs">
                   <EffectiveIcon className="h-3 w-3" />
                   {effectiveConfig.label}
                 </Badge>
               </div>
 
+              {/* Meta */}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Envoyée le {format(new Date(inv.created_at), 'dd MMM yyyy', { locale: fr })}</span>
                 {inv.resent_count > 0 && (
@@ -137,11 +139,13 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
                 )}
               </div>
 
+              {/* Actions */}
               {canManage && (effectiveStatus === 'pending' || effectiveStatus === 'expired') && (
                 <div className="flex gap-2 pt-1">
                   <Button
                     variant="outline"
                     size="sm"
+                    className="gap-1.5 text-xs"
                     onClick={() => handleResend(inv)}
                     disabled={actionLoading === inv.id}
                   >
@@ -151,9 +155,9 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="gap-1.5 text-xs text-destructive hover:text-destructive"
                     onClick={() => handleCancel(inv)}
                     disabled={actionLoading === inv.id}
-                    className="text-destructive hover:text-destructive"
                   >
                     <XCircle className="h-3 w-3" />
                     Annuler
