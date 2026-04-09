@@ -228,7 +228,7 @@ const LandingPage: React.FC = () => {
           </div>
            <div className="flex items-center gap-2 md:gap-3">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-[5.5rem] md:w-28 h-9 md:h-10 text-xs md:text-sm bg-accent/20 border-2 border-accent text-foreground rounded-full font-medium">
+              <SelectTrigger className="w-[5.5rem] md:w-28 h-9 md:h-10 text-xs md:text-sm bg-accent border-2 border-accent text-black rounded-full font-bold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -238,7 +238,7 @@ const LandingPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Link to="/login">
-              <Button size="sm" className="h-9 md:h-10 bg-accent/20 border-2 border-accent text-foreground hover:bg-accent/30 text-xs md:text-sm px-4 md:px-5 whitespace-nowrap rounded-full font-medium">
+              <Button size="sm" className="h-9 md:h-10 bg-accent border-2 border-accent text-black hover:bg-accent/90 text-xs md:text-sm px-4 md:px-5 whitespace-nowrap rounded-full font-bold">
                 {t.sign_in}
               </Button>
             </Link>
