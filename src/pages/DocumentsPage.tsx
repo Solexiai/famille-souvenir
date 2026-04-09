@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { LimitWarning } from '@/components/PlanGate';
-import { usePlan, FREE_LIMITS, isOverFreeLimit } from '@/hooks/usePlan';
+import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
 
 const categories = [
@@ -43,14 +43,14 @@ const visibilityLabels: Record<DocumentVisibility, string> = {
   family_circle: 'Tout le cercle',
   heirs_only: 'Héritiers uniquement',
   executor_workspace: 'Espace exécuteur',
-  verified_executor_only: 'Exécuteur vérifié uniquement',
+  verified_executor_only: 'Exécuteur vérifié',
 };
 
 const verificationLabels: Record<VerificationStatus, string> = {
   unreviewed: 'Non examiné',
   identified: 'Identifié',
   needs_update: 'À mettre à jour',
-  needs_professional_review: 'À revoir avec un professionnel',
+  needs_professional_review: 'Revoir pro.',
   document_verified: 'Vérifié',
 };
 
@@ -105,7 +105,7 @@ const DocumentsPage: React.FC = () => {
     const ext = file.name.split('.').pop();
     const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, file);
-    if (uploadError) { toast.error("Erreur lors de l'envoi du fichier. Veuillez réessayer."); setUploading(false); return; }
+    if (uploadError) { toast.error("Erreur lors de l'envoi du fichier."); setUploading(false); return; }
 
     const { error } = await supabase.from('documents').insert({
       circle_id: circle.id,
@@ -119,9 +119,8 @@ const DocumentsPage: React.FC = () => {
       file_size: file.size,
     });
 
-    if (error) toast.error("Erreur lors de l'enregistrement du document.");
+    if (error) toast.error("Erreur lors de l'enregistrement.");
     else {
-      // Audit log
       await supabase.from('audit_logs').insert({
         circle_id: circle.id, user_id: user.id,
         action: 'document_uploaded',
@@ -146,107 +145,126 @@ const DocumentsPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
-              <FolderOpen className="h-6 w-6 text-accent" />
-              Documents
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Centre documentaire structuré et sécurisé.
-            </p>
+      <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 space-y-4 sm:space-y-6 animate-fade-in">
+        {/* Header */}
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
+                <FolderOpen className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
+                Documents
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+                Centre documentaire structuré et sécurisé.
+              </p>
+            </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1.5 shrink-0 text-xs sm:text-sm">
+                  <Plus className="h-4 w-4" />
+                  Ajouter
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg mx-3">
+                <DialogHeader>
+                  <DialogTitle className="font-heading">Ajouter un document</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleUpload} className="space-y-3 sm:space-y-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs sm:text-sm">Titre</Label>
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Acte de naissance" required className="text-sm" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs sm:text-sm">Description</Label>
+                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Notes..." className="text-sm min-h-[60px]" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs sm:text-sm">Catégorie</Label>
+                      <Select value={category} onValueChange={setCategory}>
+                        <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {categories.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs sm:text-sm">Visibilité</Label>
+                      <Select value={visibility} onValueChange={(v) => setVisibility(v as DocumentVisibility)}>
+                        <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(visibilityLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs sm:text-sm">Fichier</Label>
+                    <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required className="text-sm" />
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">PDF, images ou documents. Max 20 Mo.</p>
+                  </div>
+                  <Button type="submit" className="w-full text-sm" disabled={uploading}>
+                    {uploading && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+                    Enregistrer
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
           <LimitWarning current={documents.length} max={FREE_LIMITS.maxDocuments} label={t.plan_gate_document_limit} />
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle className="font-heading">Ajouter un document</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleUpload} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Titre</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Acte de naissance" required />
-                </div>
-                <div className="space-y-2">
-                  <Label>Description</Label>
-                  <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Notes..." />
-                </div>
-                <div className="space-y-2">
-                  <Label>Catégorie</Label>
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {categories.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Fichier</Label>
-                  <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required />
-                  <p className="text-xs text-muted-foreground">PDF, images ou documents. Max 20 Mo.</p>
-                </div>
-                <div className="space-y-2">
-                  <Label>Visibilité</Label>
-                  <Select value={visibility} onValueChange={(v) => setVisibility(v as DocumentVisibility)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(visibilityLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button type="submit" className="w-full" disabled={uploading}>
-                  {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Enregistrer
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
         </div>
 
+        {/* Document list */}
         {documents.length === 0 ? (
           <Card className="shadow-soft">
-            <CardContent className="py-12 text-center">
-              <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun document enregistré.</p>
-              <p className="text-sm text-muted-foreground mt-1">Centralisez vos documents importants ici.</p>
+            <CardContent className="py-10 sm:py-12 text-center">
+              <FolderOpen className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground font-medium">Aucun document enregistré.</p>
+              <p className="text-xs text-muted-foreground mt-1">Centralisez vos documents importants ici.</p>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2.5 sm:space-y-3">
             {documents.map((doc) => (
-              <Card key={doc.id} className="shadow-soft">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-lg bg-secondary p-2">
-                        <FileText className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{doc.title}</p>
-                        {doc.description && <p className="text-xs text-muted-foreground">{doc.description}</p>}
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {categories.find(c => c.value === doc.category)?.label || doc.category}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {visibilityLabels[doc.visibility]}
-                          </Badge>
-                          <Badge className={`text-xs ${verificationColors[doc.verification_status]}`}>
-                            {verificationLabels[doc.verification_status]}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(doc.created_at).toLocaleDateString('fr-FR')}
-                          </span>
+              <Card key={doc.id} className="shadow-soft overflow-hidden">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-start gap-3">
+                    {/* Icon */}
+                    <div className="rounded-lg bg-secondary p-2 shrink-0 mt-0.5">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0 space-y-1.5">
+                      {/* Title row */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{doc.title}</p>
+                          {doc.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5 break-words">{doc.description}</p>
+                          )}
                         </div>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => handleDownload(doc)}>
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* Badges row */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0.5">
+                          {categories.find(c => c.value === doc.category)?.label || doc.category}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0.5">
+                          {visibilityLabels[doc.visibility]}
+                        </Badge>
+                        <Badge className={`text-[10px] sm:text-xs px-1.5 py-0.5 ${verificationColors[doc.verification_status]}`}>
+                          {verificationLabels[doc.verification_status]}
+                        </Badge>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-auto">
+                          {new Date(doc.created_at).toLocaleDateString('fr-FR')}
+                        </span>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => handleDownload(doc)}>
-                      <Download className="h-4 w-4" />
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
