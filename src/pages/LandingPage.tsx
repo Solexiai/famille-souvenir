@@ -283,40 +283,6 @@ const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* ─── Hero ─── */}
-      <section
-        className="relative pt-28 pb-12 md:pt-40 md:pb-14 overflow-hidden"
-        style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <div className="absolute inset-0 bg-primary/80" />
-        <div className="container relative z-10 text-center px-6">
-          <p className="text-sm font-medium text-accent mb-4 tracking-widest uppercase">
-            {t.app_name}
-          </p>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-primary-foreground leading-[1.1] max-w-4xl mx-auto">
-            {t.landing_hero_title.split(',').length > 1 ? (
-              <>
-                {t.landing_hero_title.split(',')[0]},
-                <br />
-                <span className="text-accent">{t.landing_hero_title.split(',').slice(1).join(',').trim() || ''}</span>
-              </>
-            ) : (
-              <>{t.landing_hero_title}</>
-            )}
-          </h1>
-          <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-primary-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            {t.landing_hero_subtitle}
-          </p>
-          <div className="mt-10 flex items-center justify-center">
-            <Link to="/setup">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2">
-                {t.landing_cta_start}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ─── Testimonials Carousel ─── */}
       <TestimonialsCarousel />
