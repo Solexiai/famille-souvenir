@@ -18,6 +18,20 @@ import imgDocuments from '@/assets/landing-documents.jpg';
 import imgChecklist from '@/assets/landing-checklist.jpg';
 import imgPrivacy from '@/assets/landing-privacy.jpg';
 
+// Testimonial portraits
+import frMarie from '@/assets/testimonials/fr-marie.jpg';
+import frJeanFrancois from '@/assets/testimonials/fr-jeanfrancois.jpg';
+import frSylvie from '@/assets/testimonials/fr-sylvie.jpg';
+import frCarlos from '@/assets/testimonials/fr-carlos.jpg';
+import enPatricia from '@/assets/testimonials/en-patricia.jpg';
+import enJames from '@/assets/testimonials/en-james.jpg';
+import enSarah from '@/assets/testimonials/en-sarah.jpg';
+import enTomLisa from '@/assets/testimonials/en-tomlisa.jpg';
+import esLucia from '@/assets/testimonials/es-lucia.jpg';
+import esAndres from '@/assets/testimonials/es-andres.jpg';
+import esIsabel from '@/assets/testimonials/es-isabel.jpg';
+import esMartin from '@/assets/testimonials/es-martin.jpg';
+
 interface Testimonial {
   quote: string;
   name: string;
