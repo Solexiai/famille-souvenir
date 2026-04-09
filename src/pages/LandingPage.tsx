@@ -224,7 +224,7 @@ const LandingPage: React.FC = () => {
       <header className="absolute top-0 left-0 right-0 z-50">
         <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
           <div className="flex items-center gap-2">
-            <span className="text-xl md:text-2xl font-heading font-bold text-accent drop-shadow-md">Solexi.ai</span>
+            <span className="text-xl md:text-3xl lg:text-4xl font-heading font-bold text-white drop-shadow-md">Solexi.ai</span>
           </div>
            <div className="flex items-center gap-2 md:gap-3">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
