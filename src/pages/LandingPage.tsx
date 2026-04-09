@@ -37,6 +37,7 @@ interface Testimonial {
   name: string;
   age: string;
   location: string;
+  photo: string;
 }
 
 const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
@@ -46,24 +47,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Marie T.',
       age: '67 ans',
       location: 'Québec, QC',
+      photo: frMarie,
     },
     {
       quote: "Quand mon père est tombé malade, on savait exactement quoi faire. Tout était là, clair, organisé. Solexi nous a épargnés d'un chaos insupportable.",
       name: 'Jean-François L.',
       age: '45 ans',
       location: 'Ottawa, ON',
+      photo: frJeanFrancois,
     },
     {
       quote: "Plus simple qu'un formulaire d'impôt. Et infiniment plus important. Je le recommande à toute personne qui aime quelqu'un.",
       name: 'Sylvie M.',
       age: '58 ans',
       location: 'Montréal, QC',
+      photo: frSylvie,
     },
     {
       quote: "Ma famille vit entre Montréal et Miami. Solexi nous a permis de tout centraliser, peu importe la juridiction. C'est exactement ce qu'il nous fallait.",
       name: 'Carlos R.',
       age: '52 ans',
       location: 'Miami, FL',
+      photo: frCarlos,
     },
   ],
   en: [
@@ -72,24 +77,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Patricia H.',
       age: '71',
       location: 'Scottsdale, AZ',
+      photo: enPatricia,
     },
     {
       quote: "I'm a planner by nature, but estate stuff always felt overwhelming. Solexi broke it down into manageable steps. Now my kids won't have to figure it all out alone.",
       name: 'James K.',
       age: '59',
       location: 'Nashville, TN',
+      photo: enJames,
     },
     {
       quote: "My parents live in Florida, my brother in Seattle. Solexi gave us one place to coordinate everything — no more scattered emails and lost documents.",
       name: 'Sarah B.',
       age: '42',
       location: 'Portland, OR',
+      photo: enSarah,
     },
     {
       quote: "I thought this kind of tool was only for wealthy families. Turns out it's for anyone who wants to spare their loved ones unnecessary stress. Worth every minute.",
       name: 'Tom & Lisa D.',
       age: '53',
       location: 'Charlotte, NC',
+      photo: enTomLisa,
     },
   ],
   es: [
@@ -98,24 +107,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Lucía V.',
       age: '68 años',
       location: 'Guadalajara, MX',
+      photo: esLucia,
     },
     {
       quote: "Somos una familia grande repartida entre Colombia y Chile. Solexi nos dio un espacio común para organizar lo importante sin depender de mensajes perdidos.",
       name: 'Andrés P.',
       age: '44 años',
       location: 'Medellín, CO',
+      photo: esAndres,
     },
     {
       quote: "Pensé que organizar mis documentos legales sería un proceso largo y caro. Con Solexi, lo hice en una tarde desde mi casa. Ojalá lo hubiera descubierto antes.",
       name: 'Isabel M.',
       age: '57 años',
       location: 'Lima, PE',
+      photo: esIsabel,
     },
     {
       quote: "Mi mamá siempre decía 'ya lo haré'. Cuando la convencí de usar Solexi, terminó en menos de una hora. Ahora dice que duerme más tranquila.",
       name: 'Martín R.',
       age: '35 años',
       location: 'Santo Domingo, DO',
+      photo: esMartin,
     },
   ],
 };
