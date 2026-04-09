@@ -343,15 +343,7 @@ const LandingPage: React.FC = () => {
               {t.founder_section_title}
             </h2>
           </div>
-          <div className="mx-auto max-w-4xl flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-            <div className="shrink-0 w-56 sm:w-72 lg:w-80">
-              <img
-                src={founderImg}
-                alt={t.founder_name}
-                loading="lazy"
-                className="w-full rounded-2xl shadow-elevated"
-              />
-            </div>
+          <div className="mx-auto max-w-3xl">
             <div className="flex-1 space-y-6 text-center lg:text-left">
               <p className="text-base sm:text-lg text-white/80 leading-relaxed">
                 {t.founder_quote_1}
