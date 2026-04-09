@@ -528,6 +528,16 @@ export interface Translations {
   memories_file_too_large: string;
   memories_file_type_error: string;
   memories_upload_error: string;
+
+  // Founder / Soul section
+  founder_section_tag: string;
+  founder_section_title: string;
+  founder_name: string;
+  founder_role: string;
+  founder_quote_1: string;
+  founder_quote_2: string;
+  founder_quote_3: string;
+  founder_quote_4: string;
 }
 
 export interface TerminologyPack {

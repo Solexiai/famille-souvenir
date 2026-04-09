@@ -507,6 +507,49 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* ─── L'âme de Solexi.ai ─── */}
+      <section className="py-20 bg-[hsl(220,45%,8%)] overflow-hidden">
+        <div className="container">
+          <div className="text-center mb-12">
+            <p className="text-xs font-medium uppercase tracking-wider text-accent mb-4">
+              {t.founder_section_tag}
+            </p>
+            <h2 className="font-heading text-3xl md:text-4xl font-semibold text-white">
+              {t.founder_section_title}
+            </h2>
+          </div>
+          <div className="mx-auto max-w-4xl flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+            {/* Founder image */}
+            <div className="shrink-0 w-48 sm:w-56 lg:w-64">
+              <img
+                src={founderImg}
+                alt={t.founder_name}
+                loading="lazy"
+                className="w-full rounded-2xl shadow-elevated"
+              />
+            </div>
+            {/* Quotes */}
+            <div className="flex-1 space-y-6 text-center lg:text-left">
+              <p className="text-base sm:text-lg text-white/80 leading-relaxed">
+                {t.founder_quote_1}
+              </p>
+              <p className="text-base sm:text-lg font-semibold text-white leading-relaxed">
+                {t.founder_quote_2}
+              </p>
+              <p className="text-base sm:text-lg italic text-accent leading-relaxed">
+                {t.founder_quote_3}
+              </p>
+              <p className="text-base sm:text-lg text-white/80 leading-relaxed">
+                {t.founder_quote_4}
+              </p>
+              <p className="text-sm text-white/60 pt-2">
+                — {t.founder_name},<br />{t.founder_role}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Final CTA ─── */}
       <section
         className="relative py-24 overflow-hidden"
