@@ -168,7 +168,7 @@ const TestimonialsCarousel: React.FC = () => {
         />
         <div className="absolute inset-0 bg-secondary/60" />
       </div>
-      <div className="container max-w-3xl text-center px-4">
+      <div className="container max-w-3xl text-center px-4 relative z-10">
         <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star key={i} className="h-4 w-4 md:h-5 md:w-5 fill-accent text-accent" />
