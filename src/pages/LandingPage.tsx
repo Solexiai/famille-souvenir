@@ -452,34 +452,6 @@ const LandingPage: React.FC = () => {
       </section>
 
 
-      {/* ─── Final CTA ─── */}
-      <section
-        className="relative py-24 overflow-hidden"
-        style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <div className="absolute inset-0 bg-primary/85" />
-        <div className="container relative z-10 text-center">
-          <h2 className="font-heading text-3xl md:text-5xl font-semibold text-primary-foreground mb-6">
-            {t.landing_hero_title}
-          </h2>
-          <p className="text-primary-foreground/70 text-lg mb-10 max-w-xl mx-auto">
-            {t.landing_hero_subtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/setup">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2">
-                {t.landing_cta_start}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link to="/pricing">
-              <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-base px-8 py-6">
-                {t.landing_pricing}
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ─── Footer ─── */}
       <footer className="border-t border-border py-10 bg-card">
