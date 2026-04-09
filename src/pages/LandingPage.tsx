@@ -13,11 +13,6 @@ import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 
 import logoSolexi from '@/assets/logo-solexi.png';
 import heroBg from '@/assets/landing-hero-bg.jpg';
-import founderImg from '@/assets/solexi-founder.png';
-import imgCircle from '@/assets/landing-circle.jpg';
-import imgDocuments from '@/assets/landing-documents.jpg';
-import imgChecklist from '@/assets/landing-checklist.jpg';
-import imgPrivacy from '@/assets/landing-privacy.jpg';
 
 // Testimonial portraits
 import frMarie from '@/assets/testimonials/fr-marie.jpg';
@@ -238,12 +233,6 @@ const LandingPage: React.FC = () => {
     return null;
   }
 
-  const featureCards = [
-    { img: imgCircle, label: t.landing_features[0]?.title ?? 'Cercle familial', href: '/setup' },
-    { img: imgDocuments, label: t.landing_features[1]?.title ?? 'Documents', href: '/setup' },
-    { img: imgChecklist, label: t.landing_features[2]?.title ?? 'Préparation', href: '/setup' },
-    { img: imgPrivacy, label: t.landing_features[3]?.title ?? 'Vie privée', href: '/setup' },
-  ];
 
   const trustItems = [
     { icon: Shield, label: t.landing_trust_security ?? 'Sécurité avancée' },
