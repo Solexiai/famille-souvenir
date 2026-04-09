@@ -222,13 +222,13 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* ─── Header ─── */}
       <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
-          <div className="flex items-center gap-2">
+        <div className="container flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
+          <div className="flex items-center">
             <span className="text-xl md:text-3xl lg:text-4xl font-heading font-bold text-white drop-shadow-md">Solexi.ai</span>
           </div>
-           <div className="flex items-center gap-2 md:gap-3">
+           <div className="flex items-center gap-3 md:gap-4">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-[8.5rem] h-10 md:h-11 text-sm bg-accent border-2 border-accent text-black rounded-full font-bold justify-center">
+              <SelectTrigger className="w-[7.5rem] md:w-[8.5rem] h-10 md:h-11 text-sm bg-accent border-2 border-accent text-black rounded-full font-bold justify-center">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -238,7 +238,7 @@ const LandingPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Link to="/login">
-              <Button size="sm" className="w-[8.5rem] h-10 md:h-11 bg-accent border-2 border-accent text-black hover:bg-accent/90 text-sm whitespace-nowrap rounded-full font-bold justify-center">
+              <Button size="sm" className="w-[7.5rem] md:w-[8.5rem] h-10 md:h-11 bg-accent border-2 border-accent text-black hover:bg-accent/90 text-sm whitespace-nowrap rounded-full font-bold justify-center">
                 {t.sign_in}
               </Button>
             </Link>
