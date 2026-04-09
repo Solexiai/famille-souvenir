@@ -493,66 +493,72 @@ const ChecklistPage: React.FC = () => {
                     <CardContent className="space-y-2 pt-0">
                       {catItems.map(item => (
                         <div key={item.id} className="rounded-lg border border-border p-3 space-y-2">
+                          {/* Title + badges row */}
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="text-sm font-medium text-foreground">{item.title}</p>
-                                {item.requires_professional_review && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-amber-600">
-                                    <AlertTriangle className="h-3 w-3" />
-                                    Pro
-                                  </span>
-                                )}
-                                {item.linked_document_id && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
-                                    <FileText className="h-3 w-3" />
-                                    Doc
-                                  </span>
-                                )}
-                              </div>
-                              {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
-                              <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
-                                {item.assigned_to && (
-                                  <span className="inline-flex items-center gap-1">
-                                    <User className="h-3 w-3" />
-                                    {getMemberName(item.assigned_to)}
-                                  </span>
-                                )}
-                                {item.due_date && (
-                                  <span className="inline-flex items-center gap-1">
-                                    <CalendarIcon className="h-3 w-3" />
-                                    {new Date(item.due_date).toLocaleDateString('fr-FR')}
-                                  </span>
-                                )}
-                                {item.evidence_note && <span>📎 {item.evidence_note}</span>}
-                                {item.status === 'blocked' && item.blocked_reason && (
-                                  <span className="text-destructive">⛔ {item.blocked_reason}</span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              {canEdit ? (
-                                <>
-                                  <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as ChecklistStatus)}>
-                                    <SelectTrigger className="w-[130px] h-7 text-xs">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                                    </SelectContent>
-                                  </Select>
-                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => openEditDialog(item)}>
-                                    Modifier
-                                  </Button>
-                                </>
-                              ) : (
-                                <Badge className={`text-xs ${statusColors[item.status]}`}>
-                                  {statusIcons[item.status]}
-                                  {statusLabels[item.status]}
-                                </Badge>
-                              )}
-                            </div>
+                            <p className="text-sm font-medium text-foreground break-words min-w-0 flex-1">{item.title}</p>
+                            {!canEdit && (
+                              <Badge className={`text-xs shrink-0 ${statusColors[item.status]}`}>
+                                {statusIcons[item.status]}
+                                {statusLabels[item.status]}
+                              </Badge>
+                            )}
                           </div>
+
+                          {/* Tags */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {item.requires_professional_review && (
+                              <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                                <AlertTriangle className="h-3 w-3" /> Pro
+                              </span>
+                            )}
+                            {item.linked_document_id && (
+                              <span className="inline-flex items-center gap-1 text-xs text-primary">
+                                <FileText className="h-3 w-3" /> Doc
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Description */}
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground break-words">{item.description}</p>
+                          )}
+
+                          {/* Meta: assignee, date, evidence, blocked */}
+                          <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
+                            {item.assigned_to && (
+                              <span className="inline-flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {getMemberName(item.assigned_to)}
+                              </span>
+                            )}
+                            {item.due_date && (
+                              <span className="inline-flex items-center gap-1">
+                                <CalendarIcon className="h-3 w-3" />
+                                {new Date(item.due_date).toLocaleDateString('fr-FR')}
+                              </span>
+                            )}
+                            {item.evidence_note && <span className="break-words">📎 {item.evidence_note}</span>}
+                            {item.status === 'blocked' && item.blocked_reason && (
+                              <span className="text-destructive break-words">⛔ {item.blocked_reason}</span>
+                            )}
+                          </div>
+
+                          {/* Actions row */}
+                          {canEdit && (
+                            <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+                              <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as ChecklistStatus)}>
+                                <SelectTrigger className="h-8 text-xs flex-1 min-w-0">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Button variant="outline" size="sm" className="text-xs h-8 px-3 shrink-0" onClick={() => openEditDialog(item)}>
+                                Modifier
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </CardContent>
