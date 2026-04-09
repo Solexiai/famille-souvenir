@@ -72,6 +72,38 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       const link = `${baseUrl}/invitation/accept?token=${inserted.token}`;
       setLastInviteLink(link);
 
+      // Fetch circle name for email
+      const { data: circleData } = await supabase
+        .from('family_circles')
+        .select('name')
+        .eq('id', circleId)
+        .single();
+
+      // Fetch inviter profile for email
+      const { data: inviterProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', userId)
+        .single();
+
+      // Send invitation email
+      await supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'circle-invitation',
+          recipientEmail: result.data.email,
+          idempotencyKey: `circle-invite-${inserted.token}`,
+          templateData: {
+            firstName: result.data.firstName,
+            lastName: result.data.lastName,
+            circleName: circleData?.name || 'un cercle familial',
+            inviterName: inviterProfile?.full_name || '',
+            role,
+            invitationMessage: result.data.invitationMessage || '',
+            acceptUrl: link,
+          },
+        },
+      });
+
       // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
@@ -80,7 +112,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
         details: { email: result.data.email, role, name: `${result.data.firstName} ${result.data.lastName}` },
       });
 
-      toast.success(`Invitation créée pour ${result.data.firstName} ${result.data.lastName}`);
+      toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
       setFirstName('');
       setLastName('');
       setEmail('');
