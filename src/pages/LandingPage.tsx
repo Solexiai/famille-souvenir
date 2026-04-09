@@ -17,36 +17,104 @@ import imgDocuments from '@/assets/landing-documents.jpg';
 import imgChecklist from '@/assets/landing-checklist.jpg';
 import imgPrivacy from '@/assets/landing-privacy.jpg';
 
-const testimonials = [
-  {
-    quote: "J'ai enfin fait ce que je remettais depuis des années. En dix minutes, c'était fait. Un énorme poids de moins — et une paix immense.",
-    name: 'Marie T.',
-    age: '67 ans',
-    location: 'Québec, QC',
-  },
-  {
-    quote: "Quand mon père est tombé malade, on savait exactement quoi faire. Tout était là, clair, organisé. Solexi nous a épargnés d'un chaos insupportable.",
-    name: 'Jean-François L.',
-    age: '45 ans',
-    location: 'Ottawa, ON',
-  },
-  {
-    quote: "Plus simple qu'un formulaire d'impôt. Et infiniment plus important. Je le recommande à toute personne qui aime quelqu'un.",
-    name: 'Sylvie M.',
-    age: '58 ans',
-    location: 'Montréal, QC',
-  },
-  {
-    quote: "Ma famille vit entre Montréal et Miami. Solexi nous a permis de tout centraliser, peu importe la juridiction. C'est exactement ce qu'il nous fallait.",
-    name: 'Carlos R.',
-    age: '52 ans',
-    location: 'Miami, FL',
-  },
-];
+interface Testimonial {
+  quote: string;
+  name: string;
+  age: string;
+  location: string;
+}
+
+const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
+  fr: [
+    {
+      quote: "J'ai enfin fait ce que je remettais depuis des années. En dix minutes, c'était fait. Un énorme poids de moins — et une paix immense.",
+      name: 'Marie T.',
+      age: '67 ans',
+      location: 'Québec, QC',
+    },
+    {
+      quote: "Quand mon père est tombé malade, on savait exactement quoi faire. Tout était là, clair, organisé. Solexi nous a épargnés d'un chaos insupportable.",
+      name: 'Jean-François L.',
+      age: '45 ans',
+      location: 'Ottawa, ON',
+    },
+    {
+      quote: "Plus simple qu'un formulaire d'impôt. Et infiniment plus important. Je le recommande à toute personne qui aime quelqu'un.",
+      name: 'Sylvie M.',
+      age: '58 ans',
+      location: 'Montréal, QC',
+    },
+    {
+      quote: "Ma famille vit entre Montréal et Miami. Solexi nous a permis de tout centraliser, peu importe la juridiction. C'est exactement ce qu'il nous fallait.",
+      name: 'Carlos R.',
+      age: '52 ans',
+      location: 'Miami, FL',
+    },
+  ],
+  en: [
+    {
+      quote: "I finally did what I'd been putting off for years. In ten minutes, it was done. A huge weight off my shoulders — and incredible peace of mind.",
+      name: 'Linda W.',
+      age: '64',
+      location: 'Austin, TX',
+    },
+    {
+      quote: "When my father got sick, we knew exactly what to do. Everything was there, clear and organized. Solexi saved us from unbearable chaos.",
+      name: 'Michael P.',
+      age: '47',
+      location: 'Chicago, IL',
+    },
+    {
+      quote: "Simpler than a tax form. And infinitely more important. I recommend it to anyone who loves someone.",
+      name: 'Karen S.',
+      age: '55',
+      location: 'Denver, CO',
+    },
+    {
+      quote: "My family lives between New York and Los Angeles. Solexi let us centralize everything, no matter the state. Exactly what we needed.",
+      name: 'David R.',
+      age: '50',
+      location: 'New York, NY',
+    },
+  ],
+  es: [
+    {
+      quote: "Por fin hice lo que venía postergando durante años. En diez minutos, estaba listo. Un peso enorme de encima — y una paz inmensa.",
+      name: 'Ana G.',
+      age: '62 años',
+      location: 'Ciudad de México, MX',
+    },
+    {
+      quote: "Cuando mi padre enfermó, sabíamos exactamente qué hacer. Todo estaba ahí, claro y organizado. Solexi nos ahorró un caos insoportable.",
+      name: 'Roberto M.',
+      age: '48 años',
+      location: 'Bogotá, CO',
+    },
+    {
+      quote: "Más simple que un formulario de impuestos. E infinitamente más importante. Se lo recomiendo a toda persona que ame a alguien.",
+      name: 'Carmen L.',
+      age: '56 años',
+      location: 'Buenos Aires, AR',
+    },
+    {
+      quote: "Mi familia vive entre Santiago y Lima. Solexi nos permitió centralizar todo, sin importar el país. Es exactamente lo que necesitábamos.",
+      name: 'Diego F.',
+      age: '51 años',
+      location: 'Santiago, CL',
+    },
+  ],
+};
 
 const TestimonialsCarousel: React.FC = () => {
+  const { lang } = useLocale();
+  const testimonials = testimonialsByLang[lang];
   const [current, setCurrent] = useState(0);
   const total = testimonials.length;
+
+  // Reset to first testimonial when language changes
+  useEffect(() => {
+    setCurrent(0);
+  }, [lang]);
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % total), [total]);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + total) % total), [total]);
@@ -61,14 +129,12 @@ const TestimonialsCarousel: React.FC = () => {
   return (
     <section className="py-6 md:py-8 bg-secondary/30">
       <div className="container max-w-3xl text-center px-4">
-        {/* Stars */}
         <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star key={i} className="h-4 w-4 md:h-5 md:w-5 fill-accent text-accent" />
           ))}
         </div>
 
-        {/* Quote */}
         <div className="relative min-h-[100px] md:min-h-[140px] flex items-center justify-center">
           <Quote className="absolute -top-2 left-0 h-6 w-6 md:h-8 md:w-8 text-accent/20" />
           <p className="font-heading text-base md:text-xl text-foreground leading-relaxed italic px-6 md:px-8">
@@ -76,18 +142,16 @@ const TestimonialsCarousel: React.FC = () => {
           </p>
         </div>
 
-        {/* Author */}
         <div className="mt-6">
           <p className="font-semibold text-foreground">{t.name}</p>
           <p className="text-sm text-muted-foreground">{t.age} · {t.location}</p>
         </div>
 
-        {/* Navigation */}
         <div className="mt-4 md:mt-6 flex items-center justify-center gap-3 md:gap-4">
           <button
             onClick={prev}
             className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
-            aria-label="Précédent"
+            aria-label="Previous"
           >
             <ChevronLeft className="h-4 w-4 text-foreground" />
           </button>
@@ -99,14 +163,14 @@ const TestimonialsCarousel: React.FC = () => {
                 className={`h-2 rounded-full transition-all duration-300 ${
                   i === current ? 'w-6 bg-accent' : 'w-2 bg-border'
                 }`}
-                aria-label={`Témoignage ${i + 1}`}
+                aria-label={`Testimonial ${i + 1}`}
               />
             ))}
           </div>
           <button
             onClick={next}
             className="p-2 rounded-full border border-border hover:bg-accent/10 transition-colors"
-            aria-label="Suivant"
+            aria-label="Next"
           >
             <ChevronRight className="h-4 w-4 text-foreground" />
           </button>
@@ -115,7 +179,6 @@ const TestimonialsCarousel: React.FC = () => {
     </section>
   );
 };
-
 const LandingPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
