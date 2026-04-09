@@ -397,7 +397,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* ─── Value Props Grid ─── */}
-      <section className="py-20">
+      <section className="py-20 bg-primary/5">
         <div className="container">
           <div className="text-center mb-12">
             <p className="text-xs font-medium uppercase tracking-wider text-accent mb-4">
