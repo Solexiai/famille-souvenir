@@ -571,6 +571,15 @@ const en: Translations = {
   memories_file_too_large: 'File must not exceed 50 MB.',
   memories_file_type_error: 'File type not allowed.',
   memories_upload_error: 'Error uploading file.',
+
+  founder_section_tag: 'The Soul of Solexi.ai',
+  founder_section_title: 'Why Solexi.ai Exists',
+  founder_name: 'Daniel Tanguay',
+  founder_role: 'Founder, Solexi.ai',
+  founder_quote_1: 'I\'m not a lawyer. I\'m not a notary. I\'m someone who has seen families suffer from something that could have been avoided.',
+  founder_quote_2: 'Solexi.ai is not a legal service. It\'s a human service.',
+  founder_quote_3: 'The idea is simple: if preparing your legacy were as easy as ordering on Amazon, people would do it.',
+  founder_quote_4: 'That\'s exactly what we want to build. Fast. Accessible. For everyone. Because every family deserves clarity.',
 };
 
 export default en;
