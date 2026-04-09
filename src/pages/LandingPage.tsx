@@ -344,7 +344,7 @@ const LandingPage: React.FC = () => {
             </h2>
           </div>
           <div className="mx-auto max-w-4xl flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-            <div className="shrink-0 w-48 sm:w-56 lg:w-64">
+            <div className="shrink-0 w-56 sm:w-72 lg:w-80">
               <img
                 src={founderImg}
                 alt={t.founder_name}
