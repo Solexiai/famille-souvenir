@@ -242,7 +242,7 @@ const LandingPage: React.FC = () => {
   ];
 
   const howItWorks = [
-    { icon: Users, title: t.landing_how_1_title ?? 'Créez votre cercle', desc: t.landing_how_1_desc ?? 'Invitez vos proches dans un espace privé et sécurisé.' },
+    { icon: Users, title: t.landing_how_1_title ?? 'Créez votre succession familiale', desc: t.landing_how_1_desc ?? 'Invitez vos proches dans un espace privé et sécurisé.' },
     { icon: FileText, title: t.landing_how_2_title ?? 'Organisez vos documents', desc: t.landing_how_2_desc ?? 'Centralisez les documents importants avec contrôle de visibilité.' },
     { icon: CheckSquare, title: t.landing_how_3_title ?? 'Structurez la préparation', desc: t.landing_how_3_desc ?? 'Suivez les étapes avec des checklists et la gouvernance familiale.' },
     { icon: Briefcase, title: t.landing_how_4_title ?? 'Préparez la transmission', desc: t.landing_how_4_desc ?? 'Désignez un exécuteur et assurez la continuité.' },
@@ -373,7 +373,7 @@ const LandingPage: React.FC = () => {
       {/* ─── How It Works ─── */}
       <section className="bg-primary py-20">
         <div className="container text-center">
-          <p className="text-xs font-medium uppercase tracking-wider text-accent mb-4">
+          <p className="text-sm md:text-base font-semibold uppercase tracking-widest text-accent mb-4">
             {t.landing_how_tag ?? 'Comment ça marche'}
           </p>
           <h2 className="font-heading text-3xl md:text-4xl font-semibold text-primary-foreground mb-12">
