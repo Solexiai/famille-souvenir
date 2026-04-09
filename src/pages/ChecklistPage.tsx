@@ -386,62 +386,77 @@ const ChecklistPage: React.FC = () => {
 
         {/* Summary cards */}
         {stats.total > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.completed}/{stats.total}</p>
-              <p className="text-xs text-muted-foreground">Complets</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.needsReview}</p>
-              <p className="text-xs text-muted-foreground">À vérifier</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-amber-600">{stats.blocked}</p>
-              <p className="text-xs text-muted-foreground">Bloqués</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.proReview}</p>
-              <p className="text-xs text-muted-foreground">Revue pro</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.withDoc}</p>
-              <p className="text-xs text-muted-foreground">Appuyés par document</p>
-            </CardContent></Card>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.completed}/{stats.total}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Complets</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.needsReview}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">À vérifier</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-amber-600">{stats.blocked}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Bloqués</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.proReview}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Revue pro</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft col-span-2 sm:col-span-1">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.withDoc}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Appuyés par document</p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* Filters */}
         {stats.total > 0 && (
           <Card className="shadow-soft">
-            <CardContent className="py-3 flex flex-wrap gap-3 items-center">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={filterAssigned} onValueChange={setFilterAssigned}>
-                <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Attribué à" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les membres</SelectItem>
-                  <SelectItem value="unassigned">Non attribué</SelectItem>
-                  {members.map(m => (
-                    <SelectItem key={m.user_id} value={m.user_id}>
-                      {(m as any).profiles?.full_name || 'Membre'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Tri" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Par catégorie</SelectItem>
-                  <SelectItem value="incomplete">Urgence</SelectItem>
-                  <SelectItem value="due_date">Échéance</SelectItem>
-                </SelectContent>
-              </Select>
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2 sm:mb-0 sm:hidden">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Filtres</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Statut" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filterAssigned} onValueChange={setFilterAssigned}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Attribué à" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les membres</SelectItem>
+                    <SelectItem value="unassigned">Non attribué</SelectItem>
+                    {members.map(m => (
+                      <SelectItem key={m.user_id} value={m.user_id}>
+                        {(m as any).profiles?.full_name || 'Membre'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Tri" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Par catégorie</SelectItem>
+                    <SelectItem value="incomplete">Urgence</SelectItem>
+                    <SelectItem value="due_date">Échéance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         )}
