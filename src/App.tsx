@@ -27,6 +27,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import PricingPage from "./pages/PricingPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
+import UnsubscribePage from "./pages/UnsubscribePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/invitation/accept" element={<AcceptInvitationPage />} />
+              <Route path="/unsubscribe" element={<UnsubscribePage />} />
 
               {/* Protected routes */}
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
