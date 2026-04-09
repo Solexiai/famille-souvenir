@@ -178,7 +178,7 @@ const LandingPage: React.FC = () => {
                 {t.sign_in}
               </Button>
             </Link>
-            <Link to="/signup" className="hidden sm:block">
+            <Link to="/signup">
               <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xs md:text-sm">
                 {t.sign_up}
               </Button>
