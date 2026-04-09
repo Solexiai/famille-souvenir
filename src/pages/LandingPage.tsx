@@ -11,6 +11,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@
 import { SupportedLanguage } from '@/i18n/types';
 import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 
+import logoSolexi from '@/assets/logo-solexi.png';
 import heroBg from '@/assets/landing-hero-bg.jpg';
 import imgCircle from '@/assets/landing-circle.jpg';
 import imgDocuments from '@/assets/landing-documents.jpg';
@@ -223,7 +224,7 @@ const LandingPage: React.FC = () => {
       <header className="absolute top-0 left-0 right-0 z-50">
         <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
           <div className="flex items-center gap-2">
-            <span className="font-heading text-lg md:text-xl font-semibold text-primary-foreground">{t.app_name}</span>
+            <img src={logoSolexi} alt="Solexi.ai" className="h-9 md:h-11 w-auto drop-shadow-md" />
           </div>
            <div className="flex items-center gap-2 md:gap-4">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
