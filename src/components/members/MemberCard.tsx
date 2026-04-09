@@ -39,14 +39,15 @@ export const MemberCard: React.FC<Props> = ({ member, labels, canViewContact }) 
   const showContact = canViewContact && profile?.is_visible_to_family !== false;
 
   return (
-    <div className="rounded-lg border border-border p-4 space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center shrink-0">
-            <span className="text-sm font-medium text-secondary-foreground">{initial}</span>
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
+    <div className="rounded-lg border border-border p-3 sm:p-4 space-y-3">
+      {/* Header: avatar + name + role */}
+      <div className="flex items-start gap-3">
+        <div className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center shrink-0">
+          <span className="text-sm font-medium text-secondary-foreground">{initial}</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div className="flex items-center gap-2 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
               {profile?.is_emergency_contact && (
                 <Badge variant="destructive" className="text-[10px] px-1.5 py-0 shrink-0">
@@ -55,39 +56,39 @@ export const MemberCard: React.FC<Props> = ({ member, labels, canViewContact }) 
                 </Badge>
               )}
             </div>
-            {profile?.relationship_label && (
-              <p className="text-xs text-muted-foreground">{profile.relationship_label}</p>
-            )}
+            <Badge variant="secondary" className="flex items-center gap-1 shrink-0 text-[11px]">
+              <RoleIcon className="h-3 w-3" />
+              {roleLabels[member.role]}
+            </Badge>
           </div>
+          {profile?.relationship_label && (
+            <p className="text-xs text-muted-foreground mt-0.5">{profile.relationship_label}</p>
+          )}
         </div>
-        <Badge variant="secondary" className="flex items-center gap-1 shrink-0">
-          <RoleIcon className="h-3 w-3" />
-          {roleLabels[member.role]}
-        </Badge>
       </div>
 
       {showContact && (
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground ml-[52px]">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1.5 sm:gap-3 text-xs text-muted-foreground pl-[52px]">
           {profile?.email && (
-            <span className="flex items-center gap-1">
-              <Mail className="h-3 w-3" /> {profile.email}
+            <span className="flex items-center gap-1 truncate">
+              <Mail className="h-3 w-3 shrink-0" /> <span className="truncate">{profile.email}</span>
             </span>
           )}
           {profile?.phone && (
             <span className="flex items-center gap-1">
-              <Phone className="h-3 w-3" /> {profile.phone}
+              <Phone className="h-3 w-3 shrink-0" /> {profile.phone}
             </span>
           )}
           {profile?.city && (
             <span className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> {profile.city}
+              <MapPin className="h-3 w-3 shrink-0" /> {profile.city}
             </span>
           )}
         </div>
       )}
 
       {labels.length > 0 && (
-        <div className="ml-[52px]">
+        <div className="pl-[52px]">
           <FamilyLabelsForMember labels={labels} />
         </div>
       )}

@@ -89,17 +89,17 @@ const MembersPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-6 animate-fade-in">
-        <h1 className="font-heading text-2xl font-semibold text-foreground">Membres du cercle</h1>
+      <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
+        <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground">Membres du cercle</h1>
 
         <LimitWarning current={members.length} max={FREE_LIMITS.maxMembers} label={t.plan_gate_member_limit} />
 
         <Tabs defaultValue="members" className="space-y-4">
-          <TabsList className="w-full flex overflow-x-auto">
-            <TabsTrigger value="members" className="flex-1 text-xs sm:text-sm">Membres</TabsTrigger>
-            {isManager && <TabsTrigger value="invitations" className="flex-1 text-xs sm:text-sm">Invitations</TabsTrigger>}
-            <TabsTrigger value="labels" className="flex-1 text-xs sm:text-sm">Labels</TabsTrigger>
-            <TabsTrigger value="executor" className="flex-1 text-xs sm:text-sm">Exécuteur</TabsTrigger>
+          <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${isManager ? 4 : 3}, 1fr)` }}>
+            <TabsTrigger value="members" className="text-xs sm:text-sm px-2">Membres</TabsTrigger>
+            {isManager && <TabsTrigger value="invitations" className="text-xs sm:text-sm px-2">Invitations</TabsTrigger>}
+            <TabsTrigger value="labels" className="text-xs sm:text-sm px-2">Labels</TabsTrigger>
+            <TabsTrigger value="executor" className="text-xs sm:text-sm px-2">Exécuteur</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
