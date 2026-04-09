@@ -113,7 +113,7 @@ const CirclePage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-0 space-y-6 animate-fade-in">
         <h1 className="font-heading text-2xl font-semibold text-foreground">Cercle familial</h1>
 
         {!circle ? (

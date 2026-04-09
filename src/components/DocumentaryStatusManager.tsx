@@ -110,8 +110,8 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
         {statusFields.map((sf) => {
           const currentValue = String(circle[sf.key] || '');
           return (
-            <div key={sf.key} className="flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
+            <div key={sf.key} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-4">
+              <div className="shrink-0">
                 <p className="text-sm font-medium text-foreground">{sf.label}</p>
               </div>
               {canEdit ? (
@@ -120,7 +120,7 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
                   onValueChange={(v) => handleChange(sf.key, v)}
                   disabled={saving === sf.key}
                 >
-                  <SelectTrigger className="w-[220px]">
+                  <SelectTrigger className="w-full sm:w-[220px] md:w-[260px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
