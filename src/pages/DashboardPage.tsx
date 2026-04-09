@@ -326,7 +326,7 @@ const DashboardPage: React.FC = () => {
 
             {/* Quick actions — 3 cols on mobile, clean icons */}
             <div>
-              <h3 className="font-heading text-sm font-semibold text-foreground mb-3">{t.dash_checklist || 'Accès rapide'}</h3>
+              <h3 className="font-heading text-sm font-semibold text-foreground mb-3">Accès rapide</h3>
               <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
                 {visibleActions.map((action) => {
                   const Icon = action.icon;
