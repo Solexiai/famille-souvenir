@@ -386,62 +386,77 @@ const ChecklistPage: React.FC = () => {
 
         {/* Summary cards */}
         {stats.total > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.completed}/{stats.total}</p>
-              <p className="text-xs text-muted-foreground">Complets</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.needsReview}</p>
-              <p className="text-xs text-muted-foreground">À vérifier</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-amber-600">{stats.blocked}</p>
-              <p className="text-xs text-muted-foreground">Bloqués</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.proReview}</p>
-              <p className="text-xs text-muted-foreground">Revue pro</p>
-            </CardContent></Card>
-            <Card className="shadow-soft"><CardContent className="py-4 text-center">
-              <p className="text-2xl font-semibold text-foreground">{stats.withDoc}</p>
-              <p className="text-xs text-muted-foreground">Appuyés par document</p>
-            </CardContent></Card>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.completed}/{stats.total}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Complets</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.needsReview}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">À vérifier</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-amber-600">{stats.blocked}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Bloqués</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.proReview}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Revue pro</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-soft col-span-2 sm:col-span-1">
+              <CardContent className="p-3 sm:py-4 text-center">
+                <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.withDoc}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">Appuyés par document</p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* Filters */}
         {stats.total > 0 && (
           <Card className="shadow-soft">
-            <CardContent className="py-3 flex flex-wrap gap-3 items-center">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={filterAssigned} onValueChange={setFilterAssigned}>
-                <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Attribué à" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les membres</SelectItem>
-                  <SelectItem value="unassigned">Non attribué</SelectItem>
-                  {members.map(m => (
-                    <SelectItem key={m.user_id} value={m.user_id}>
-                      {(m as any).profiles?.full_name || 'Membre'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-                <SelectTrigger className="w-[150px] h-8 text-xs"><SelectValue placeholder="Tri" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Par catégorie</SelectItem>
-                  <SelectItem value="incomplete">Urgence</SelectItem>
-                  <SelectItem value="due_date">Échéance</SelectItem>
-                </SelectContent>
-              </Select>
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2 sm:mb-0 sm:hidden">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Filtres</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Statut" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les statuts</SelectItem>
+                    {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={filterAssigned} onValueChange={setFilterAssigned}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Attribué à" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les membres</SelectItem>
+                    <SelectItem value="unassigned">Non attribué</SelectItem>
+                    {members.map(m => (
+                      <SelectItem key={m.user_id} value={m.user_id}>
+                        {(m as any).profiles?.full_name || 'Membre'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Tri" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Par catégorie</SelectItem>
+                    <SelectItem value="incomplete">Urgence</SelectItem>
+                    <SelectItem value="due_date">Échéance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -478,66 +493,72 @@ const ChecklistPage: React.FC = () => {
                     <CardContent className="space-y-2 pt-0">
                       {catItems.map(item => (
                         <div key={item.id} className="rounded-lg border border-border p-3 space-y-2">
+                          {/* Title + badges row */}
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <p className="text-sm font-medium text-foreground">{item.title}</p>
-                                {item.requires_professional_review && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-amber-600">
-                                    <AlertTriangle className="h-3 w-3" />
-                                    Pro
-                                  </span>
-                                )}
-                                {item.linked_document_id && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-primary">
-                                    <FileText className="h-3 w-3" />
-                                    Doc
-                                  </span>
-                                )}
-                              </div>
-                              {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
-                              <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
-                                {item.assigned_to && (
-                                  <span className="inline-flex items-center gap-1">
-                                    <User className="h-3 w-3" />
-                                    {getMemberName(item.assigned_to)}
-                                  </span>
-                                )}
-                                {item.due_date && (
-                                  <span className="inline-flex items-center gap-1">
-                                    <CalendarIcon className="h-3 w-3" />
-                                    {new Date(item.due_date).toLocaleDateString('fr-FR')}
-                                  </span>
-                                )}
-                                {item.evidence_note && <span>📎 {item.evidence_note}</span>}
-                                {item.status === 'blocked' && item.blocked_reason && (
-                                  <span className="text-destructive">⛔ {item.blocked_reason}</span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              {canEdit ? (
-                                <>
-                                  <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as ChecklistStatus)}>
-                                    <SelectTrigger className="w-[130px] h-7 text-xs">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
-                                    </SelectContent>
-                                  </Select>
-                                  <Button variant="ghost" size="sm" className="text-xs h-7 px-2" onClick={() => openEditDialog(item)}>
-                                    Modifier
-                                  </Button>
-                                </>
-                              ) : (
-                                <Badge className={`text-xs ${statusColors[item.status]}`}>
-                                  {statusIcons[item.status]}
-                                  {statusLabels[item.status]}
-                                </Badge>
-                              )}
-                            </div>
+                            <p className="text-sm font-medium text-foreground break-words min-w-0 flex-1">{item.title}</p>
+                            {!canEdit && (
+                              <Badge className={`text-xs shrink-0 ${statusColors[item.status]}`}>
+                                {statusIcons[item.status]}
+                                {statusLabels[item.status]}
+                              </Badge>
+                            )}
                           </div>
+
+                          {/* Tags */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {item.requires_professional_review && (
+                              <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                                <AlertTriangle className="h-3 w-3" /> Pro
+                              </span>
+                            )}
+                            {item.linked_document_id && (
+                              <span className="inline-flex items-center gap-1 text-xs text-primary">
+                                <FileText className="h-3 w-3" /> Doc
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Description */}
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground break-words">{item.description}</p>
+                          )}
+
+                          {/* Meta: assignee, date, evidence, blocked */}
+                          <div className="flex items-center gap-3 flex-wrap text-xs text-muted-foreground">
+                            {item.assigned_to && (
+                              <span className="inline-flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {getMemberName(item.assigned_to)}
+                              </span>
+                            )}
+                            {item.due_date && (
+                              <span className="inline-flex items-center gap-1">
+                                <CalendarIcon className="h-3 w-3" />
+                                {new Date(item.due_date).toLocaleDateString('fr-FR')}
+                              </span>
+                            )}
+                            {item.evidence_note && <span className="break-words">📎 {item.evidence_note}</span>}
+                            {item.status === 'blocked' && item.blocked_reason && (
+                              <span className="text-destructive break-words">⛔ {item.blocked_reason}</span>
+                            )}
+                          </div>
+
+                          {/* Actions row */}
+                          {canEdit && (
+                            <div className="flex items-center gap-2 pt-1 border-t border-border/50">
+                              <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as ChecklistStatus)}>
+                                <SelectTrigger className="h-8 text-xs flex-1 min-w-0">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Button variant="outline" size="sm" className="text-xs h-8 px-3 shrink-0" onClick={() => openEditDialog(item)}>
+                                Modifier
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </CardContent>
