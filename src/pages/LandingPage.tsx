@@ -224,11 +224,11 @@ const LandingPage: React.FC = () => {
       <header className="absolute top-0 left-0 right-0 z-50">
         <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
           <div className="flex items-center gap-2">
-            <span className="text-lg md:text-xl font-heading font-bold text-primary-foreground drop-shadow-md">Solexi.ai</span>
+            <span className="text-xl md:text-2xl font-heading font-bold text-accent drop-shadow-md">Solexi.ai</span>
           </div>
-           <div className="flex items-center gap-2 md:gap-4">
+           <div className="flex items-center gap-2 md:gap-3">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-[5.5rem] md:w-28 h-8 md:h-9 text-[11px] md:text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
+              <SelectTrigger className="w-[5.5rem] md:w-28 h-9 md:h-10 text-xs md:text-sm bg-accent/20 border-2 border-accent text-foreground rounded-full font-medium">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -238,13 +238,8 @@ const LandingPage: React.FC = () => {
               </SelectContent>
             </Select>
             <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-[11px] md:text-sm text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10 px-2.5 md:px-4 whitespace-nowrap">
+              <Button size="sm" className="h-9 md:h-10 bg-accent/20 border-2 border-accent text-foreground hover:bg-accent/30 text-xs md:text-sm px-4 md:px-5 whitespace-nowrap rounded-full font-medium">
                 {t.sign_in}
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 text-[11px] md:text-sm px-2.5 md:px-4 whitespace-nowrap">
-                {t.sign_up}
               </Button>
             </Link>
           </div>
