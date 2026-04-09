@@ -18,11 +18,26 @@ import imgDocuments from '@/assets/landing-documents.jpg';
 import imgChecklist from '@/assets/landing-checklist.jpg';
 import imgPrivacy from '@/assets/landing-privacy.jpg';
 
+// Testimonial portraits
+import frMarie from '@/assets/testimonials/fr-marie.jpg';
+import frJeanFrancois from '@/assets/testimonials/fr-jeanfrancois.jpg';
+import frSylvie from '@/assets/testimonials/fr-sylvie.jpg';
+import frCarlos from '@/assets/testimonials/fr-carlos.jpg';
+import enPatricia from '@/assets/testimonials/en-patricia.jpg';
+import enJames from '@/assets/testimonials/en-james.jpg';
+import enSarah from '@/assets/testimonials/en-sarah.jpg';
+import enTomLisa from '@/assets/testimonials/en-tomlisa.jpg';
+import esLucia from '@/assets/testimonials/es-lucia.jpg';
+import esAndres from '@/assets/testimonials/es-andres.jpg';
+import esIsabel from '@/assets/testimonials/es-isabel.jpg';
+import esMartin from '@/assets/testimonials/es-martin.jpg';
+
 interface Testimonial {
   quote: string;
   name: string;
   age: string;
   location: string;
+  photo: string;
 }
 
 const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
@@ -32,24 +47,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Marie T.',
       age: '67 ans',
       location: 'Québec, QC',
+      photo: frMarie,
     },
     {
       quote: "Quand mon père est tombé malade, on savait exactement quoi faire. Tout était là, clair, organisé. Solexi nous a épargnés d'un chaos insupportable.",
       name: 'Jean-François L.',
       age: '45 ans',
       location: 'Ottawa, ON',
+      photo: frJeanFrancois,
     },
     {
       quote: "Plus simple qu'un formulaire d'impôt. Et infiniment plus important. Je le recommande à toute personne qui aime quelqu'un.",
       name: 'Sylvie M.',
       age: '58 ans',
       location: 'Montréal, QC',
+      photo: frSylvie,
     },
     {
       quote: "Ma famille vit entre Montréal et Miami. Solexi nous a permis de tout centraliser, peu importe la juridiction. C'est exactement ce qu'il nous fallait.",
       name: 'Carlos R.',
       age: '52 ans',
       location: 'Miami, FL',
+      photo: frCarlos,
     },
   ],
   en: [
@@ -58,24 +77,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Patricia H.',
       age: '71',
       location: 'Scottsdale, AZ',
+      photo: enPatricia,
     },
     {
       quote: "I'm a planner by nature, but estate stuff always felt overwhelming. Solexi broke it down into manageable steps. Now my kids won't have to figure it all out alone.",
       name: 'James K.',
       age: '59',
       location: 'Nashville, TN',
+      photo: enJames,
     },
     {
       quote: "My parents live in Florida, my brother in Seattle. Solexi gave us one place to coordinate everything — no more scattered emails and lost documents.",
       name: 'Sarah B.',
       age: '42',
       location: 'Portland, OR',
+      photo: enSarah,
     },
     {
       quote: "I thought this kind of tool was only for wealthy families. Turns out it's for anyone who wants to spare their loved ones unnecessary stress. Worth every minute.",
       name: 'Tom & Lisa D.',
       age: '53',
       location: 'Charlotte, NC',
+      photo: enTomLisa,
     },
   ],
   es: [
@@ -84,24 +107,28 @@ const testimonialsByLang: Record<SupportedLanguage, Testimonial[]> = {
       name: 'Lucía V.',
       age: '68 años',
       location: 'Guadalajara, MX',
+      photo: esLucia,
     },
     {
       quote: "Somos una familia grande repartida entre Colombia y Chile. Solexi nos dio un espacio común para organizar lo importante sin depender de mensajes perdidos.",
       name: 'Andrés P.',
       age: '44 años',
       location: 'Medellín, CO',
+      photo: esAndres,
     },
     {
       quote: "Pensé que organizar mis documentos legales sería un proceso largo y caro. Con Solexi, lo hice en una tarde desde mi casa. Ojalá lo hubiera descubierto antes.",
       name: 'Isabel M.',
       age: '57 años',
       location: 'Lima, PE',
+      photo: esIsabel,
     },
     {
       quote: "Mi mamá siempre decía 'ya lo haré'. Cuando la convencí de usar Solexi, terminó en menos de una hora. Ahora dice que duerme más tranquila.",
       name: 'Martín R.',
       age: '35 años',
       location: 'Santo Domingo, DO',
+      photo: esMartin,
     },
   ],
 };
@@ -128,8 +155,20 @@ const TestimonialsCarousel: React.FC = () => {
   const t = testimonials[current];
 
   return (
-    <section className="py-6 md:py-8 bg-secondary/30">
-      <div className="container max-w-3xl text-center px-4">
+    <section className="py-6 md:py-8 relative overflow-hidden">
+      {/* Blurred background photo */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={t.photo}
+          alt=""
+          className="w-full h-full object-cover blur-[6px] scale-110 opacity-20"
+          loading="lazy"
+          width={512}
+          height={512}
+        />
+        <div className="absolute inset-0 bg-secondary/60" />
+      </div>
+      <div className="container max-w-3xl text-center px-4 relative z-10">
         <div className="flex justify-center gap-1 mb-4">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star key={i} className="h-4 w-4 md:h-5 md:w-5 fill-accent text-accent" />
@@ -143,7 +182,15 @@ const TestimonialsCarousel: React.FC = () => {
           </p>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <img
+            src={t.photo}
+            alt={t.name}
+            className="w-14 h-14 md:w-16 md:h-16 rounded-full object-cover border-2 border-accent shadow-md"
+            loading="lazy"
+            width={64}
+            height={64}
+          />
           <p className="font-semibold text-foreground">{t.name}</p>
           <p className="text-sm text-muted-foreground">{t.age} · {t.location}</p>
         </div>
