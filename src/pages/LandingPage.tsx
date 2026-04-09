@@ -158,11 +158,11 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* ─── Header ─── */}
       <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="container flex h-14 md:h-16 items-center justify-between">
+        <div className="container flex h-14 md:h-16 items-center justify-between px-3 md:px-6">
           <div className="flex items-center gap-2">
             <span className="font-heading text-lg md:text-xl font-semibold text-primary-foreground">{t.app_name}</span>
           </div>
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-1.5 md:gap-4">
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
               <SelectTrigger className="w-20 md:w-24 h-8 md:h-9 text-xs bg-transparent border-primary-foreground/20 text-primary-foreground">
                 <SelectValue />
@@ -179,7 +179,7 @@ const LandingPage: React.FC = () => {
               </Button>
             </Link>
             <Link to="/signup">
-              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 text-xs md:text-sm">
+              <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 text-[11px] md:text-sm px-2 md:px-4 whitespace-nowrap">
                 {t.sign_up}
               </Button>
             </Link>
