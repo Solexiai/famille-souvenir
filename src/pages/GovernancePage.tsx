@@ -548,5 +548,6 @@ const GovernancePage: React.FC = () => {
       </div>
     </AppLayout>
   );
+};
 
 export default GovernancePage;
