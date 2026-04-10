@@ -753,6 +753,66 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          attempts: number
+          blocked_until: string | null
+          created_at: string
+          id: string
+          key: string
+          window_start: string
+        }
+        Insert: {
+          action: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          key: string
+          window_start?: string
+        }
+        Update: {
+          action?: string
+          attempts?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          key?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
+      security_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           billing_cycle: string | null
@@ -822,6 +882,48 @@ export type Database = {
         }
         Relationships: []
       }
+      upload_quotas: {
+        Row: {
+          circle_id: string
+          documents_bytes: number
+          documents_count: number
+          id: string
+          month_key: string
+          photos_bytes: number
+          photos_count: number
+          total_bytes: number
+          updated_at: string
+          videos_bytes: number
+          videos_count: number
+        }
+        Insert: {
+          circle_id: string
+          documents_bytes?: number
+          documents_count?: number
+          id?: string
+          month_key?: string
+          photos_bytes?: number
+          photos_count?: number
+          total_bytes?: number
+          updated_at?: string
+          videos_bytes?: number
+          videos_count?: number
+        }
+        Update: {
+          circle_id?: string
+          documents_bytes?: number
+          documents_count?: number
+          id?: string
+          month_key?: string
+          photos_bytes?: number
+          photos_count?: number
+          total_bytes?: number
+          updated_at?: string
+          videos_bytes?: number
+          videos_count?: number
+        }
+        Relationships: []
+      }
       vault_documents: {
         Row: {
           category: string | null
@@ -876,6 +978,15 @@ export type Database = {
     Functions: {
       can_access_executor_workspace: {
         Args: { _circle_id: string; _user_id: string }
+        Returns: boolean
+      }
+      check_rate_limit: {
+        Args: {
+          _action: string
+          _key: string
+          _max_attempts?: number
+          _window_seconds?: number
+        }
         Returns: boolean
       }
       delete_email: {
