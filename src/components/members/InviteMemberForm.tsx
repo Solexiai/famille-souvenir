@@ -11,6 +11,7 @@ import { Loader2, UserPlus, Copy, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import type { AppRole } from '@/types/database';
+import { sendInvitationEmail } from '@/lib/invitation-email';
 
 const inviteSchema = z.object({
   firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
@@ -67,52 +68,43 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     if (error) {
       toast.error("Erreur lors de l'envoi de l'invitation.");
     } else {
-      // Build invitation link
-      const baseUrl = window.location.origin;
-      const link = `${baseUrl}/invitation/accept?token=${inserted.token}`;
-      setLastInviteLink(link);
-
-      // Fetch circle name for email
-      const { data: circleData } = await supabase
-        .from('family_circles')
-        .select('name')
-        .eq('id', circleId)
-        .single();
-
-      // Fetch inviter profile for email
-      const { data: inviterProfile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('user_id', userId)
-        .single();
-
-      // Send invitation email
-      await supabase.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'circle-invitation',
-          recipientEmail: result.data.email,
-          idempotencyKey: `circle-invite-${inserted.token}`,
-          templateData: {
-            firstName: result.data.firstName,
-            lastName: result.data.lastName,
-            circleName: circleData?.name || 'un cercle familial',
-            inviterName: inviterProfile?.full_name || '',
-            role,
-            invitationMessage: result.data.invitationMessage || '',
-            acceptUrl: link,
-          },
+      const emailResult = await sendInvitationEmail({
+        circleId,
+        userId,
+        invitation: {
+          token: inserted.token,
+          email: result.data.email,
+          role,
+          firstName: result.data.firstName,
+          lastName: result.data.lastName,
+          invitationMessage: result.data.invitationMessage || '',
         },
       });
+
+      setLastInviteLink(emailResult.link);
 
       // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
         circle_id: circleId,
         action: 'invitation_sent',
-        details: { email: result.data.email, role, name: `${result.data.firstName} ${result.data.lastName}` },
+        details: {
+          email: result.data.email,
+          role,
+          name: `${result.data.firstName} ${result.data.lastName}`,
+          email_delivery: emailResult.ok ? 'queued' : 'failed',
+          email_error: emailResult.error || null,
+        },
       });
 
-      toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
+      if (emailResult.ok) {
+        toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
+      } else {
+        toast.error(
+          `Invitation créée, mais le courriel n'a pas pu être envoyé. Utilisez le lien généré. ${emailResult.error || ''}`.trim()
+        );
+      }
+
       setFirstName('');
       setLastName('');
       setEmail('');
