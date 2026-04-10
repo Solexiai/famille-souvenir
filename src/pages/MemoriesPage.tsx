@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Loader2, Plus, Image, Video, Mic, FileText } from 'lucide-react';
 import type { Memory, MemoryType, MemoryVisibility, FamilyCircle } from '@/types/database';
 import { z } from 'zod';
+import { validateUpload } from '@/lib/upload-validation';
 
 const memorySchema = z.object({
   caption: z.string().trim().min(1, 'Veuillez ajouter une légende').max(500),
