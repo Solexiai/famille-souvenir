@@ -144,19 +144,10 @@ const MemoriesPage: React.FC = () => {
 
     // Upload file if provided
     if (file && (type === 'photo' || type === 'video' || type === 'audio')) {
-      const maxSize = 50 * 1024 * 1024; // 50MB
-      if (file.size > maxSize) {
-        toast.error('Le fichier ne doit pas dépasser 50 Mo.');
-        setCreating(false);
-        return;
-      }
-      const allowedTypes: Record<string, string[]> = {
-        photo: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-        video: ['video/mp4', 'video/webm', 'video/quicktime'],
-        audio: ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4'],
-      };
-      if (!allowedTypes[type]?.includes(file.type)) {
-        toast.error('Type de fichier non autorisé.');
+      // Server-side validation (MIME, magic bytes, quotas, plan limits)
+      const validation = await validateUpload(file, type, circle.id);
+      if (!validation.allowed) {
+        toast.error(validation.error || 'Upload refusé');
         setCreating(false);
         return;
       }
