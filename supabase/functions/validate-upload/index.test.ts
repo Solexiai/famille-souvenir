@@ -36,10 +36,10 @@ Deno.test("validate-upload rejects blocked extension", async () => {
       circleId: "00000000-0000-0000-0000-000000000000",
     }),
   });
-  const body = await res.json();
-  await res.body?.cancel();
+  const body = await res.text();
   // Should fail auth first (anon key is not a user token), or reject extension
   assertEquals(res.status === 401 || res.status === 403, true);
+  assertNotEquals(body, "");
 });
 
 Deno.test("security-alert logs event", async () => {
