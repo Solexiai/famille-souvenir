@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
+import { validateUpload } from '@/lib/upload-validation';
+import { logAuditEvent } from '@/lib/audit';
 import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -99,8 +101,15 @@ const DocumentsPage: React.FC = () => {
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !circle || !user || !title.trim()) return;
-    if (file.size > 20 * 1024 * 1024) { toast.error('Max 20 Mo.'); return; }
     setUploading(true);
+
+    // Server-side validation (MIME, magic bytes, quotas, plan limits)
+    const validation = await validateUpload(file, 'document', circle.id);
+    if (!validation.allowed) {
+      toast.error(validation.error || 'Upload refusé');
+      setUploading(false);
+      return;
+    }
 
     const ext = file.name.split('.').pop();
     const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
@@ -121,10 +130,8 @@ const DocumentsPage: React.FC = () => {
 
     if (error) toast.error("Erreur lors de l'enregistrement.");
     else {
-      await supabase.from('audit_logs').insert({
-        circle_id: circle.id, user_id: user.id,
-        action: 'document_uploaded',
-        details: { title: title.trim(), category, visibility, file_name: file.name },
+      await logAuditEvent('document_uploaded', circle.id, {
+        title: title.trim(), category, visibility, file_name: file.name,
       });
       toast.success('Document ajouté avec succès.');
       setTitle(''); setDescription(''); setCategory('other'); setVisibility('private_owner'); setFile(null);
