@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Invitation } from '@/types/database';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { sendInvitationEmail } from '@/lib/invitation-email';
 
 const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.FC<{ className?: string }> }> = {
   pending: { label: 'En attente', variant: 'outline', icon: Clock },
@@ -53,12 +54,38 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
       .eq('id', inv.id);
 
     if (!error) {
+      const emailResult = await sendInvitationEmail({
+        circleId,
+        userId,
+        invitation: {
+          token: inv.token,
+          email: inv.email,
+          role: inv.role,
+          firstName: inv.first_name,
+          lastName: inv.last_name,
+          invitationMessage: inv.invitation_message,
+        },
+      });
+
       await supabase.from('audit_logs').insert({
         user_id: userId, circle_id: circleId,
         action: 'invitation_resent',
-        details: { email: inv.email, invitation_id: inv.id },
+        details: {
+          email: inv.email,
+          invitation_id: inv.id,
+          email_delivery: emailResult.ok ? 'queued' : 'failed',
+          email_error: emailResult.error || null,
+        },
       });
-      toast.success(`Invitation renvoyée à ${inv.first_name || inv.email}`);
+
+      if (emailResult.ok) {
+        toast.success(`Invitation renvoyée à ${inv.first_name || inv.email}`);
+      } else {
+        toast.error(
+          `L'invitation a bien été renouvelée, mais le courriel n'a pas pu être envoyé. ${emailResult.error || ''}`.trim()
+        );
+      }
+
       loadInvitations();
     } else {
       toast.error("Erreur lors du renvoi.");
