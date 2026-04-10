@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
+import { validateUpload } from '@/lib/upload-validation';
+import { logAuditEvent } from '@/lib/audit';
 import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
