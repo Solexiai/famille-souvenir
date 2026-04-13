@@ -92,7 +92,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
           email: result.data.email,
           role,
           name: `${result.data.firstName} ${result.data.lastName}`,
-          email_delivery: emailResult.ok ? 'queued' : 'failed',
+          email_delivery: emailResult.ok ? 'sent' : 'failed',
           email_error: emailResult.error || null,
         },
       });
