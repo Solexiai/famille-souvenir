@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,9 @@ import { z } from 'zod';
 const SignupPage: React.FC = () => {
   const { signUp } = useAuth();
   const { t } = useLocale();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,7 +63,7 @@ const SignupPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.auth_verify_email_desc.replace('{email}', email) }} />
-            <Link to="/login">
+            <Link to={`/login${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}>
               <Button variant="outline" className="w-full">{t.auth_back_to_login}</Button>
             </Link>
           </CardContent>

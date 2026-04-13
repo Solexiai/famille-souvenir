@@ -91,7 +91,7 @@ const LoginPage: React.FC = () => {
               </Link>
               <p className="text-muted-foreground">
                 {t.auth_no_account}{' '}
-                <Link to="/signup" className="text-accent hover:underline">
+                <Link to={`/signup${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`} className="text-accent hover:underline">
                   {t.auth_create_account}
                 </Link>
               </p>

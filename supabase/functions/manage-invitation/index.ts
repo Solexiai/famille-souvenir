@@ -34,13 +34,13 @@ Deno.serve(async (req) => {
       }
 
       const userToken = authHeader.replace('Bearer ', '')
-      const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(userToken)
-      if (claimsError || !claimsData?.claims) {
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(userToken)
+      if (authError || !authUser) {
         return new Response(JSON.stringify({ error: 'Token utilisateur invalide' }), {
           status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         })
       }
-      const userId = claimsData.claims.sub as string
+      const userId = authUser.id
 
       // Get invitation
       const { data: invitation, error: invError } = await supabase
