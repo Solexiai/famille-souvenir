@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocale } from '@/contexts/LocaleContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,19 +18,11 @@ interface InvitationInfo {
   circle_name: string;
 }
 
-const roleLabels: Record<string, string> = {
-  owner: 'Propriétaire',
-  family_manager: 'Gestionnaire',
-  family_member: 'Membre',
-  heir: 'Héritier',
-  proposed_executor: 'Exécuteur pressenti',
-  verified_executor: 'Exécuteur documenté',
-};
-
 const AcceptInvitationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLocale();
   const token = searchParams.get('token');
 
   const [validating, setValidating] = useState(true);
@@ -38,10 +31,11 @@ const AcceptInvitationPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Validate token on mount
+  const roleLabel = (role: string) => t.member_roles[role] || role;
+
   useEffect(() => {
     if (!token) {
-      setError('Lien d\'invitation invalide. Aucun jeton fourni.');
+      setError(t.accept_invalid_link);
       setValidating(false);
       return;
     }
@@ -52,13 +46,13 @@ const AcceptInvitationPage: React.FC = () => {
       });
 
       if (fnError || !data) {
-        setError('Impossible de vérifier cette invitation.');
+        setError(t.accept_cannot_verify);
       } else if (!data.valid) {
         setError(
-          data.invitation?.status === 'accepted' ? 'Cette invitation a déjà été acceptée.'
-          : data.invitation?.status === 'expired' ? 'Cette invitation a expiré.'
-          : data.invitation?.status === 'declined' ? 'Cette invitation a été déclinée.'
-          : 'Cette invitation n\'est plus valide.'
+          data.invitation?.status === 'accepted' ? t.accept_already_accepted
+          : data.invitation?.status === 'expired' ? t.accept_expired
+          : data.invitation?.status === 'declined' ? t.accept_declined
+          : t.accept_no_longer_valid
         );
       } else {
         setInvitation(data.invitation);
@@ -78,13 +72,12 @@ const AcceptInvitationPage: React.FC = () => {
     });
 
     if (fnError || !data?.success) {
-      const msg = data?.error || 'Erreur lors de l\'acceptation de l\'invitation.';
+      const msg = data?.error || t.accept_error_default;
       setError(msg);
       toast.error(msg);
     } else {
-      setSuccess(data.message || 'Vous avez bien rejoint le cercle !');
-      toast.success(data.message || 'Vous avez bien rejoint le cercle !');
-      // Redirect after delay
+      setSuccess(data.message || t.accept_success_default);
+      toast.success(data.message || t.accept_success_default);
       setTimeout(() => navigate('/dashboard'), 2000);
     }
     setAccepting(false);
@@ -96,14 +89,13 @@ const AcceptInvitationPage: React.FC = () => {
         <Card className="w-full max-w-md shadow-card">
           <CardContent className="py-12 flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-accent" />
-            <p className="text-sm text-muted-foreground">Vérification de l'invitation…</p>
+            <p className="text-sm text-muted-foreground">{t.accept_verifying}</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Error state
   if (error && !invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -112,7 +104,7 @@ const AcceptInvitationPage: React.FC = () => {
             <XCircle className="h-12 w-12 text-destructive" />
             <p className="text-foreground font-medium">{error}</p>
             <Link to="/">
-              <Button variant="outline">Retour à l'accueil</Button>
+              <Button variant="outline">{t.accept_back_home}</Button>
             </Link>
           </CardContent>
         </Card>
@@ -120,7 +112,6 @@ const AcceptInvitationPage: React.FC = () => {
     );
   }
 
-  // Success state
   if (success) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -128,14 +119,13 @@ const AcceptInvitationPage: React.FC = () => {
           <CardContent className="py-12 flex flex-col items-center gap-4 text-center">
             <CheckCircle className="h-12 w-12 text-accent" />
             <p className="text-foreground font-medium">{success}</p>
-            <p className="text-sm text-muted-foreground">Redirection vers le tableau de bord…</p>
+            <p className="text-sm text-muted-foreground">{t.accept_redirecting}</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Valid invitation, not authenticated
   if (!user && invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -144,30 +134,34 @@ const AcceptInvitationPage: React.FC = () => {
             <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
               <Users className="h-7 w-7 text-accent" />
             </div>
-            <CardTitle className="font-heading text-xl">Rejoindre le cercle</CardTitle>
-            <CardDescription>
-              Vous êtes invité(e) à rejoindre <strong>{invitation.circle_name}</strong> en tant que {roleLabels[invitation.role] || invitation.role}.
-            </CardDescription>
+            <CardTitle className="font-heading text-xl">{t.accept_join_circle}</CardTitle>
+            <CardDescription
+              dangerouslySetInnerHTML={{
+                __html: t.accept_invited_to
+                  .replace('{circle}', invitation.circle_name)
+                  .replace('{role}', roleLabel(invitation.role))
+              }}
+            />
           </CardHeader>
           <CardContent className="space-y-4 text-center">
             {invitation.first_name && (
               <p className="text-sm text-muted-foreground">
-                Invitation adressée à {invitation.first_name} {invitation.last_name}
+                {t.accept_addressed_to.replace('{name}', `${invitation.first_name} ${invitation.last_name}`)}
               </p>
             )}
             <p className="text-sm text-muted-foreground">
-              Connectez-vous ou créez un compte pour accepter cette invitation.
+              {t.accept_login_or_signup}
             </p>
             <div className="flex flex-col gap-2">
               <Link to={`/login?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
                 <Button className="w-full gap-2">
                   <LogIn className="h-4 w-4" />
-                  Se connecter
+                  {t.accept_login}
                 </Button>
               </Link>
               <Link to={`/signup?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
                 <Button variant="outline" className="w-full">
-                  Créer un compte
+                  {t.accept_signup}
                 </Button>
               </Link>
             </div>
@@ -177,7 +171,6 @@ const AcceptInvitationPage: React.FC = () => {
     );
   }
 
-  // Valid invitation, authenticated
   if (user && invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -186,18 +179,22 @@ const AcceptInvitationPage: React.FC = () => {
             <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
               <Users className="h-7 w-7 text-accent" />
             </div>
-            <CardTitle className="font-heading text-xl">Rejoindre le cercle</CardTitle>
-            <CardDescription>
-              Vous êtes invité(e) à rejoindre <strong>{invitation.circle_name}</strong>
-            </CardDescription>
+            <CardTitle className="font-heading text-xl">{t.accept_join_circle}</CardTitle>
+            <CardDescription
+              dangerouslySetInnerHTML={{
+                __html: t.accept_invited_to
+                  .replace('{circle}', invitation.circle_name)
+                  .replace('{role}', roleLabel(invitation.role))
+              }}
+            />
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-lg bg-secondary/50 p-4 space-y-2 text-sm">
               {invitation.first_name && (
-                <p><span className="text-muted-foreground">Destinataire :</span> {invitation.first_name} {invitation.last_name}</p>
+                <p><span className="text-muted-foreground">{t.accept_recipient} :</span> {invitation.first_name} {invitation.last_name}</p>
               )}
-              <p><span className="text-muted-foreground">Rôle :</span> {roleLabels[invitation.role] || invitation.role}</p>
-              <p><span className="text-muted-foreground">Cercle :</span> {invitation.circle_name}</p>
+              <p><span className="text-muted-foreground">{t.accept_role} :</span> {roleLabel(invitation.role)}</p>
+              <p><span className="text-muted-foreground">{t.accept_circle} :</span> {invitation.circle_name}</p>
             </div>
 
             {error && (
@@ -206,7 +203,7 @@ const AcceptInvitationPage: React.FC = () => {
 
             <Button onClick={handleAccept} disabled={accepting} className="w-full">
               {accepting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Accepter l'invitation
+              {t.accept_btn}
             </Button>
           </CardContent>
         </Card>
