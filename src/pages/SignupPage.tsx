@@ -13,6 +13,9 @@ import { z } from 'zod';
 const SignupPage: React.FC = () => {
   const { signUp } = useAuth();
   const { t } = useLocale();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
