@@ -5,7 +5,7 @@ import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 
 const SITE_NAME = 'Famille Souvenir'
 const SENDER_DOMAIN = 'updates.solexi.ai'
-const FROM_EMAIL = `updates@solexi.ai`
+const FROM_EMAIL = `noreply@${SENDER_DOMAIN}`
 const RESEND_GATEWAY_URL = 'https://connector-gateway.lovable.dev/resend'
 
 const corsHeaders = {
