@@ -59,6 +59,8 @@ export const sendInvitationEmail = async ({
     supabase.from('profiles').select('full_name').eq('user_id', userId).maybeSingle(),
   ]);
 
+  const lang = localStorage.getItem('solexi_lang') || 'fr';
+
   const { data, error } = await supabase.functions.invoke('send-transactional-email', {
     body: {
       templateName: 'circle-invitation',
@@ -72,6 +74,7 @@ export const sendInvitationEmail = async ({
         role: invitation.role,
         invitationMessage: invitation.invitationMessage || '',
         acceptUrl: link,
+        lang,
       },
     },
   });

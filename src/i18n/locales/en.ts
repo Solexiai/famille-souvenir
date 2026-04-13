@@ -543,6 +543,30 @@ const en: Translations = {
   invitations_cancel_error: 'Error cancelling.',
   invitations_cancelled: 'Invitation cancelled.',
 
+  // Accept invitation page
+  accept_title: 'Join the circle',
+  accept_verifying: 'Verifying invitation…',
+  accept_invalid_link: 'Invalid invitation link. No token provided.',
+  accept_already_accepted: 'This invitation has already been accepted.',
+  accept_expired: 'This invitation has expired.',
+  accept_declined: 'This invitation was declined.',
+  accept_no_longer_valid: 'This invitation is no longer valid.',
+  accept_cannot_verify: 'Unable to verify this invitation.',
+  accept_back_home: 'Back to home',
+  accept_redirecting: 'Redirecting to dashboard…',
+  accept_join_circle: 'Join the circle',
+  accept_invited_to: 'You are invited to join <strong>{circle}</strong> as {role}.',
+  accept_addressed_to: 'Invitation addressed to {name}',
+  accept_login_or_signup: 'Sign in or create an account to accept this invitation.',
+  accept_login: 'Sign in',
+  accept_signup: 'Create an account',
+  accept_recipient: 'Recipient',
+  accept_role: 'Role',
+  accept_circle: 'Circle',
+  accept_btn: 'Accept invitation',
+  accept_success_default: 'You have joined the circle!',
+  accept_error_default: 'Error accepting invitation.',
+
   // Member card
   member_roles: {
     owner: 'Owner', family_manager: 'Manager', family_member: 'Member',

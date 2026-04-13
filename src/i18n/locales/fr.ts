@@ -553,6 +553,30 @@ const fr: Translations = {
   invitations_cancel_error: 'Erreur lors de l\'annulation.',
   invitations_cancelled: 'Invitation annulée.',
 
+  // Accept invitation page
+  accept_title: 'Rejoindre le cercle',
+  accept_verifying: 'Vérification de l\'invitation…',
+  accept_invalid_link: 'Lien d\'invitation invalide. Aucun jeton fourni.',
+  accept_already_accepted: 'Cette invitation a déjà été acceptée.',
+  accept_expired: 'Cette invitation a expiré.',
+  accept_declined: 'Cette invitation a été déclinée.',
+  accept_no_longer_valid: 'Cette invitation n\'est plus valide.',
+  accept_cannot_verify: 'Impossible de vérifier cette invitation.',
+  accept_back_home: 'Retour à l\'accueil',
+  accept_redirecting: 'Redirection vers le tableau de bord…',
+  accept_join_circle: 'Rejoindre le cercle',
+  accept_invited_to: 'Vous êtes invité(e) à rejoindre <strong>{circle}</strong> en tant que {role}.',
+  accept_addressed_to: 'Invitation adressée à {name}',
+  accept_login_or_signup: 'Connectez-vous ou créez un compte pour accepter cette invitation.',
+  accept_login: 'Se connecter',
+  accept_signup: 'Créer un compte',
+  accept_recipient: 'Destinataire',
+  accept_role: 'Rôle',
+  accept_circle: 'Cercle',
+  accept_btn: 'Accepter l\'invitation',
+  accept_success_default: 'Vous avez bien rejoint le cercle !',
+  accept_error_default: 'Erreur lors de l\'acceptation de l\'invitation.',
+
   // Member card
   member_roles: {
     owner: 'Propriétaire', family_manager: 'Gestionnaire', family_member: 'Membre',
