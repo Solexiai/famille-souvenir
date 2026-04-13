@@ -18,5 +18,8 @@ verify_jwt = false
 [functions.validate-upload]
 verify_jwt = false
 
+[functions.manage-invitation]
+verify_jwt = false
+
 [functions.security-alert]
 verify_jwt = false

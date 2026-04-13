@@ -15,7 +15,9 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, serviceKey)
 
-    const { action, token, invitation_id } = await req.json()
+    const body = await req.json()
+    const { action, token, invitation_id } = body
+    console.log('[manage-invitation] action:', action, 'token:', token ? token.substring(0, 8) + '...' : 'none')
 
     // === ACCEPT INVITATION ===
     if (action === 'accept') {
