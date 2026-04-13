@@ -1,0 +1,1 @@
+DELETE FROM suppressed_emails WHERE email = 'katherineparadis0307@gmail.com';
