@@ -504,6 +504,30 @@ export interface Translations {
   invitations_cancel_error: string;
   invitations_cancelled: string;
 
+  // Accept invitation page
+  accept_title: string;
+  accept_verifying: string;
+  accept_invalid_link: string;
+  accept_already_accepted: string;
+  accept_expired: string;
+  accept_declined: string;
+  accept_no_longer_valid: string;
+  accept_cannot_verify: string;
+  accept_back_home: string;
+  accept_redirecting: string;
+  accept_join_circle: string;
+  accept_invited_to: string;
+  accept_addressed_to: string;
+  accept_login_or_signup: string;
+  accept_login: string;
+  accept_signup: string;
+  accept_recipient: string;
+  accept_role: string;
+  accept_circle: string;
+  accept_btn: string;
+  accept_success_default: string;
+  accept_error_default: string;
+
   // Member card
   member_roles: Record<string, string>;
   member_emergency: string;

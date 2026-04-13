@@ -543,6 +543,30 @@ const es: Translations = {
   invitations_cancel_error: 'Error al cancelar.',
   invitations_cancelled: 'Invitación cancelada.',
 
+  // Accept invitation page
+  accept_title: 'Unirse al círculo',
+  accept_verifying: 'Verificando invitación…',
+  accept_invalid_link: 'Enlace de invitación inválido. No se proporcionó un token.',
+  accept_already_accepted: 'Esta invitación ya fue aceptada.',
+  accept_expired: 'Esta invitación ha expirado.',
+  accept_declined: 'Esta invitación fue rechazada.',
+  accept_no_longer_valid: 'Esta invitación ya no es válida.',
+  accept_cannot_verify: 'No se pudo verificar esta invitación.',
+  accept_back_home: 'Volver al inicio',
+  accept_redirecting: 'Redirigiendo al panel…',
+  accept_join_circle: 'Unirse al círculo',
+  accept_invited_to: 'Está invitado(a) a unirse a <strong>{circle}</strong> como {role}.',
+  accept_addressed_to: 'Invitación dirigida a {name}',
+  accept_login_or_signup: 'Inicie sesión o cree una cuenta para aceptar esta invitación.',
+  accept_login: 'Iniciar sesión',
+  accept_signup: 'Crear cuenta',
+  accept_recipient: 'Destinatario',
+  accept_role: 'Rol',
+  accept_circle: 'Círculo',
+  accept_btn: 'Aceptar invitación',
+  accept_success_default: '¡Se unió al círculo exitosamente!',
+  accept_error_default: 'Error al aceptar la invitación.',
+
   // Member card
   member_roles: {
     owner: 'Propietario', family_manager: 'Gestor', family_member: 'Miembro',
