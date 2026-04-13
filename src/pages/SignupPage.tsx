@@ -63,7 +63,7 @@ const SignupPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.auth_verify_email_desc.replace('{email}', email) }} />
-            <Link to="/login">
+            <Link to={`/login${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}>
               <Button variant="outline" className="w-full">{t.auth_back_to_login}</Button>
             </Link>
           </CardContent>
