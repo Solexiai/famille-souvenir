@@ -1,3 +1,4 @@
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import type { AppRole } from '@/types/database';
 
@@ -23,6 +24,23 @@ interface SendInvitationEmailResult {
   queued: boolean;
   reason?: string;
 }
+
+const resolveInvitationFunctionError = async (error: unknown) => {
+  if (error instanceof FunctionsHttpError) {
+    try {
+      const payload = await error.context.json();
+      return payload?.error || payload?.details?.message || payload?.message || error.message;
+    } catch {
+      return error.message;
+    }
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Impossible d'envoyer le courriel d'invitation.";
+};
 
 export const buildInvitationAcceptUrl = (token: string) => {
   const baseUrl = window.location.origin.replace(/\/$/, '');
@@ -62,7 +80,7 @@ export const sendInvitationEmail = async ({
     return {
       ok: false,
       queued: false,
-      error: error.message || "Impossible d'envoyer le courriel d'invitation.",
+      error: await resolveInvitationFunctionError(error),
       link,
     };
   }
@@ -74,7 +92,7 @@ export const sendInvitationEmail = async ({
       error:
         data.reason === 'email_suppressed'
           ? 'Cette adresse est bloquée pour les envois.'
-          : data.error || "Le courriel d'invitation n'a pas pu être mis en file d'envoi.",
+          : data.error || "Le courriel d'invitation n'a pas pu être envoyé.",
       link,
       reason: data.reason,
     };
@@ -82,7 +100,7 @@ export const sendInvitationEmail = async ({
 
   return {
     ok: true,
-    queued: Boolean(data?.queued ?? data?.success),
+    queued: Boolean(data?.queued ?? false),
     link,
   };
 };
