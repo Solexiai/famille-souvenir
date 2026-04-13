@@ -159,13 +159,13 @@ const AcceptInvitationPage: React.FC = () => {
               Connectez-vous ou créez un compte pour accepter cette invitation.
             </p>
             <div className="flex flex-col gap-2">
-              <Link to={`/login?redirect=/invitation/accept?token=${token}`}>
+              <Link to={`/login?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
                 <Button className="w-full gap-2">
                   <LogIn className="h-4 w-4" />
                   Se connecter
                 </Button>
               </Link>
-              <Link to={`/signup?redirect=/invitation/accept?token=${token}`}>
+              <Link to={`/signup?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
                 <Button variant="outline" className="w-full">
                   Créer un compte
                 </Button>
