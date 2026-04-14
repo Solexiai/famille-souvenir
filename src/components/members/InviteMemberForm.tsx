@@ -98,7 +98,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
 
     const { data: inserted, error } = await supabase.from('invitations').insert({
       circle_id: circleId,
-      email: result.data.email,
+      email: normalizedEmail,
       role,
       invited_by: userId,
       first_name: result.data.firstName,
