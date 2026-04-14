@@ -15,6 +15,7 @@ import { Loader2, Plus, Image, Video, Mic, FileText } from 'lucide-react';
 import type { Memory, MemoryType, MemoryVisibility, FamilyCircle } from '@/types/database';
 import { z } from 'zod';
 import { validateUpload } from '@/lib/upload-validation';
+import { prepareImageForUpload } from '@/lib/image-preparation';
 
 const memorySchema = z.object({
   caption: z.string().trim().min(1, 'Veuillez ajouter une légende').max(500),
@@ -144,19 +145,25 @@ const MemoriesPage: React.FC = () => {
 
     // Upload file if provided
     if (file && (type === 'photo' || type === 'video' || type === 'audio')) {
+      // Strip EXIF/GPS and resize images before upload
+      let processedFile = file;
+      if (type === 'photo') {
+        processedFile = await prepareImageForUpload(file);
+      }
+
       // Server-side validation (MIME, magic bytes, quotas, plan limits)
-      const validation = await validateUpload(file, type, circle.id);
+      const validation = await validateUpload(processedFile, type, circle.id);
       if (!validation.allowed) {
         toast.error(validation.error || 'Upload refusé');
         setCreating(false);
         return;
       }
 
-      const ext = file.name.split('.').pop();
+      const ext = processedFile.name.split('.').pop();
       const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from('memories-media')
-        .upload(filePath, file);
+        .upload(filePath, processedFile);
       if (uploadError) {
         toast.error("Erreur lors de l'envoi du fichier.");
         setCreating(false);

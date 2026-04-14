@@ -108,9 +108,27 @@ const VaultPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <a href={doc.file_url} target="_blank" rel="noopener noreferrer">
-                      <Button variant="ghost" size="icon"><Download className="h-4 w-4" /></Button>
-                    </a>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={async () => {
+                        // Use signed URL with short TTL instead of direct file_url
+                        if (doc.file_url && !/^https?:\/\//i.test(doc.file_url)) {
+                          const { data, error } = await supabase.storage
+                            .from('vault-private')
+                            .createSignedUrl(doc.file_url, 300);
+                          if (data?.signedUrl) {
+                            window.open(data.signedUrl, '_blank');
+                          } else {
+                            toast.error('Erreur lors du téléchargement.');
+                          }
+                        } else {
+                          window.open(doc.file_url, '_blank');
+                        }
+                      }}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
