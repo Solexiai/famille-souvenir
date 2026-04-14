@@ -4,11 +4,13 @@ import { Phone, Mail, MapPin, AlertTriangle, Crown, Shield, Edit, Eye } from 'lu
 import type { CircleMember, MemberFamilyLabel, AppRole } from '@/types/database';
 import { FamilyLabelsForMember } from '@/components/FamilyLabelsManager';
 
-const roleLabels: Record<AppRole, string> = {
+const roleLabels: Record<string, string> = {
   owner: 'Propriétaire',
   family_manager: 'Gestionnaire',
   family_member: 'Membre',
   heir: 'Héritier',
+  contributor: 'Contributeur',
+  viewer: 'Observateur',
   proposed_executor: 'Exécuteur pressenti',
   verified_executor: 'Exécuteur documenté',
 };

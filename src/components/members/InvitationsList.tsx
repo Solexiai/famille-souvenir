@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Mail, RefreshCw, XCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Invitation } from '@/types/database';
+import type { Invitation, AppRole } from '@/types/database';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { sendInvitationEmail } from '@/lib/invitation-email';
@@ -15,6 +15,17 @@ const statusConfig: Record<string, { label: string; variant: 'default' | 'second
   accepted: { label: 'Acceptée', variant: 'default', icon: CheckCircle },
   declined: { label: 'Déclinée', variant: 'destructive', icon: XCircle },
   expired: { label: 'Expirée', variant: 'secondary', icon: AlertTriangle },
+};
+
+const roleLabels: Record<string, string> = {
+  owner: 'Propriétaire',
+  family_manager: 'Gestionnaire',
+  family_member: 'Membre',
+  heir: 'Héritier',
+  contributor: 'Contributeur',
+  viewer: 'Observateur',
+  proposed_executor: 'Exécuteur pressenti',
+  verified_executor: 'Exécuteur documenté',
 };
 
 interface Props {
@@ -145,17 +156,28 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
             <div key={inv.id} className="rounded-lg border border-border p-3 sm:p-4 space-y-3">
               {/* Top: info + status */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <div className="min-w-0 space-y-0.5">
+              <div className="min-w-0 space-y-0.5">
                   <p className="text-sm font-medium text-foreground">{displayName}</p>
                   <p className="text-xs text-muted-foreground break-all">{inv.email}</p>
+                  {inv.phone && (
+                    <p className="text-xs text-muted-foreground">📞 {inv.phone}</p>
+                  )}
+                  {inv.city && (
+                    <p className="text-xs text-muted-foreground">📍 {inv.city}</p>
+                  )}
                   {inv.relationship_label && (
                     <p className="text-xs text-muted-foreground">{inv.relationship_label}</p>
                   )}
                 </div>
-                <Badge variant={effectiveConfig.variant} className="flex items-center gap-1 shrink-0 self-start sm:self-center text-xs">
-                  <EffectiveIcon className="h-3 w-3" />
-                  {effectiveConfig.label}
-                </Badge>
+                <div className="flex flex-col items-end gap-1 shrink-0 self-start sm:self-center">
+                  <Badge variant="secondary" className="text-xs">
+                    {roleLabels[inv.role] || inv.role}
+                  </Badge>
+                  <Badge variant={effectiveConfig.variant} className="flex items-center gap-1 text-xs">
+                    <EffectiveIcon className="h-3 w-3" />
+                    {effectiveConfig.label}
+                  </Badge>
+                </div>
               </div>
 
               {/* Meta */}
