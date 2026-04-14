@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -24,6 +24,8 @@ const AcceptInvitationPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const { t } = useLocale();
   const token = searchParams.get('token');
+  const autoAccept = searchParams.get('autoAccept') === '1';
+  const autoAcceptAttempted = useRef(false);
 
   const [validating, setValidating] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -32,6 +34,12 @@ const AcceptInvitationPage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
 
   const roleLabel = (role: string) => t.member_roles[role] || role;
+  const authRedirectPath = useMemo(() => {
+    if (!token) return '/invitation/accept';
+
+    const params = new URLSearchParams({ token, autoAccept: '1' });
+    return `/invitation/accept?${params.toString()}`;
+  }, [token]);
 
   useEffect(() => {
     if (!token) {
@@ -63,9 +71,11 @@ const AcceptInvitationPage: React.FC = () => {
     validate();
   }, [token]);
 
-  const handleAccept = async () => {
+  const handleAccept = useCallback(async () => {
     if (!token || !user) return;
+
     setAccepting(true);
+    setError(null);
 
     const { data, error: fnError } = await supabase.functions.invoke('manage-invitation', {
       body: { action: 'accept', token },
@@ -81,7 +91,16 @@ const AcceptInvitationPage: React.FC = () => {
       setTimeout(() => navigate('/dashboard'), 2000);
     }
     setAccepting(false);
-  };
+  }, [navigate, t, token, user]);
+
+  useEffect(() => {
+    if (!autoAccept || !user || !invitation || validating || accepting || success || autoAcceptAttempted.current) {
+      return;
+    }
+
+    autoAcceptAttempted.current = true;
+    void handleAccept();
+  }, [accepting, autoAccept, handleAccept, invitation, success, user, validating]);
 
   if (authLoading || validating) {
     return (
@@ -153,13 +172,13 @@ const AcceptInvitationPage: React.FC = () => {
               {t.accept_login_or_signup}
             </p>
             <div className="flex flex-col gap-2">
-              <Link to={`/login?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
+              <Link to={`/login?redirect=${encodeURIComponent(authRedirectPath)}`}>
                 <Button className="w-full gap-2">
                   <LogIn className="h-4 w-4" />
                   {t.accept_login}
                 </Button>
               </Link>
-              <Link to={`/signup?redirect=${encodeURIComponent(`/invitation/accept?token=${token}`)}`}>
+              <Link to={`/signup?redirect=${encodeURIComponent(authRedirectPath)}`}>
                 <Button variant="outline" className="w-full">
                   {t.accept_signup}
                 </Button>
