@@ -562,6 +562,26 @@ export interface Translations {
   founder_quote_2: string;
   founder_quote_3: string;
   founder_quote_4: string;
+
+  // MFA
+  mfa_title: string;
+  mfa_desc: string;
+  mfa_enabled: string;
+  mfa_disabled: string;
+  mfa_enable_btn: string;
+  mfa_disable_btn: string;
+  mfa_scan_qr: string;
+  mfa_enter_code: string;
+  mfa_verify: string;
+  mfa_verifying: string;
+  mfa_success: string;
+  mfa_disabled_success: string;
+  mfa_error: string;
+  mfa_invalid_code: string;
+  mfa_challenge_title: string;
+  mfa_challenge_desc: string;
+  mfa_challenge_submit: string;
+  mfa_challenge_error: string;
 }
 
 export interface TerminologyPack {

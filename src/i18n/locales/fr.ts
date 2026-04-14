@@ -614,6 +614,25 @@ const fr: Translations = {
   founder_quote_2: 'Solexi.ai n\'est pas un service juridique. C\'est un service humain.',
   founder_quote_3: 'L\'idée est simple\u00A0: si préparer son héritage était aussi facile que commander sur Amazon, les gens le feraient.',
   founder_quote_4: 'Alors, c\'est exactement ce que nous voulons construire. Rapide. Accessible. Pour tout le monde. Parce que chaque famille mérite la clarté.',
+
+  mfa_title: 'Authentification à deux facteurs (2FA)',
+  mfa_desc: 'Ajoutez une couche de sécurité supplémentaire à votre compte avec une application d\'authentification.',
+  mfa_enabled: 'Activée',
+  mfa_disabled: 'Désactivée',
+  mfa_enable_btn: 'Activer la 2FA',
+  mfa_disable_btn: 'Désactiver la 2FA',
+  mfa_scan_qr: 'Scannez ce QR code avec votre application d\'authentification (Google Authenticator, Authy, etc.)',
+  mfa_enter_code: 'Code de vérification',
+  mfa_verify: 'Vérifier et activer',
+  mfa_verifying: 'Vérification…',
+  mfa_success: 'Authentification à deux facteurs activée avec succès !',
+  mfa_disabled_success: '2FA désactivée.',
+  mfa_error: 'Erreur lors de la configuration 2FA.',
+  mfa_invalid_code: 'Code invalide. Veuillez réessayer.',
+  mfa_challenge_title: 'Vérification en deux étapes',
+  mfa_challenge_desc: 'Entrez le code à 6 chiffres de votre application d\'authentification.',
+  mfa_challenge_submit: 'Vérifier',
+  mfa_challenge_error: 'Code invalide. Veuillez réessayer.',
 };
 
 export default fr;
