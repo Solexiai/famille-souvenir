@@ -14,28 +14,26 @@ const AuthCallbackPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
+
     const handleCallback = async () => {
       try {
-        // Supabase exchanges the hash fragment for a session automatically
-        // We just need to wait for the session to be available
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        // 1. Recover session from URL hash (email verification redirect)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
 
-        if (sessionError || !session) {
-          // Try to exchange hash params if present (e.g., from email confirmation link)
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          const accessToken = hashParams.get('access_token');
-          const refreshToken = hashParams.get('refresh_token');
-
-          if (accessToken && refreshToken) {
-            const { error: setError } = await supabase.auth.setSession({
-              access_token: accessToken,
-              refresh_token: refreshToken,
-            });
-            if (setError) {
-              throw new Error('Impossible de restaurer la session : ' + setError.message);
-            }
-          } else {
-            // No session and no hash tokens - wait briefly for onAuthStateChange
+        if (accessToken && refreshToken) {
+          const { error: setError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (setError) throw new Error('Session invalide : ' + setError.message);
+        } else {
+          // No hash tokens — check if session already exists
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) {
+            // Wait briefly for onAuthStateChange
             await new Promise<void>((resolve, reject) => {
               const timeout = setTimeout(() => reject(new Error('Session non trouvée')), 5000);
               const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
@@ -49,7 +47,9 @@ const AuthCallbackPage: React.FC = () => {
           }
         }
 
-        // Session is now available - check for pending invitation token
+        if (cancelled) return;
+
+        // 2. Check for pending invitation token
         const invitationToken = localStorage.getItem(INVITATION_TOKEN_KEY);
 
         if (invitationToken) {
@@ -59,29 +59,27 @@ const AuthCallbackPage: React.FC = () => {
             body: { action: 'accept', token: invitationToken },
           });
 
+          localStorage.removeItem(INVITATION_TOKEN_KEY);
+
+          if (cancelled) return;
+
           if (fnError || !data?.success) {
-            const msg = data?.error || 'Erreur lors de l\'acceptation de l\'invitation';
-            // Clean up token even on error to avoid loops
-            localStorage.removeItem(INVITATION_TOKEN_KEY);
-            
-            // Still redirect to dashboard - account is confirmed
+            const msg = data?.error || 'Erreur lors du rattachement au cercle';
             setStatus('error');
             setErrorMessage(msg);
             toast.error(msg);
             setTimeout(() => navigate('/dashboard'), 3000);
-            return;
+          } else {
+            setStatus('success');
+            toast.success(data.message || 'Vous avez rejoint le cercle !');
+            setTimeout(() => navigate('/dashboard'), 2000);
           }
-
-          // Success - clean up and redirect
-          localStorage.removeItem(INVITATION_TOKEN_KEY);
-          setStatus('success');
-          toast.success(data.message || 'Vous avez rejoint le cercle avec succès !');
-          setTimeout(() => navigate('/dashboard'), 2000);
         } else {
-          // No pending invitation - just redirect to dashboard
+          // No pending invitation — go to dashboard
           navigate('/dashboard');
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('Auth callback error:', err);
         localStorage.removeItem(INVITATION_TOKEN_KEY);
         setStatus('error');
@@ -91,6 +89,7 @@ const AuthCallbackPage: React.FC = () => {
     };
 
     handleCallback();
+    return () => { cancelled = true; };
   }, [navigate]);
 
   return (

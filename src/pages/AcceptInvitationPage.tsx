@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle, XCircle, Users, LogIn } from 'lucide-react';
+
+const INVITATION_TOKEN_KEY = 'solexi_invitation_token';
 
 interface InvitationInfo {
   id: string;
@@ -18,23 +20,12 @@ interface InvitationInfo {
   circle_name: string;
 }
 
-const INVITATION_TOKEN_KEY = 'solexi_invitation_token';
-
 const AcceptInvitationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { t } = useLocale();
   const token = searchParams.get('token');
-  const autoAccept = searchParams.get('autoAccept') === '1';
-  const autoAcceptAttempted = useRef(false);
-
-  // Persist invitation token immediately so it survives signup/email-verify flow
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem(INVITATION_TOKEN_KEY, token);
-    }
-  }, [token]);
 
   const [validating, setValidating] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -43,13 +34,15 @@ const AcceptInvitationPage: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
 
   const roleLabel = (role: string) => t.member_roles[role] || role;
-  const authRedirectPath = useMemo(() => {
-    if (!token) return '/invitation/accept';
 
-    const params = new URLSearchParams({ token, autoAccept: '1' });
-    return `/invitation/accept?${params.toString()}`;
+  // 1. Persist token to localStorage immediately (survives signup + email verify)
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem(INVITATION_TOKEN_KEY, token);
+    }
   }, [token]);
 
+  // 2. Validate the invitation token
   useEffect(() => {
     if (!token) {
       setError(t.accept_invalid_link);
@@ -80,9 +73,9 @@ const AcceptInvitationPage: React.FC = () => {
     validate();
   }, [token]);
 
-  const handleAccept = useCallback(async () => {
+  // 3. If user is already logged in, accept the invitation directly
+  const handleAccept = async () => {
     if (!token || !user) return;
-
     setAccepting(true);
     setError(null);
 
@@ -95,22 +88,15 @@ const AcceptInvitationPage: React.FC = () => {
       setError(msg);
       toast.error(msg);
     } else {
+      localStorage.removeItem(INVITATION_TOKEN_KEY);
       setSuccess(data.message || t.accept_success_default);
       toast.success(data.message || t.accept_success_default);
       setTimeout(() => navigate('/dashboard'), 2000);
     }
     setAccepting(false);
-  }, [navigate, t, token, user]);
+  };
 
-  useEffect(() => {
-    if (!autoAccept || !user || !invitation || validating || accepting || success || autoAcceptAttempted.current) {
-      return;
-    }
-
-    autoAcceptAttempted.current = true;
-    void handleAccept();
-  }, [accepting, autoAccept, handleAccept, invitation, success, user, validating]);
-
+  // Loading state
   if (authLoading || validating) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -124,6 +110,7 @@ const AcceptInvitationPage: React.FC = () => {
     );
   }
 
+  // Error without invitation info
   if (error && !invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -131,15 +118,14 @@ const AcceptInvitationPage: React.FC = () => {
           <CardContent className="py-12 flex flex-col items-center gap-4 text-center">
             <XCircle className="h-12 w-12 text-destructive" />
             <p className="text-foreground font-medium">{error}</p>
-            <Link to="/">
-              <Button variant="outline">{t.accept_back_home}</Button>
-            </Link>
+            <Link to="/"><Button variant="outline">{t.accept_back_home}</Button></Link>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  // Success
   if (success) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -154,6 +140,9 @@ const AcceptInvitationPage: React.FC = () => {
     );
   }
 
+  // Not logged in — show login/signup options
+  // Token is already saved in localStorage. After login or signup+verify,
+  // the invitation will be accepted automatically.
   if (!user && invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -177,20 +166,13 @@ const AcceptInvitationPage: React.FC = () => {
                 {t.accept_addressed_to.replace('{name}', `${invitation.first_name} ${invitation.last_name}`)}
               </p>
             )}
-            <p className="text-sm text-muted-foreground">
-              {t.accept_login_or_signup}
-            </p>
+            <p className="text-sm text-muted-foreground">{t.accept_login_or_signup}</p>
             <div className="flex flex-col gap-2">
-              <Link to={`/login?redirect=${encodeURIComponent(authRedirectPath)}`}>
-                <Button className="w-full gap-2">
-                  <LogIn className="h-4 w-4" />
-                  {t.accept_login}
-                </Button>
+              <Link to="/login">
+                <Button className="w-full gap-2"><LogIn className="h-4 w-4" />{t.accept_login}</Button>
               </Link>
-              <Link to={`/signup?redirect=${encodeURIComponent(authRedirectPath)}`}>
-                <Button variant="outline" className="w-full">
-                  {t.accept_signup}
-                </Button>
+              <Link to="/signup">
+                <Button variant="outline" className="w-full">{t.accept_signup}</Button>
               </Link>
             </div>
           </CardContent>
@@ -199,6 +181,7 @@ const AcceptInvitationPage: React.FC = () => {
     );
   }
 
+  // Logged in — show accept button
   if (user && invitation) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -224,11 +207,7 @@ const AcceptInvitationPage: React.FC = () => {
               <p><span className="text-muted-foreground">{t.accept_role} :</span> {roleLabel(invitation.role)}</p>
               <p><span className="text-muted-foreground">{t.accept_circle} :</span> {invitation.circle_name}</p>
             </div>
-
-            {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
-            )}
-
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
             <Button onClick={handleAccept} disabled={accepting} className="w-full">
               {accepting && <Loader2 className="h-4 w-4 animate-spin" />}
               {t.accept_btn}

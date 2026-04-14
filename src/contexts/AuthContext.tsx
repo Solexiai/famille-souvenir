@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, redirectTo?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
@@ -35,10 +35,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, _redirectTo?: string) => {
-    // Always redirect to /auth/callback after email verification.
-    // The callback page will recover the session and handle any pending
-    // invitation token stored in localStorage.
+  const signUp = async (email: string, password: string, fullName: string) => {
+    // After email verification, Supabase redirects here with session tokens.
+    // AuthCallbackPage will recover the session and accept any pending invitation.
     const emailRedirectTo = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signUp({
       email,

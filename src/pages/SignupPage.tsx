@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,6 @@ const SignupPage: React.FC = () => {
   const { signUp } = useAuth();
   const { t } = useLocale();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +43,7 @@ const SignupPage: React.FC = () => {
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password, fullName, redirectTo || undefined);
+    const { error } = await signUp(email, password, fullName);
     setLoading(false);
     if (error) {
       toast.error(t.auth_signup_error);
@@ -63,7 +61,7 @@ const SignupPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: t.auth_verify_email_desc.replace('{email}', email) }} />
-            <Link to={`/login${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}>
+            <Link to="/login">
               <Button variant="outline" className="w-full">{t.auth_back_to_login}</Button>
             </Link>
           </CardContent>
@@ -88,51 +86,20 @@ const SignupPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">{t.auth_full_name}</Label>
-                <Input
-                  id="fullName"
-                  placeholder="Jean Dupont"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  autoComplete="name"
-                  required
-                />
+                <Input id="fullName" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t.auth_email}</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                  required
-                />
+                <Input id="email" type="email" placeholder="email@example.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">{t.auth_password}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                />
+                <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required />
                 <p className="text-xs text-muted-foreground">{t.auth_password_hint}</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">{t.auth_confirm_password}</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                  required
-                />
+                <Input id="confirmPassword" type="password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" required />
               </div>
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -141,9 +108,7 @@ const SignupPage: React.FC = () => {
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               {t.auth_has_account}{' '}
-              <Link to={`/login${redirectTo ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`} className="text-accent hover:underline">
-                {t.sign_in}
-              </Link>
+              <Link to="/login" className="text-accent hover:underline">{t.sign_in}</Link>
             </p>
           </CardContent>
         </Card>
