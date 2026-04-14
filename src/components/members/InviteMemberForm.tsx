@@ -74,17 +74,23 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       }
     }
 
-    // ── Check if a pending invitation already exists for this email ──
-    const { data: existingInvitation } = await supabase
+    // ── Check if ANY invitation already exists for this email in this circle ──
+    const normalizedEmail = result.data.email.toLowerCase().trim();
+    const { data: existingInvitations } = await supabase
       .from('invitations')
-      .select('id')
+      .select('id, status')
       .eq('circle_id', circleId)
-      .eq('email', result.data.email)
-      .eq('status', 'pending')
-      .single();
+      .eq('email', normalizedEmail);
 
-    if (existingInvitation) {
-      toast.error('Une invitation est déjà en attente pour cette adresse courriel.');
+    const activeInvitation = existingInvitations?.find(
+      inv => inv.status === 'pending' || inv.status === 'accepted'
+    );
+
+    if (activeInvitation) {
+      const msg = activeInvitation.status === 'accepted'
+        ? 'Cette personne a déjà accepté une invitation pour ce cercle.'
+        : 'Une invitation est déjà en attente pour cette adresse courriel.';
+      toast.error(msg);
       setInviting(false);
       return;
     }
