@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { validateUpload } from '@/lib/upload-validation';
+import { prepareImageForUpload } from '@/lib/image-preparation';
 import { logAuditEvent } from '@/lib/audit';
 import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
