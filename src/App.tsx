@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 import SetupPage from "./pages/SetupPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/pricing" element={<PricingPage />} />
               <Route path="/invitation/accept" element={<AcceptInvitationPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
+              <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
               {/* Protected routes */}
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />

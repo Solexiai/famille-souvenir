@@ -18,6 +18,8 @@ interface InvitationInfo {
   circle_name: string;
 }
 
+const INVITATION_TOKEN_KEY = 'solexi_invitation_token';
+
 const AcceptInvitationPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -26,6 +28,13 @@ const AcceptInvitationPage: React.FC = () => {
   const token = searchParams.get('token');
   const autoAccept = searchParams.get('autoAccept') === '1';
   const autoAcceptAttempted = useRef(false);
+
+  // Persist invitation token immediately so it survives signup/email-verify flow
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem(INVITATION_TOKEN_KEY, token);
+    }
+  }, [token]);
 
   const [validating, setValidating] = useState(true);
   const [accepting, setAccepting] = useState(false);
