@@ -89,7 +89,7 @@ export async function validateUpload(
     return { allowed: true };
   } catch (err) {
     console.error('Upload validation failed:', err);
-    // Fail open with client-side validation only — log for monitoring
-    return { allowed: true };
+    // Fail closed — refuse upload if server validation is unavailable
+    return { allowed: false, error: 'Validation du fichier indisponible. Réessayez.', code: 'VALIDATION_UNAVAILABLE' };
   }
 }
