@@ -53,10 +53,11 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     setLastInviteLink(null);
 
     // ── Check if this email is already a member of this circle ──
+    const normalizedEmailForProfile = result.data.email.toLowerCase().trim();
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('user_id')
-      .eq('email', result.data.email)
+      .eq('email', normalizedEmailForProfile)
       .single();
 
     if (existingProfile) {
