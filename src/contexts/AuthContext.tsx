@@ -35,9 +35,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, redirectTo?: string) => {
-    const base = window.location.origin;
-    const emailRedirectTo = redirectTo ? `${base}${redirectTo}` : base;
+  const signUp = async (email: string, password: string, fullName: string, _redirectTo?: string) => {
+    // Always redirect to /auth/callback after email verification.
+    // The callback page will recover the session and handle any pending
+    // invitation token stored in localStorage.
+    const emailRedirectTo = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signUp({
       email,
       password,
