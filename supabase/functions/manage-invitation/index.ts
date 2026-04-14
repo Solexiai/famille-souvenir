@@ -121,6 +121,13 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Circle name for response
+      const { data: circle } = await supabase
+        .from('family_circles')
+        .select('name')
+        .eq('id', invitation.circle_id)
+        .single()
+
       // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
@@ -129,12 +136,17 @@ Deno.serve(async (req) => {
         details: { invitation_id: invitation.id, email: invitation.email, role: invitation.role },
       })
 
-      // Circle name for response
-      const { data: circle } = await supabase
-        .from('family_circles')
-        .select('name')
-        .eq('id', invitation.circle_id)
-        .single()
+      // Notify the manager who sent the invitation
+      const memberName = [invitation.first_name, invitation.last_name].filter(Boolean).join(' ') || invitation.email
+      const circleName = circle?.name || 'le cercle'
+      await supabase.from('notifications').insert({
+        user_id: invitation.invited_by,
+        circle_id: invitation.circle_id,
+        type: 'invitation_accepted',
+        title: `${memberName} a rejoint ${circleName}`,
+        body: `${memberName} a accepté votre invitation et fait maintenant partie du cercle.`,
+        link: '/circle/members',
+      })
 
       return jsonResponse({
         success: true,
