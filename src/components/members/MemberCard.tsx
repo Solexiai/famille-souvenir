@@ -22,6 +22,8 @@ const roleIcons: Record<AppRole, React.FC<{ className?: string }>> = {
   heir: Eye,
   proposed_executor: Eye,
   verified_executor: Shield,
+  viewer: Eye,
+  contributor: Edit,
 };
 
 interface Props {
