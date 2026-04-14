@@ -103,17 +103,23 @@ const DocumentsPage: React.FC = () => {
     if (!file || !circle || !user || !title.trim()) return;
     setUploading(true);
 
+    // Strip EXIF/GPS and resize if it's an image upload
+    let processedFile = file;
+    if (file.type.startsWith('image/')) {
+      processedFile = await prepareImageForUpload(file);
+    }
+
     // Server-side validation (MIME, magic bytes, quotas, plan limits)
-    const validation = await validateUpload(file, 'document', circle.id);
+    const validation = await validateUpload(processedFile, 'document', circle.id);
     if (!validation.allowed) {
       toast.error(validation.error || 'Upload refusé');
       setUploading(false);
       return;
     }
 
-    const ext = file.name.split('.').pop();
+    const ext = processedFile.name.split('.').pop();
     const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, file);
+    const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, processedFile);
     if (uploadError) { toast.error("Erreur lors de l'envoi du fichier."); setUploading(false); return; }
 
     const { error } = await supabase.from('documents').insert({

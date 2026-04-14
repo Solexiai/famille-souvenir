@@ -159,11 +159,11 @@ const MemoriesPage: React.FC = () => {
         return;
       }
 
-      const ext = file.name.split('.').pop();
+      const ext = processedFile.name.split('.').pop();
       const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage
         .from('memories-media')
-        .upload(filePath, file);
+        .upload(filePath, processedFile);
       if (uploadError) {
         toast.error("Erreur lors de l'envoi du fichier.");
         setCreating(false);

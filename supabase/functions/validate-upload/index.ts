@@ -21,10 +21,22 @@ const ALLOWED_FORMATS: Record<string, { mimes: string[]; extensions: string[]; m
   video: {
     mimes: ["video/mp4", "video/webm", "video/quicktime"],
     extensions: ["mp4", "webm", "mov"],
+    magicBytes: [
+      [0x00, 0x00, 0x00],           // MP4/MOV ftyp (variable 4th byte)
+      [0x1A, 0x45, 0xDF, 0xA3],     // WebM (EBML header)
+    ],
   },
   audio: {
     mimes: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/mp4"],
     extensions: ["mp3", "wav", "ogg", "m4a"],
+    magicBytes: [
+      [0x49, 0x44, 0x33],           // MP3 with ID3 tag
+      [0xFF, 0xFB],                 // MP3 sync word (MPEG1 Layer3)
+      [0xFF, 0xFA],                 // MP3 sync word (MPEG1 Layer3 alt)
+      [0x52, 0x49, 0x46, 0x46],     // WAV (RIFF container)
+      [0x4F, 0x67, 0x67, 0x53],     // OGG (OggS)
+      [0x00, 0x00, 0x00],           // M4A (ftyp container, like MP4)
+    ],
   },
   document: {
     mimes: [
@@ -128,7 +140,7 @@ Deno.serve(async (req) => {
       return jsonResp({ error: "Extension non autorisée", code: "INVALID_EXTENSION" }, 400);
     }
 
-    // 4. Validate magic bytes if provided
+    // 4. Validate magic bytes (now enforced for ALL file types including audio/video)
     if (magicBytesHex && formatConfig.magicBytes) {
       const headerBytes = hexToBytes(magicBytesHex);
       const matchesMagic = formatConfig.magicBytes.some((magic) =>
