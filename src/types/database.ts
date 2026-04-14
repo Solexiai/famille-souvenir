@@ -1,4 +1,4 @@
-export type AppRole = 'owner' | 'family_manager' | 'family_member' | 'heir' | 'proposed_executor' | 'verified_executor';
+export type AppRole = 'owner' | 'family_manager' | 'family_member' | 'heir' | 'proposed_executor' | 'verified_executor' | 'viewer' | 'contributor';
 export type MemoryType = 'photo' | 'video' | 'audio' | 'text';
 export type MemoryVisibility = 'circle' | 'managers' | 'private';
 export type DocumentVisibility = 'private_owner' | 'managers_only' | 'family_circle' | 'heirs_only' | 'executor_workspace' | 'verified_executor_only';
