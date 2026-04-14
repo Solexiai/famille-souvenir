@@ -14,8 +14,8 @@ const SignupPage: React.FC = () => {
   const { signUp } = useAuth();
   const { t } = useLocale();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect');
+  // No redirect param needed — invitation token is in localStorage
+  // and will be handled by AuthCallbackPage after email verification
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
