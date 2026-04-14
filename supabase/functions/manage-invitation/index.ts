@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const jsonResponse = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -16,65 +22,49 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceKey)
 
     const body = await req.json()
-    const { action, token, invitation_id } = body
+    const { action, token } = body
     console.log('[manage-invitation] action:', action, 'token:', token ? token.substring(0, 8) + '...' : 'none')
 
-    // === ACCEPT INVITATION ===
+    // ──────────────────────────────────────────────
+    // ACCEPT INVITATION
+    // ──────────────────────────────────────────────
     if (action === 'accept') {
-      if (!token) {
-        return new Response(JSON.stringify({ error: 'Token requis' }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
+      if (!token) return jsonResponse({ error: 'Token requis' }, 400)
 
-      // Validate auth
+      // Authenticate caller
       const authHeader = req.headers.get('Authorization')
       if (!authHeader?.startsWith('Bearer ')) {
-        return new Response(JSON.stringify({ error: 'Non authentifié' }), {
-          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        return jsonResponse({ error: 'Non authentifié' }, 401)
       }
-
-      const userToken = authHeader.replace('Bearer ', '')
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(userToken)
-      if (authError || !authUser) {
-        return new Response(JSON.stringify({ error: 'Token utilisateur invalide' }), {
-          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(
+        authHeader.replace('Bearer ', '')
+      )
+      if (authError || !authUser) return jsonResponse({ error: 'Token utilisateur invalide' }, 401)
       const userId = authUser.id
 
-      // Get invitation
+      // Fetch invitation
       const { data: invitation, error: invError } = await supabase
         .from('invitations')
         .select('*')
         .eq('token', token)
         .single()
+      if (invError || !invitation) return jsonResponse({ error: 'Invitation introuvable' }, 404)
 
-      if (invError || !invitation) {
-        return new Response(JSON.stringify({ error: 'Invitation introuvable' }), {
-          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
-
-      // Check status
+      // Status checks
       if (invitation.status !== 'pending') {
-        return new Response(JSON.stringify({
-          error: invitation.status === 'accepted' ? 'Cette invitation a déjà été acceptée'
-            : invitation.status === 'declined' ? 'Cette invitation a été déclinée'
-            : 'Cette invitation n\'est plus valide'
-        }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        const msg = invitation.status === 'accepted' ? 'Cette invitation a déjà été acceptée'
+          : invitation.status === 'declined' ? 'Cette invitation a été déclinée'
+          : "Cette invitation n'est plus valide"
+        return jsonResponse({ error: msg }, 400)
       }
 
-      // Check expiration
+      // Expiration check
       if (new Date(invitation.expires_at) < new Date()) {
         await supabase.from('invitations').update({ status: 'expired' }).eq('id', invitation.id)
-        return new Response(JSON.stringify({ error: 'Cette invitation a expiré' }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        return jsonResponse({ error: 'Cette invitation a expiré' }, 400)
       }
 
-      // Check if already a member
+      // ── Check if already a member of this circle ──
       const { data: existingMember } = await supabase
         .from('circle_members')
         .select('id')
@@ -83,16 +73,15 @@ Deno.serve(async (req) => {
         .single()
 
       if (existingMember) {
-        // Already a member, just mark invitation accepted
         await supabase.from('invitations').update({ status: 'accepted' }).eq('id', invitation.id)
-        return new Response(JSON.stringify({
+        return jsonResponse({
           success: true,
           circle_id: invitation.circle_id,
-          message: 'Vous faites déjà partie de ce cercle'
-        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+          message: 'Vous faites déjà partie de ce cercle',
+        })
       }
 
-      // Create circle membership
+      // ── Create membership with the role from the invitation ──
       const { error: memberError } = await supabase
         .from('circle_members')
         .insert({
@@ -102,15 +91,14 @@ Deno.serve(async (req) => {
         })
 
       if (memberError) {
-        return new Response(JSON.stringify({ error: 'Erreur lors de l\'ajout au cercle' }), {
-          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        console.error('[manage-invitation] memberError:', memberError)
+        return jsonResponse({ error: "Erreur lors de l'ajout au cercle" }, 500)
       }
 
-      // Update invitation status
+      // Mark invitation accepted
       await supabase.from('invitations').update({ status: 'accepted' }).eq('id', invitation.id)
 
-      // Populate profile with invitation data if available
+      // ── Populate profile with invitation data (only fill blanks) ──
       if (invitation.first_name || invitation.last_name || invitation.phone || invitation.city || invitation.relationship_label) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -138,35 +126,29 @@ Deno.serve(async (req) => {
         user_id: userId,
         circle_id: invitation.circle_id,
         action: 'invitation_accepted',
-        details: {
-          invitation_id: invitation.id,
-          email: invitation.email,
-          role: invitation.role,
-        },
+        details: { invitation_id: invitation.id, email: invitation.email, role: invitation.role },
       })
 
-      // Get circle name for response
+      // Circle name for response
       const { data: circle } = await supabase
         .from('family_circles')
         .select('name')
         .eq('id', invitation.circle_id)
         .single()
 
-      return new Response(JSON.stringify({
+      return jsonResponse({
         success: true,
         circle_id: invitation.circle_id,
         circle_name: circle?.name || 'Cercle',
-        message: `Vous avez bien rejoint le cercle « ${circle?.name || ''} »`
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        message: `Vous avez bien rejoint le cercle « ${circle?.name || ''} »`,
+      })
     }
 
-    // === VALIDATE TOKEN (check without accepting) ===
+    // ──────────────────────────────────────────────
+    // VALIDATE TOKEN (check without accepting)
+    // ──────────────────────────────────────────────
     if (action === 'validate') {
-      if (!token) {
-        return new Response(JSON.stringify({ error: 'Token requis' }), {
-          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
-      }
+      if (!token) return jsonResponse({ error: 'Token requis' }, 400)
 
       const { data: invitation, error: invError } = await supabase
         .from('invitations')
@@ -175,9 +157,7 @@ Deno.serve(async (req) => {
         .single()
 
       if (invError || !invitation) {
-        return new Response(JSON.stringify({ valid: false, error: 'Invitation introuvable' }), {
-          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        })
+        return jsonResponse({ valid: false, error: 'Invitation introuvable' }, 404)
       }
 
       const expired = new Date(invitation.expires_at) < new Date()
@@ -185,14 +165,13 @@ Deno.serve(async (req) => {
         await supabase.from('invitations').update({ status: 'expired' }).eq('id', invitation.id)
       }
 
-      // Get circle name
       const { data: circle } = await supabase
         .from('family_circles')
         .select('name')
         .eq('id', invitation.circle_id)
         .single()
 
-      return new Response(JSON.stringify({
+      return jsonResponse({
         valid: invitation.status === 'pending' && !expired,
         invitation: {
           id: invitation.id,
@@ -202,17 +181,13 @@ Deno.serve(async (req) => {
           first_name: invitation.first_name,
           last_name: invitation.last_name,
           circle_name: circle?.name || 'Cercle familial',
-        }
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+        },
+      })
     }
 
-    return new Response(JSON.stringify({ error: 'Action non reconnue' }), {
-      status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
-
+    return jsonResponse({ error: 'Action non reconnue' }, 400)
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Erreur serveur' }), {
-      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    })
+    console.error('[manage-invitation] error:', err)
+    return jsonResponse({ error: 'Erreur serveur' }, 500)
   }
 })
