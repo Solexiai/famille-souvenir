@@ -604,6 +604,25 @@ const es: Translations = {
   founder_quote_2: 'Solexi.ai no es un servicio legal. Es un servicio humano.',
   founder_quote_3: 'La idea es simple: si preparar tu legado fuera tan fácil como pedir en Amazon, la gente lo haría.',
   founder_quote_4: 'Eso es exactamente lo que queremos construir. Rápido. Accesible. Para todos. Porque cada familia merece claridad.',
+
+  mfa_title: 'Autenticación de dos factores (2FA)',
+  mfa_desc: 'Agregue una capa adicional de seguridad con una aplicación de autenticación.',
+  mfa_enabled: 'Habilitada',
+  mfa_disabled: 'Deshabilitada',
+  mfa_enable_btn: 'Habilitar 2FA',
+  mfa_disable_btn: 'Deshabilitar 2FA',
+  mfa_scan_qr: 'Escanee este código QR con su aplicación de autenticación (Google Authenticator, Authy, etc.)',
+  mfa_enter_code: 'Código de verificación',
+  mfa_verify: 'Verificar y activar',
+  mfa_verifying: 'Verificando…',
+  mfa_success: '¡Autenticación de dos factores habilitada con éxito!',
+  mfa_disabled_success: '2FA deshabilitada.',
+  mfa_error: 'Error al configurar 2FA.',
+  mfa_invalid_code: 'Código inválido. Intente de nuevo.',
+  mfa_challenge_title: 'Verificación en dos pasos',
+  mfa_challenge_desc: 'Ingrese el código de 6 dígitos de su aplicación de autenticación.',
+  mfa_challenge_submit: 'Verificar',
+  mfa_challenge_error: 'Código inválido. Intente de nuevo.',
 };
 
 export default es;
