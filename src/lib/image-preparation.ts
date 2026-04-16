@@ -82,3 +82,48 @@ export async function prepareImageForUpload(file: File): Promise<File> {
     img.src = url;
   });
 }
+
+
+/**
+ * Generate a small thumbnail image (JPEG) from an input image.
+ */
+export async function prepareImageThumbnail(file: File, maxDimension = 400): Promise<File | null> {
+  if (!file.type.startsWith('image/') || file.type === 'image/gif') return null;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      const ratio = Math.min(maxDimension / width, maxDimension / height, 1);
+      width = Math.round(width * ratio);
+      height = Math.round(height * ratio);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve(null);
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return resolve(null);
+        const baseName = file.name.replace(/\.[^/.]+$/, '');
+        resolve(new File([blob], `${baseName}-thumb.jpg`, {
+          type: 'image/jpeg',
+          lastModified: Date.now(),
+        }));
+      }, 'image/jpeg', 0.75);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+
+    img.src = url;
+  });
+}

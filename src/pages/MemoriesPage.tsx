@@ -15,7 +15,7 @@ import { Loader2, Plus, Image, Video, Mic, FileText } from 'lucide-react';
 import type { Memory, MemoryType, MemoryVisibility, FamilyCircle } from '@/types/database';
 import { z } from 'zod';
 import { validateUpload } from '@/lib/upload-validation';
-import { prepareImageForUpload } from '@/lib/image-preparation';
+import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 
 const memorySchema = z.object({
   caption: z.string().trim().min(1, 'Veuillez ajouter une légende').max(500),
@@ -105,11 +105,17 @@ const MemoriesPage: React.FC = () => {
           };
         }
 
+        const thumbnailPath = memory.type === 'photo' ? storagePath.replace(/(\.[^./]+)$/, '-thumb.jpg') : null;
+
+        const { data: thumbSignedData } = thumbnailPath
+          ? await supabase.storage.from('memories-media').createSignedUrl(thumbnailPath, 3600)
+          : { data: null };
+
         const { data: signedData, error: signedError } = await supabase.storage
           .from('memories-media')
           .createSignedUrl(storagePath, 3600);
 
-        if (signedError) {
+        if (signedError && !thumbSignedData?.signedUrl) {
           return {
             ...memory,
             mediaSrc: /^https?:\/\//i.test(memory.media_url) ? memory.media_url : undefined,
@@ -118,7 +124,7 @@ const MemoriesPage: React.FC = () => {
 
         return {
           ...memory,
-          mediaSrc: signedData?.signedUrl,
+          mediaSrc: thumbSignedData?.signedUrl || signedData?.signedUrl,
         };
       })
     );
@@ -170,6 +176,14 @@ const MemoriesPage: React.FC = () => {
         return;
       }
       media_url = filePath;
+
+      if (type === 'photo') {
+        const thumbnailFile = await prepareImageThumbnail(processedFile);
+        if (thumbnailFile) {
+          const thumbnailPath = filePath.replace(/(\.[^./]+)$/, '-thumb.jpg');
+          await supabase.storage.from('memories-media').upload(thumbnailPath, thumbnailFile, { upsert: true });
+        }
+      }
     }
 
     const { error } = await supabase.from('memories').insert({

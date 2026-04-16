@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { Loader2, User, Shield, Download, Trash2, Info } from 'lucide-react';
+import { Loader2, User, Shield, Download, Trash2, Info, CreditCard } from 'lucide-react';
 import type { Profile, Consent } from '@/types/database';
 import { LANGUAGE_ORDER, LANGUAGE_LABELS } from '@/i18n/config';
 import { MfaEnrollment } from '@/components/MfaEnrollment';
@@ -35,6 +35,8 @@ const SettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string>('inactive');
 
   const deleteWord = t.settings_delete_confirm_word;
 
@@ -49,6 +51,10 @@ const SettingsPage: React.FC = () => {
         setLanguage(p.language);
       }
       const { data: con } = await supabase.from('consents').select('*').eq('user_id', user.id).single();
+      const { data: sub } = await supabase.from('subscriptions').select('payment_state, subscription_status').eq('user_id', user.id).single();
+      if (sub) {
+        setSubscriptionStatus(sub.payment_state || sub.subscription_status || 'inactive');
+      }
       if (con) {
         const c = con as Consent;
         setConsent(c);
@@ -135,6 +141,52 @@ const SettingsPage: React.FC = () => {
     await signOut();
   };
 
+
+
+  const openCheckout = async () => {
+    if (!user) return;
+    setBillingLoading(true);
+    try {
+      const { data: ownedCircle } = await supabase
+        .from('family_circles')
+        .select('id')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+      if (!ownedCircle?.id) {
+        toast.error('Vous devez être propriétaire d'un cercle pour souscrire.');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { circleId: ownedCircle.id },
+      });
+
+      if (error || !data?.checkoutUrl) {
+        toast.error('Impossible de démarrer le paiement.');
+        return;
+      }
+
+      window.location.href = data.checkoutUrl;
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setBillingLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+      if (error || !data?.portalUrl) {
+        toast.error('Portail de facturation indisponible.');
+        return;
+      }
+      window.location.href = data.portalUrl;
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -185,6 +237,27 @@ const SettingsPage: React.FC = () => {
         </Card>
 
         <MfaEnrollment />
+
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-accent" />
+              Facturation
+            </CardTitle>
+            <CardDescription>
+              Statut actuel: <span className="font-medium">{subscriptionStatus}</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button onClick={openCheckout} disabled={billingLoading} className="w-full">
+              {billingLoading && <Loader2 className="h-4 w-4 animate-spin" />} Passer au plan annuel
+            </Button>
+            <Button variant="outline" onClick={openBillingPortal} disabled={billingLoading} className="w-full">
+              Gérer mon abonnement Stripe
+            </Button>
+          </CardContent>
+        </Card>
+
 
         <Card className="shadow-card">
           <CardHeader>

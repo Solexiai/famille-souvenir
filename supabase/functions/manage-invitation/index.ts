@@ -11,6 +11,28 @@ const jsonResponse = (body: Record<string, unknown>, status = 200) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 
+
+const normalizeEmail = (value: string | null | undefined) =>
+  (value ?? '').trim().toLowerCase()
+
+const isLikelyToken = (value: string) => /^[A-Za-z0-9_-]{24,128}$/.test(value)
+
+const logAppEvent = async (
+  supabase: ReturnType<typeof createClient>,
+  eventType: string,
+  level: 'info' | 'warning' | 'error',
+  userId: string | null,
+  context: Record<string, unknown>
+) => {
+  await supabase.from('app_events').insert({
+    source: 'manage-invitation',
+    level,
+    event_type: eventType,
+    user_id: userId,
+    context,
+  })
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -29,7 +51,7 @@ Deno.serve(async (req) => {
     // ACCEPT INVITATION
     // ──────────────────────────────────────────────
     if (action === 'accept') {
-      if (!token) return jsonResponse({ error: 'Token requis' }, 400)
+      if (!token || !isLikelyToken(token)) return jsonResponse({ error: 'Token requis ou invalide' }, 400)
 
       // Authenticate caller
       const authHeader = req.headers.get('Authorization')
@@ -41,6 +63,7 @@ Deno.serve(async (req) => {
       )
       if (authError || !authUser) return jsonResponse({ error: 'Token utilisateur invalide' }, 401)
       const userId = authUser.id
+      const authEmail = normalizeEmail(authUser.email)
 
       // Fetch invitation
       const { data: invitation, error: invError } = await supabase
@@ -49,6 +72,16 @@ Deno.serve(async (req) => {
         .eq('token', token)
         .single()
       if (invError || !invitation) return jsonResponse({ error: 'Invitation introuvable' }, 404)
+
+      const invitationEmail = normalizeEmail(invitation.email)
+      if (!authEmail || authEmail !== invitationEmail) {
+        await logAppEvent(supabase, 'invitation_email_mismatch', 'warning', userId, {
+          invitation_id: invitation.id,
+          invitation_email: invitationEmail,
+          auth_email: authEmail,
+        })
+        return jsonResponse({ error: 'Ce compte ne correspond pas au courriel invité' }, 403)
+      }
 
       // Status checks
       if (invitation.status !== 'pending') {
@@ -74,6 +107,10 @@ Deno.serve(async (req) => {
 
       if (existingMember) {
         await supabase.from('invitations').update({ status: 'accepted' }).eq('id', invitation.id)
+        await logAppEvent(supabase, 'invitation_accept_idempotent', 'info', userId, {
+          invitation_id: invitation.id,
+          circle_id: invitation.circle_id,
+        })
         return jsonResponse({
           success: true,
           circle_id: invitation.circle_id,
@@ -91,12 +128,20 @@ Deno.serve(async (req) => {
         })
 
       if (memberError) {
-        console.error('[manage-invitation] memberError:', memberError)
-        return jsonResponse({ error: "Erreur lors de l'ajout au cercle" }, 500)
+        // Unique index conflict can happen under concurrent accepts -> treat as idempotent success
+        const pgCode = (memberError as { code?: string }).code
+        if (pgCode !== '23505') {
+          console.error('[manage-invitation] memberError:', memberError)
+          return jsonResponse({ error: "Erreur lors de l'ajout au cercle" }, 500)
+        }
       }
 
-      // Mark invitation accepted
-      await supabase.from('invitations').update({ status: 'accepted' }).eq('id', invitation.id)
+      // Mark invitation accepted (only if still pending)
+      await supabase
+        .from('invitations')
+        .update({ status: 'accepted' })
+        .eq('id', invitation.id)
+        .eq('status', 'pending')
 
       // ── Populate profile with invitation data (only fill blanks) ──
       if (invitation.first_name || invitation.last_name || invitation.phone || invitation.city || invitation.relationship_label) {
@@ -148,6 +193,11 @@ Deno.serve(async (req) => {
         link: '/circle/members',
       })
 
+      await logAppEvent(supabase, 'invitation_accepted', 'info', userId, {
+        invitation_id: invitation.id,
+        circle_id: invitation.circle_id,
+      })
+
       return jsonResponse({
         success: true,
         circle_id: invitation.circle_id,
@@ -160,11 +210,11 @@ Deno.serve(async (req) => {
     // VALIDATE TOKEN (check without accepting)
     // ──────────────────────────────────────────────
     if (action === 'validate') {
-      if (!token) return jsonResponse({ error: 'Token requis' }, 400)
+      if (!token || !isLikelyToken(token)) return jsonResponse({ error: 'Token requis ou invalide' }, 400)
 
       const { data: invitation, error: invError } = await supabase
         .from('invitations')
-        .select('id, email, role, status, expires_at, circle_id, first_name, last_name')
+        .select('id, role, status, expires_at, circle_id')
         .eq('token', token)
         .single()
 
@@ -187,11 +237,8 @@ Deno.serve(async (req) => {
         valid: invitation.status === 'pending' && !expired,
         invitation: {
           id: invitation.id,
-          email: invitation.email,
           role: invitation.role,
           status: expired ? 'expired' : invitation.status,
-          first_name: invitation.first_name,
-          last_name: invitation.last_name,
           circle_name: circle?.name || 'Cercle familial',
         },
       })
