@@ -12,11 +12,8 @@ const INVITATION_TOKEN_KEY = 'solexi_invitation_token';
 
 interface InvitationInfo {
   id: string;
-  email: string;
   role: string;
   status: string;
-  first_name: string;
-  last_name: string;
   circle_name: string;
 }
 
@@ -161,11 +158,6 @@ const AcceptInvitationPage: React.FC = () => {
             />
           </CardHeader>
           <CardContent className="space-y-4 text-center">
-            {invitation.first_name && (
-              <p className="text-sm text-muted-foreground">
-                {t.accept_addressed_to.replace('{name}', `${invitation.first_name} ${invitation.last_name}`)}
-              </p>
-            )}
             <p className="text-sm text-muted-foreground">{t.accept_login_or_signup}</p>
             <div className="flex flex-col gap-2">
               <Link to="/login">
@@ -201,9 +193,6 @@ const AcceptInvitationPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-lg bg-secondary/50 p-4 space-y-2 text-sm">
-              {invitation.first_name && (
-                <p><span className="text-muted-foreground">{t.accept_recipient} :</span> {invitation.first_name} {invitation.last_name}</p>
-              )}
               <p><span className="text-muted-foreground">{t.accept_role} :</span> {roleLabel(invitation.role)}</p>
               <p><span className="text-muted-foreground">{t.accept_circle} :</span> {invitation.circle_name}</p>
             </div>

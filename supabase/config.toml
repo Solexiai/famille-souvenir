@@ -14,8 +14,15 @@ project_id = "kgutbdtsemvccwmdcuza"
   [functions.process-email-queue]
     verify_jwt = true
   [functions.security-alert]
-    verify_jwt = false
+    verify_jwt = true
   [functions.send-transactional-email]
     verify_jwt = false
   [functions.validate-upload]
+    verify_jwt = true
+
+  [functions.create-checkout-session]
+    verify_jwt = true
+  [functions.customer-portal]
+    verify_jwt = true
+  [functions.stripe-webhook]
     verify_jwt = false
