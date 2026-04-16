@@ -154,7 +154,7 @@ const SettingsPage: React.FC = () => {
         .maybeSingle();
 
       if (!ownedCircle?.id) {
-        toast.error('Vous devez être propriétaire d'un cercle pour souscrire.');
+          toast.error("Vous devez être propriétaire d'un cercle pour souscrire.");
         return;
       }
 
