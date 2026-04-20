@@ -26,6 +26,7 @@ import type {
   CircleMember, AppRole, Document as DocType
 } from '@/types/database';
 import { hasPermission } from '@/components/PermissionMatrix';
+import type { Database } from '@/integrations/supabase/types';
 
 const categoryLabels: Record<ChecklistCategory, string> = {
   legal: 'Juridique',
@@ -67,6 +68,10 @@ const statusIcons: Record<ChecklistStatus, React.ReactNode> = {
   needs_review: <AlertTriangle className="h-3.5 w-3.5" />,
   blocked: <Ban className="h-3.5 w-3.5" />,
 };
+
+type ChecklistInsert = Database['public']['Tables']['checklist_items']['Insert'];
+type ChecklistUpdate = Database['public']['Tables']['checklist_items']['Update'];
+type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
@@ -157,7 +162,10 @@ const ChecklistPage: React.FC = () => {
   const auditLog = async (action: string, details: Record<string, unknown>) => {
     if (!circle || !user) return;
     await supabase.from('audit_logs').insert({
-      user_id: user.id, circle_id: circle.id, action, details: details as any,
+      user_id: user.id,
+      circle_id: circle.id,
+      action,
+      details: details as AuditLogInsert['details'],
     });
   };
 
@@ -166,22 +174,23 @@ const ChecklistPage: React.FC = () => {
     if (!circle || !user || !title.trim()) return;
     setSaving(true);
 
-    const payload = {
+    const payload: ChecklistInsert = {
       circle_id: circle.id,
       category,
       title: title.trim(),
-      description,
+      description: description || null,
       status: formStatus,
       requires_professional_review: requiresPro,
       assigned_to: assignedTo || null,
       due_date: dueDate ? format(dueDate, 'yyyy-MM-dd') : null,
       linked_document_id: linkedDocId || null,
-      evidence_note: evidenceNote,
-      blocked_reason: blockedReason,
+      evidence_note: evidenceNote || null,
+      blocked_reason: blockedReason || null,
     };
 
     if (editItem) {
-      const { error } = await supabase.from('checklist_items').update(payload).eq('id', editItem.id);
+      const updatePayload: ChecklistUpdate = payload;
+      const { error } = await supabase.from('checklist_items').update(updatePayload).eq('id', editItem.id);
       if (error) { toast.error('Erreur lors de la mise à jour.'); }
       else {
         toast.success('Élément mis à jour.');
@@ -257,13 +266,17 @@ const ChecklistPage: React.FC = () => {
   const getMemberName = (userId: string | null) => {
     if (!userId) return null;
     const m = members.find(mb => mb.user_id === userId);
-    return m ? (m as any).profiles?.full_name || 'Membre' : null;
+    return m ? m.profiles?.full_name || 'Membre' : null;
   };
 
   const toggleCat = (cat: string) => {
     setCollapsedCats(prev => {
       const s = new Set(prev);
-      s.has(cat) ? s.delete(cat) : s.add(cat);
+      if (s.has(cat)) {
+        s.delete(cat);
+      } else {
+        s.add(cat);
+      }
       return s;
     });
   };
@@ -335,7 +348,7 @@ const ChecklistPage: React.FC = () => {
                         <SelectItem value="none">Non attribué</SelectItem>
                         {members.map(m => (
                           <SelectItem key={m.user_id} value={m.user_id}>
-                            {(m as any).profiles?.full_name || (m as any).profiles?.email || 'Membre'}
+                            {m.profiles?.full_name || m.profiles?.email || 'Membre'}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -443,12 +456,15 @@ const ChecklistPage: React.FC = () => {
                     <SelectItem value="unassigned">Non attribué</SelectItem>
                     {members.map(m => (
                       <SelectItem key={m.user_id} value={m.user_id}>
-                        {(m as any).profiles?.full_name || 'Membre'}
+                        {m.profiles?.full_name || 'Membre'}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
+                <Select
+                  value={sortBy}
+                  onValueChange={(v: 'default' | 'incomplete' | 'due_date') => setSortBy(v)}
+                >
                   <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Tri" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="default">Par catégorie</SelectItem>

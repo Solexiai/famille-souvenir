@@ -14,6 +14,17 @@ const corsHeaders = {
     'authorization, x-client-info, apikey, content-type',
 }
 
+type TemplateData = Record<string, unknown>
+type SendTransactionalEmailRequestBody = {
+  templateName?: string
+  template_name?: string
+  recipientEmail?: string
+  recipient_email?: string
+  idempotencyKey?: string
+  idempotency_key?: string
+  templateData?: TemplateData
+}
+
 function generateToken(): string {
   const bytes = new Uint8Array(32)
   crypto.getRandomValues(bytes)
@@ -26,7 +37,7 @@ function normalizeOrigin(value: string | null): string | null {
   return value ? value.replace(/\/$/, '') : null
 }
 
-function resolveSiteOrigin(req: Request, templateData: Record<string, any>): string | null {
+function resolveSiteOrigin(req: Request, templateData: TemplateData): string | null {
   const requestOrigin = normalizeOrigin(req.headers.get('origin'))
   if (requestOrigin) return requestOrigin
 
@@ -81,10 +92,10 @@ Deno.serve(async (req) => {
   let recipientEmail: string
   let idempotencyKey: string
   let messageId: string
-  let templateData: Record<string, any> = {}
+  let templateData: TemplateData = {}
 
   try {
-    const body = await req.json()
+    const body = (await req.json()) as SendTransactionalEmailRequestBody
     templateName = body.templateName || body.template_name
     recipientEmail = body.recipientEmail || body.recipient_email
     messageId = crypto.randomUUID()
