@@ -51,9 +51,9 @@ const SettingsPage: React.FC = () => {
         setLanguage(p.language);
       }
       const { data: con } = await supabase.from('consents').select('*').eq('user_id', user.id).single();
-      const { data: sub } = await supabase.from('subscriptions').select('payment_state, subscription_status').eq('user_id', user.id).single();
+      const { data: sub } = await supabase.from('subscriptions').select('subscription_status').eq('user_id', user.id).single();
       if (sub) {
-        setSubscriptionStatus(sub.payment_state || sub.subscription_status || 'inactive');
+        setSubscriptionStatus(sub.subscription_status || 'inactive');
       }
       if (con) {
         const c = con as Consent;
