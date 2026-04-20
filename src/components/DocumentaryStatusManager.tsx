@@ -51,7 +51,14 @@ interface Props {
 }
 
 type StatusField = {
-  key: keyof FamilyCircle;
+  key:
+    | 'testament_status'
+    | 'mandate_status'
+    | 'notary_status'
+    | 'beneficiary_designation_status'
+    | 'critical_documents_status'
+    | 'dossier_readiness_status'
+    | 'death_status';
   label: string;
   options: Record<string, string>;
 };
@@ -70,12 +77,12 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
   const { user } = useAuth();
   const [saving, setSaving] = useState<string | null>(null);
 
-  const handleChange = async (field: keyof FamilyCircle, value: string) => {
+  const handleChange = async (field: StatusField['key'], value: string) => {
     setSaving(field);
-    const updatePayload: Record<string, string> = { [field]: value };
+    const updatePayload = { [field]: value } as Partial<FamilyCircle>;
     const { error } = await supabase
       .from('family_circles')
-      .update(updatePayload as any)
+      .update(updatePayload)
       .eq('id', circle.id);
 
     if (error) {

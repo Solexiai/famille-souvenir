@@ -25,6 +25,11 @@ import type {
   CircleMember, AppRole, ChecklistItem, Document as DocType
 } from '@/types/database';
 import { hasPermission } from '@/components/PermissionMatrix';
+import type { Database } from '@/integrations/supabase/types';
+
+type AuditLogDetails = Database['public']['Tables']['audit_logs']['Insert']['details'];
+type GovernanceInsert = Database['public']['Tables']['governance_responsibilities']['Insert'];
+type GovernanceUpdate = Database['public']['Tables']['governance_responsibilities']['Update'];
 
 const areaLabels: Record<GovernanceArea, string> = {
   documents: 'Documents',
@@ -152,7 +157,7 @@ const GovernancePage: React.FC = () => {
   const auditLog = async (action: string, details: Record<string, unknown>) => {
     if (!circle || !user) return;
     await supabase.from('audit_logs').insert({
-      user_id: user.id, circle_id: circle.id, action, details: details as any,
+      user_id: user.id, circle_id: circle.id, action, details: details as AuditLogDetails,
     });
   };
 
@@ -161,21 +166,22 @@ const GovernancePage: React.FC = () => {
     if (!circle || !user || !title.trim() || !memberId) return;
     setSaving(true);
 
-    const payload = {
+    const payload: GovernanceInsert = {
       circle_id: circle.id,
       member_id: memberId,
       area,
       title: title.trim(),
-      description,
+      description: description || null,
       status: formStatus,
       due_date: dueDate ? format(dueDate, 'yyyy-MM-dd') : null,
       linked_checklist_item: linkedChecklist || null,
       linked_document: linkedDoc || null,
-      note,
+      note: note || null,
     };
 
     if (editItem) {
-      const { error } = await supabase.from('governance_responsibilities').update(payload as any).eq('id', editItem.id);
+      const updatePayload: GovernanceUpdate = payload;
+      const { error } = await supabase.from('governance_responsibilities').update(updatePayload).eq('id', editItem.id);
       if (error) { toast.error('Erreur lors de la mise à jour.'); }
       else {
         toast.success('Responsabilité mise à jour.');
@@ -183,7 +189,7 @@ const GovernancePage: React.FC = () => {
         if (editItem.member_id !== memberId) await auditLog('governance_assignment_change', { id: editItem.id, old: editItem.member_id, new: memberId });
       }
     } else {
-      const { data: newItem, error } = await supabase.from('governance_responsibilities').insert(payload as any).select().single();
+      const { data: newItem, error } = await supabase.from('governance_responsibilities').insert(payload).select().single();
       if (error) { toast.error('Erreur lors de la création.'); }
       else {
         toast.success('Responsabilité ajoutée.');
@@ -198,7 +204,8 @@ const GovernancePage: React.FC = () => {
   };
 
   const handleQuickStatus = async (item: GovernanceResponsibility, newStatus: GovernanceStatus) => {
-    const { error } = await supabase.from('governance_responsibilities').update({ status: newStatus } as any).eq('id', item.id);
+    const updatePayload: GovernanceUpdate = { status: newStatus };
+    const { error } = await supabase.from('governance_responsibilities').update(updatePayload).eq('id', item.id);
     if (error) toast.error('Erreur.');
     else {
       await auditLog('governance_status_change', { id: item.id, old: item.status, new: newStatus });
@@ -254,7 +261,8 @@ const GovernancePage: React.FC = () => {
   const toggleArea = (a: string) => {
     setCollapsedAreas(prev => {
       const s = new Set(prev);
-      s.has(a) ? s.delete(a) : s.add(a);
+      if (s.has(a)) s.delete(a);
+      else s.add(a);
       return s;
     });
   };

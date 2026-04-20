@@ -228,8 +228,13 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { t, lang, setLang } = useLocale();
 
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   if (user) {
-    navigate('/dashboard');
     return null;
   }
 

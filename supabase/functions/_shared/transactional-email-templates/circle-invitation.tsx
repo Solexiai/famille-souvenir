@@ -87,6 +87,10 @@ interface CircleInvitationProps {
   lang?: string
 }
 
+type CircleInvitationTemplateData = Partial<CircleInvitationProps> & {
+  lang?: Lang
+}
+
 const CircleInvitationEmail = ({
   firstName,
   circleName = 'un cercle familial',
@@ -151,7 +155,7 @@ const CircleInvitationEmail = ({
 
 export const template = {
   component: CircleInvitationEmail,
-  subject: (data: Record<string, any>) => {
+  subject: (data: CircleInvitationTemplateData) => {
     const lang: Lang = (data.lang === 'en' || data.lang === 'es') ? data.lang : 'fr'
     return i18n[lang].subject(data.circleName || 'un cercle familial')
   },
