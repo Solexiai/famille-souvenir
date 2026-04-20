@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session, AuthenticatorAssuranceLevels } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseConfigError, isSupabaseConfigured } from '@/integrations/supabase/config';
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +26,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [mfaVerified, setMfaVerified] = useState(false);
 
   const checkMfaStatus = async () => {
+    if (!isSupabaseConfigured) {
+      setMfaRequired(false);
+      setMfaVerified(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error || !data) {
       setMfaRequired(false);
@@ -40,6 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -70,6 +82,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: getSupabaseConfigError() };
+    }
+
     const emailRedirectTo = `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signUp({
       email,
@@ -83,15 +99,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: getSupabaseConfigError() };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error as Error | null };
   };
 
   const signOut = async () => {
+    if (!isSupabaseConfigured) {
+      return;
+    }
+
     await supabase.auth.signOut();
   };
 
   const resetPassword = async (email: string) => {
+    if (!isSupabaseConfigured) {
+      return { error: getSupabaseConfigError() };
+    }
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
