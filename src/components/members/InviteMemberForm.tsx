@@ -58,7 +58,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       .from('profiles')
       .select('user_id')
       .eq('email', normalizedEmailForProfile)
-      .single();
+      .maybeSingle();
 
     if (existingProfile) {
       const { data: existingMember } = await supabase
@@ -66,7 +66,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
         .select('id')
         .eq('circle_id', circleId)
         .eq('user_id', existingProfile.user_id)
-        .single();
+        .maybeSingle();
 
       if (existingMember) {
         toast.error('Cette personne fait déjà partie du cercle.');
