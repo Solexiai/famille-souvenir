@@ -46,7 +46,7 @@ const SignupPage: React.FC = () => {
     const { error } = await signUp(email, password, fullName);
     setLoading(false);
     if (error) {
-      toast.error(t.auth_signup_error);
+      toast.error(error.message || t.auth_signup_error);
     } else {
       setSuccess(true);
     }

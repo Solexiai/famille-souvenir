@@ -39,7 +39,7 @@ const LoginPage: React.FC = () => {
     const { error } = await signIn(email, password);
     if (error) {
       setLoading(false);
-      toast.error(t.auth_invalid_credentials);
+      toast.error(error.message || t.auth_invalid_credentials);
       return;
     }
 

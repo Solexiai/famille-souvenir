@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  isSupabaseConfigured,
+  missingSupabaseConfigMessage,
+  supabase,
+} from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +35,11 @@ const ResetPasswordPage: React.FC = () => {
   });
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setReady(false);
+      return;
+    }
+
     const hash = window.location.hash;
     if (hash.includes('type=recovery')) {
       setReady(true);
@@ -39,6 +48,11 @@ const ResetPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isSupabaseConfigured) {
+      toast.error(missingSupabaseConfigMessage);
+      return;
+    }
+
     const result = schema.safeParse({ password, confirmPassword });
     if (!result.success) {
       toast.error(result.error.errors[0].message);
@@ -60,7 +74,9 @@ const ResetPasswordPage: React.FC = () => {
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <Card className="w-full max-w-md shadow-card">
           <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">{t.error_generic}</p>
+            <p className="text-muted-foreground">
+              {isSupabaseConfigured ? t.error_generic : missingSupabaseConfigMessage}
+            </p>
             <Button variant="outline" className="mt-4" onClick={() => navigate('/login')}>
               {t.auth_back_to_login}
             </Button>

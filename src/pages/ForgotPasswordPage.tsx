@@ -32,7 +32,7 @@ const ForgotPasswordPage: React.FC = () => {
     const { error } = await resetPassword(email);
     setLoading(false);
     if (error) {
-      toast.error(t.auth_reset_error);
+      toast.error(error.message || t.auth_reset_error);
     } else {
       setSent(true);
     }
