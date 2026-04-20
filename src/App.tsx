@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SupabaseConfigBanner } from "@/components/SupabaseConfigBanner";
 
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -39,6 +40,7 @@ const App = () => (
       <AuthProvider>
         <TooltipProvider>
           <Sonner />
+          <SupabaseConfigBanner />
           <BrowserRouter>
             <Routes>
               {/* Public routes */}

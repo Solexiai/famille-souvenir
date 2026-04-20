@@ -2,16 +2,38 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as
+  | string
+  | undefined;
+
+export const isSupabaseConfigured = Boolean(
+  SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY,
+);
+
+if (!isSupabaseConfigured) {
+  // Surface a clear error in the console instead of crashing the whole React
+  // tree at module-load time when the environment variables are missing.
+  // eslint-disable-next-line no-console
+  console.error(
+    '[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY. ' +
+      'Copy .env.example to .env.local and fill in the values, then restart the dev server.',
+  );
+}
+
+// Fall back to harmless placeholder values so `createClient` does not throw at
+// import time. The app still guards against unconfigured Supabase via
+// `isSupabaseConfigured`, and any network call would fail with a clear error.
+const resolvedUrl = SUPABASE_URL || 'https://placeholder.supabase.co';
+const resolvedKey = SUPABASE_PUBLISHABLE_KEY || 'placeholder-anon-key';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient<Database>(resolvedUrl, resolvedKey, {
   auth: {
-    storage: localStorage,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
-  }
+  },
 });
