@@ -6,7 +6,9 @@ import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 const SITE_NAME = 'Famille Souvenir'
 const SENDER_DOMAIN = 'updates.solexi.ai'
 const FROM_EMAIL = `noreply@${SENDER_DOMAIN}`
-const RESEND_GATEWAY_URL = 'https://connector-gateway.lovable.dev/resend'
+// Keep direct Resend API usage here: connector-gateway auth caused
+// "Unsupported JWT algorithm ES256" in invitation email sends.
+const RESEND_API_URL = 'https://api.resend.com'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,14 +65,16 @@ function buildUnsubscribeFooter(unsubscribeUrl: string): string {
 }
 
 Deno.serve(async (req) => {
+  console.log('[send-transactional-email] start')
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  console.log('[send-transactional-email] env loaded')
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing Supabase environment variables')
@@ -80,8 +84,8 @@ Deno.serve(async (req) => {
     )
   }
 
-  if (!lovableApiKey || !resendApiKey) {
-    console.error('Missing Resend/Lovable API keys')
+  if (!resendApiKey) {
+    console.error('Missing RESEND_API_KEY')
     return new Response(
       JSON.stringify({ error: 'Email provider not configured' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -96,6 +100,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as SendTransactionalEmailRequestBody
+    console.log('[send-transactional-email] body parsed')
     templateName = body.templateName || body.template_name
     recipientEmail = body.recipientEmail || body.recipient_email
     messageId = crypto.randomUUID()
@@ -127,6 +132,7 @@ Deno.serve(async (req) => {
       { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
+  console.log('[send-transactional-email] template resolved', templateName)
 
   const effectiveRecipient = template.to || recipientEmail
   if (!effectiveRecipient) {
@@ -137,6 +143,7 @@ Deno.serve(async (req) => {
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  console.log('[send-transactional-email] supabase client created')
 
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
@@ -303,15 +310,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    const resendResponse = await fetch(`${RESEND_GATEWAY_URL}/emails`, {
+    console.log('[send-transactional-email] before resend fetch')
+    const resendResponse = await fetch(`${RESEND_API_URL}/emails`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${lovableApiKey}`,
-        'X-Connection-Api-Key': resendApiKey,
+        Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify(resendPayload),
     })
+    console.log('[send-transactional-email] after resend fetch', resendResponse.status)
 
     const resendData = await resendResponse.json()
 
@@ -352,6 +360,7 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {
+    console.error('[send-transactional-email] fatal error', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
 
     await supabase.from('email_send_log').insert({
