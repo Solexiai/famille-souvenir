@@ -1,5 +1,5 @@
-import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '@/integrations/supabase/config';
 import type { AppRole } from '@/types/database';
 
 interface InvitationEmailPayload {
