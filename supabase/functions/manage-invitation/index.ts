@@ -72,17 +72,16 @@ Deno.serve(async (req) => {
       }
 
       const email = normalizeEmail(invitation.email)
-      const redirectTo = `https://solexi.ai/auth/callback?invitation_token=${encodeURIComponent(token)}`
+      const appUrl = body.appUrl || 'https://famille-memories-vault.lovable.app'
+      const redirectTo = `${appUrl}/auth/callback?invitation_token=${encodeURIComponent(token)}`
 
-      // Detect if user already exists to choose magiclink (existing) vs invite (new)
-      let userExists = false
-      try {
-        const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1, email } as never)
-        const users = (list as { users?: Array<{ email?: string }> } | null)?.users ?? []
-        userExists = users.some((u) => normalizeEmail(u.email) === email)
-      } catch (_) {
-        userExists = false
-      }
+      // Detect if user already exists by checking profiles table (more reliable than listUsers filter)
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('email', email)
+        .maybeSingle()
+      const userExists = !!existingProfile
 
       const linkType = userExists ? 'magiclink' : 'invite'
 
