@@ -49,8 +49,10 @@ const AuthCallbackPage: React.FC = () => {
 
         if (cancelled) return;
 
-        // 2. Check for pending invitation token
-        const invitationToken = localStorage.getItem(INVITATION_TOKEN_KEY);
+        // 2. Check for pending invitation token (URL query first, then localStorage)
+        const urlParams = new URLSearchParams(window.location.search);
+        const invitationToken =
+          urlParams.get('invitation_token') || localStorage.getItem(INVITATION_TOKEN_KEY);
 
         if (invitationToken) {
           setStatus('accepting');

@@ -48,6 +48,63 @@ Deno.serve(async (req) => {
     console.log('[manage-invitation] action:', action, 'token:', token ? token.substring(0, 8) + '...' : 'none')
 
     // ──────────────────────────────────────────────
+    // GENERATE MAGIC LINK for an invitation token
+    // ──────────────────────────────────────────────
+    if (action === 'generate-magic-link') {
+      if (!token || !isLikelyToken(token)) {
+        return jsonResponse({ error: 'Token requis ou invalide' }, 400)
+      }
+
+      const { data: invitation, error: invError } = await supabase
+        .from('invitations')
+        .select('id, email, status, expires_at')
+        .eq('token', token)
+        .single()
+
+      if (invError || !invitation) {
+        return jsonResponse({ error: 'Invitation introuvable' }, 404)
+      }
+      if (invitation.status !== 'pending') {
+        return jsonResponse({ error: "L'invitation n'est plus active" }, 400)
+      }
+      if (new Date(invitation.expires_at) < new Date()) {
+        return jsonResponse({ error: 'Invitation expirée' }, 400)
+      }
+
+      const email = normalizeEmail(invitation.email)
+      const redirectTo = `https://solexi.ai/auth/callback?invitation_token=${encodeURIComponent(token)}`
+
+      // Detect if user already exists to choose magiclink (existing) vs invite (new)
+      let userExists = false
+      try {
+        const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1, email } as never)
+        const users = (list as { users?: Array<{ email?: string }> } | null)?.users ?? []
+        userExists = users.some((u) => normalizeEmail(u.email) === email)
+      } catch (_) {
+        userExists = false
+      }
+
+      const linkType = userExists ? 'magiclink' : 'invite'
+
+      const { data: linkData, error: linkError } = await supabase.auth.admin.generateLink({
+        type: linkType as 'magiclink' | 'invite',
+        email,
+        options: { redirectTo, data: { invitation_token: token } },
+      })
+
+      if (linkError || !linkData?.properties?.action_link) {
+        console.error('[manage-invitation] generateLink error:', linkError)
+        return jsonResponse({ error: linkError?.message || 'Échec de génération du lien' }, 500)
+      }
+
+      return jsonResponse({
+        success: true,
+        action_link: linkData.properties.action_link,
+        link_type: linkType,
+      })
+    }
+
+    // ──────────────────────────────────────────────
     // ACCEPT INVITATION
     // ──────────────────────────────────────────────
     if (action === 'accept') {
