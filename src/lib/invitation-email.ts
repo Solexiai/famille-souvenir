@@ -25,17 +25,20 @@ interface SendInvitationEmailResult {
   reason?: string;
 }
 
-// Production domain for invitation links. We never want to send links pointing
-// at the Lovable preview/sandbox origin, even if the invitation is created from
-// there — recipients must always land on the real Solexi app.
-const PRODUCTION_APP_URL = 'https://solexi.ai';
+// Resolve the app origin to use in invitation links. We use the current
+// deployment's origin so invitees land back in the same app that sent them
+// the invitation (preview, lovable.app, or custom domain).
+const PRODUCTION_APP_URL = 'https://famille-memories-vault.lovable.app';
+
+const getAppOrigin = () => {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin.replace(/\/$/, '');
+  }
+  return PRODUCTION_APP_URL;
+};
 
 export const buildInvitationAcceptUrl = (token: string) => {
-  const origin =
-    typeof window !== 'undefined' && window.location.hostname === 'localhost'
-      ? window.location.origin.replace(/\/$/, '')
-      : PRODUCTION_APP_URL;
-  return `${origin}/invitation/accept?token=${token}`;
+  return `${getAppOrigin()}/invitation/accept?token=${token}`;
 };
 
 export const sendInvitationEmail = async ({
@@ -44,6 +47,7 @@ export const sendInvitationEmail = async ({
   invitation,
 }: SendInvitationEmailInput): Promise<SendInvitationEmailResult> => {
   const fallbackLink = buildInvitationAcceptUrl(invitation.token);
+  const appUrl = getAppOrigin();
 
   // Try to obtain a magic link (one-click sign-in + auto-accept). If it
   // fails, fall back to the standard /invitation/accept page.
@@ -56,7 +60,7 @@ export const sendInvitationEmail = async ({
         apikey: resolvedSupabasePublishableKey,
         Authorization: `Bearer ${resolvedSupabasePublishableKey}`,
       },
-      body: JSON.stringify({ action: 'generate-magic-link', token: invitation.token }),
+      body: JSON.stringify({ action: 'generate-magic-link', token: invitation.token, appUrl }),
     });
     const magicData = await magicResp.json().catch(() => null);
     if (magicResp.ok && magicData?.action_link) {
