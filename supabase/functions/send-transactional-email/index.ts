@@ -65,6 +65,8 @@ function buildUnsubscribeFooter(unsubscribeUrl: string): string {
 }
 
 Deno.serve(async (req) => {
+  console.log('[send-transactional-email] start')
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -72,6 +74,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  console.log('[send-transactional-email] env loaded')
 
   if (!supabaseUrl || !supabaseServiceKey) {
     console.error('Missing Supabase environment variables')
@@ -97,6 +100,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as SendTransactionalEmailRequestBody
+    console.log('[send-transactional-email] body parsed')
     templateName = body.templateName || body.template_name
     recipientEmail = body.recipientEmail || body.recipient_email
     messageId = crypto.randomUUID()
@@ -128,6 +132,7 @@ Deno.serve(async (req) => {
       { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
+  console.log('[send-transactional-email] template resolved', templateName)
 
   const effectiveRecipient = template.to || recipientEmail
   if (!effectiveRecipient) {
@@ -138,6 +143,7 @@ Deno.serve(async (req) => {
   }
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  console.log('[send-transactional-email] supabase client created')
 
   const { data: suppressed, error: suppressionError } = await supabase
     .from('suppressed_emails')
@@ -304,6 +310,7 @@ Deno.serve(async (req) => {
       }
     }
 
+    console.log('[send-transactional-email] before resend fetch')
     const resendResponse = await fetch(`${RESEND_API_URL}/emails`, {
       method: 'POST',
       headers: {
@@ -312,6 +319,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify(resendPayload),
     })
+    console.log('[send-transactional-email] after resend fetch', resendResponse.status)
 
     const resendData = await resendResponse.json()
 
@@ -352,6 +360,7 @@ Deno.serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (err) {
+    console.error('[send-transactional-email] fatal error', err)
     const errorMessage = err instanceof Error ? err.message : String(err)
 
     await supabase.from('email_send_log').insert({
