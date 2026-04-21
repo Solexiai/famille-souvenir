@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from '@/integrations/supabase/config';
+import { resolvedSupabaseUrl, resolvedSupabasePublishableKey } from '@/integrations/supabase/config';
 import type { AppRole } from '@/types/database';
 
 interface InvitationEmailPayload {
@@ -25,23 +25,6 @@ interface SendInvitationEmailResult {
   reason?: string;
 }
 
-const resolveInvitationFunctionError = async (error: unknown) => {
-  if (error instanceof FunctionsHttpError) {
-    try {
-      const payload = await error.context.json();
-      return payload?.error || payload?.details?.message || payload?.message || error.message;
-    } catch {
-      return error.message;
-    }
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Impossible d'envoyer le courriel d'invitation.";
-};
-
 export const buildInvitationAcceptUrl = (token: string) => {
   const baseUrl = window.location.origin.replace(/\/$/, '');
   return `${baseUrl}/invitation/accept?token=${token}`;
@@ -61,29 +44,58 @@ export const sendInvitationEmail = async ({
 
   const lang = localStorage.getItem('solexi_lang') || 'fr';
 
-  const { data, error } = await supabase.functions.invoke('send-transactional-email', {
-    body: {
-      templateName: 'circle-invitation',
-      recipientEmail: invitation.email,
-      idempotencyKey: `circle-invite-${invitation.token}`,
-      templateData: {
-        firstName: invitation.firstName || '',
-        lastName: invitation.lastName || '',
-        circleName: circleData?.name || 'un cercle familial',
-        inviterName: inviterProfile?.full_name || '',
-        role: invitation.role,
-        invitationMessage: invitation.invitationMessage || '',
-        acceptUrl: link,
-        lang,
-      },
-    },
-  });
+  // Direct fetch instead of supabase.functions.invoke() to avoid sending the
+  // user's ES256-signed JWT, which the Supabase Edge Runtime gateway rejects
+  // with "Unsupported JWT algorithm ES256". The function is configured with
+  // verify_jwt = false, so only the publishable apikey is required.
+  let data: any = null;
+  let fetchError: string | null = null;
 
-  if (error) {
+  try {
+    const response = await fetch(`${resolvedSupabaseUrl}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: resolvedSupabasePublishableKey,
+        Authorization: `Bearer ${resolvedSupabasePublishableKey}`,
+      },
+      body: JSON.stringify({
+        templateName: 'circle-invitation',
+        recipientEmail: invitation.email,
+        idempotencyKey: `circle-invite-${invitation.token}`,
+        templateData: {
+          firstName: invitation.firstName || '',
+          lastName: invitation.lastName || '',
+          circleName: circleData?.name || 'un cercle familial',
+          inviterName: inviterProfile?.full_name || '',
+          role: invitation.role,
+          invitationMessage: invitation.invitationMessage || '',
+          acceptUrl: link,
+          lang,
+        },
+      }),
+    });
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      fetchError =
+        payload?.error ||
+        payload?.details?.message ||
+        payload?.message ||
+        `Edge function returned ${response.status}`;
+    } else {
+      data = payload;
+    }
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : "Impossible d'envoyer le courriel d'invitation.";
+  }
+
+  if (fetchError) {
     return {
       ok: false,
       queued: false,
-      error: await resolveInvitationFunctionError(error),
+      error: fetchError,
       link,
     };
   }
