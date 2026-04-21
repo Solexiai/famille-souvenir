@@ -86,7 +86,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: getSupabaseConfigError() };
     }
 
-    const emailRedirectTo = `${window.location.origin}/auth/callback`;
+    const invitationToken = typeof window !== 'undefined'
+      ? localStorage.getItem('solexi_invitation_token')
+      : null;
+    const emailRedirectTo = invitationToken
+      ? `${window.location.origin}/auth/callback?invitation_token=${encodeURIComponent(invitationToken)}`
+      : `${window.location.origin}/auth/callback`;
     const { error } = await supabase.auth.signUp({
       email,
       password,
