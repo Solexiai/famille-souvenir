@@ -43,7 +43,30 @@ export const sendInvitationEmail = async ({
   userId,
   invitation,
 }: SendInvitationEmailInput): Promise<SendInvitationEmailResult> => {
-  const link = buildInvitationAcceptUrl(invitation.token);
+  const fallbackLink = buildInvitationAcceptUrl(invitation.token);
+
+  // Try to obtain a magic link (one-click sign-in + auto-accept). If it
+  // fails, fall back to the standard /invitation/accept page.
+  let link = fallbackLink;
+  try {
+    const magicResp = await fetch(`${resolvedSupabaseUrl}/functions/v1/manage-invitation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: resolvedSupabasePublishableKey,
+        Authorization: `Bearer ${resolvedSupabasePublishableKey}`,
+      },
+      body: JSON.stringify({ action: 'generate-magic-link', token: invitation.token }),
+    });
+    const magicData = await magicResp.json().catch(() => null);
+    if (magicResp.ok && magicData?.action_link) {
+      link = magicData.action_link as string;
+    } else {
+      console.warn('[invitation-email] magic link unavailable, using fallback', magicData);
+    }
+  } catch (err) {
+    console.warn('[invitation-email] magic link generation failed, using fallback', err);
+  }
 
   const [{ data: circleData }, { data: inviterProfile }] = await Promise.all([
     supabase.from('family_circles').select('name').eq('id', circleId).maybeSingle(),
