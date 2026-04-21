@@ -25,9 +25,17 @@ interface SendInvitationEmailResult {
   reason?: string;
 }
 
+// Production domain for invitation links. We never want to send links pointing
+// at the Lovable preview/sandbox origin, even if the invitation is created from
+// there — recipients must always land on the real Solexi app.
+const PRODUCTION_APP_URL = 'https://solexi.ai';
+
 export const buildInvitationAcceptUrl = (token: string) => {
-  const baseUrl = window.location.origin.replace(/\/$/, '');
-  return `${baseUrl}/invitation/accept?token=${token}`;
+  const origin =
+    typeof window !== 'undefined' && window.location.hostname === 'localhost'
+      ? window.location.origin.replace(/\/$/, '')
+      : PRODUCTION_APP_URL;
+  return `${origin}/invitation/accept?token=${token}`;
 };
 
 export const sendInvitationEmail = async ({
