@@ -214,7 +214,6 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
               <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="family_manager">Gestionnaire</SelectItem>
                   <SelectItem value="family_member">Membre</SelectItem>
                   <SelectItem value="heir">Héritier</SelectItem>
                 </SelectContent>
