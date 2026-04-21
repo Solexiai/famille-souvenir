@@ -6,6 +6,8 @@ import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 const SITE_NAME = 'Famille Souvenir'
 const SENDER_DOMAIN = 'updates.solexi.ai'
 const FROM_EMAIL = `noreply@${SENDER_DOMAIN}`
+// Keep direct Resend API usage here: connector-gateway auth caused
+// "Unsupported JWT algorithm ES256" in invitation email sends.
 const RESEND_API_URL = 'https://api.resend.com'
 
 const corsHeaders = {
