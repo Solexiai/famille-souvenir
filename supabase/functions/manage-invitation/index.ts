@@ -11,6 +11,10 @@ const jsonResponse = (body: Record<string, unknown>, status = 200) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
 
+type ManageInvitationRequestBody = {
+  action?: unknown
+  token?: unknown
+}
 
 const normalizeEmail = (value: string | null | undefined) =>
   (value ?? '').trim().toLowerCase()
@@ -39,12 +43,26 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    if (!supabaseUrl || !serviceKey) {
+      return jsonResponse({ error: 'Configuration serveur incomplète' }, 500)
+    }
     const supabase = createClient(supabaseUrl, serviceKey)
 
-    const body = await req.json()
-    const { action, token } = body
+    let parsedBody: ManageInvitationRequestBody
+    try {
+      const body = await req.json()
+      if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        return jsonResponse({ error: 'Corps de requête invalide' }, 400)
+      }
+      parsedBody = body as ManageInvitationRequestBody
+    } catch {
+      return jsonResponse({ error: 'JSON invalide' }, 400)
+    }
+
+    const action = typeof parsedBody.action === 'string' ? parsedBody.action : ''
+    const token = typeof parsedBody.token === 'string' ? parsedBody.token : ''
     console.log('[manage-invitation] action:', action, 'token:', token ? token.substring(0, 8) + '...' : 'none')
 
     // ──────────────────────────────────────────────
@@ -58,8 +76,12 @@ Deno.serve(async (req) => {
       if (!authHeader?.startsWith('Bearer ')) {
         return jsonResponse({ error: 'Non authentifié' }, 401)
       }
+      const bearerToken = authHeader.replace('Bearer ', '').trim()
+      if (!bearerToken) {
+        return jsonResponse({ error: 'Token utilisateur invalide' }, 401)
+      }
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser(
-        authHeader.replace('Bearer ', '')
+        bearerToken
       )
       if (authError || !authUser) return jsonResponse({ error: 'Token utilisateur invalide' }, 401)
       const userId = authUser.id
@@ -103,7 +125,7 @@ Deno.serve(async (req) => {
         .select('id')
         .eq('circle_id', invitation.circle_id)
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (existingMember) {
         await supabase.from('invitations').update({ status: 'accepted' }).eq('id', invitation.id)
