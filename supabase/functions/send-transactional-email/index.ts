@@ -6,7 +6,7 @@ import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 const SITE_NAME = 'Famille Souvenir'
 const SENDER_DOMAIN = 'updates.solexi.ai'
 const FROM_EMAIL = `noreply@${SENDER_DOMAIN}`
-const RESEND_GATEWAY_URL = 'https://connector-gateway.lovable.dev/resend'
+const RESEND_API_URL = 'https://api.resend.com'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -69,7 +69,6 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  const lovableApiKey = Deno.env.get('LOVABLE_API_KEY')
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
 
   if (!supabaseUrl || !supabaseServiceKey) {
@@ -80,8 +79,8 @@ Deno.serve(async (req) => {
     )
   }
 
-  if (!lovableApiKey || !resendApiKey) {
-    console.error('Missing Resend/Lovable API keys')
+  if (!resendApiKey) {
+    console.error('Missing RESEND_API_KEY')
     return new Response(
       JSON.stringify({ error: 'Email provider not configured' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -303,12 +302,11 @@ Deno.serve(async (req) => {
       }
     }
 
-    const resendResponse = await fetch(`${RESEND_GATEWAY_URL}/emails`, {
+    const resendResponse = await fetch(`${RESEND_API_URL}/emails`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${lovableApiKey}`,
-        'X-Connection-Api-Key': resendApiKey,
+        Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify(resendPayload),
     })
