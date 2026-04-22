@@ -27,6 +27,7 @@ import type {
 } from '@/types/database';
 import { hasPermission } from '@/components/PermissionMatrix';
 import type { Database } from '@/integrations/supabase/types';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const categoryLabels: Record<ChecklistCategory, string> = {
   legal: 'Juridique',
@@ -75,6 +76,7 @@ type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
