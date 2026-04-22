@@ -78,8 +78,15 @@ export async function validateUpload(
     });
 
     if (error) {
-      console.error('Upload validation error:', error);
-      return { allowed: false, error: 'Erreur de validation', code: 'SERVER_ERROR' };
+      console.error('Upload validation error:', error, 'data:', data);
+      // Si la fonction a renvoyé un message d'erreur structuré dans data, l'utiliser
+      const serverMsg = (data as { error?: string; code?: string } | null)?.error;
+      const serverCode = (data as { error?: string; code?: string } | null)?.code;
+      return {
+        allowed: false,
+        error: serverMsg || `Erreur de validation: ${error.message || 'fonction indisponible'}`,
+        code: serverCode || 'SERVER_ERROR',
+      };
     }
 
     if (!data?.allowed) {
