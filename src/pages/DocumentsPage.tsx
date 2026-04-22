@@ -102,7 +102,7 @@ const DocumentsPage: React.FC = () => {
     // Server-side validation (MIME, magic bytes, quotas, plan limits)
     const validation = await validateUpload(processedFile, 'document', circle.id);
     if (!validation.allowed) {
-      toast.error(validation.error || 'Upload refusé');
+      toast.error(validation.error || t.docs_upload_error);
       setUploading(false);
       return;
     }
@@ -110,7 +110,8 @@ const DocumentsPage: React.FC = () => {
     const ext = processedFile.name.split('.').pop();
     const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await supabase.storage.from('vault-private').upload(storagePath, processedFile);
-    if (uploadError) { toast.error("Erreur lors de l'envoi du fichier."); setUploading(false); return; }
+    if (uploadError) { toast.error(t.docs_upload_error); setUploading(false); return; }
+
 
     const { error } = await supabase.from('documents').insert({
       circle_id: circle.id,
@@ -124,12 +125,12 @@ const DocumentsPage: React.FC = () => {
       file_size: file.size,
     });
 
-    if (error) toast.error("Erreur lors de l'enregistrement.");
+    if (error) toast.error(t.docs_save_error);
     else {
       await logAuditEvent('document_uploaded', circle.id, {
         title: title.trim(), category, visibility, file_name: file.name,
       });
-      toast.success('Document ajouté avec succès.');
+      toast.success(t.docs_added);
       setTitle(''); setDescription(''); setCategory('other'); setVisibility('private_owner'); setFile(null);
       setDialogOpen(false);
       loadData();
@@ -139,12 +140,13 @@ const DocumentsPage: React.FC = () => {
 
   const handleDownload = async (doc: DocType) => {
     const { data, error } = await supabase.storage.from('vault-private').createSignedUrl(doc.storage_path, 300);
-    if (error || !data) { toast.error('Erreur lors du téléchargement.'); return; }
+    if (error || !data) { toast.error(t.docs_download_error); return; }
     window.open(data.signedUrl, '_blank');
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
-  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button></div></AppLayout>;
+  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">{t.must_create_circle_first}</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button></div></AppLayout>;
+
 
   return (
     <AppLayout>
@@ -155,35 +157,35 @@ const DocumentsPage: React.FC = () => {
             <div className="min-w-0">
               <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
-                Documents
+                {t.docs_title}
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                Centre documentaire structuré et sécurisé.
+                {t.docs_subtitle}
               </p>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="gap-1.5 shrink-0 text-xs sm:text-sm">
                   <Plus className="h-4 w-4" />
-                  Ajouter
+                  {t.docs_add}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-lg mx-3">
                 <DialogHeader>
-                  <DialogTitle className="font-heading">Ajouter un document</DialogTitle>
+                  <DialogTitle className="font-heading">{t.docs_add_title}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleUpload} className="space-y-3 sm:space-y-4">
                   <div className="space-y-1.5">
-                    <Label className="text-xs sm:text-sm">Titre</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Acte de naissance" required className="text-sm" />
+                    <Label className="text-xs sm:text-sm">{t.docs_title_label}</Label>
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.docs_title_placeholder} required className="text-sm" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs sm:text-sm">Description</Label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Notes..." className="text-sm min-h-[60px]" />
+                    <Label className="text-xs sm:text-sm">{t.docs_description}</Label>
+                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="..." className="text-sm min-h-[60px]" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label className="text-xs sm:text-sm">Catégorie</Label>
+                      <Label className="text-xs sm:text-sm">{t.docs_category}</Label>
                       <Select value={category} onValueChange={setCategory}>
                         <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -192,7 +194,7 @@ const DocumentsPage: React.FC = () => {
                       </Select>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-xs sm:text-sm">Visibilité</Label>
+                      <Label className="text-xs sm:text-sm">{t.docs_visibility}</Label>
                       <Select value={visibility} onValueChange={(v) => setVisibility(v as DocumentVisibility)}>
                         <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
                         <SelectContent>
@@ -202,13 +204,13 @@ const DocumentsPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs sm:text-sm">Fichier</Label>
+                    <Label className="text-xs sm:text-sm">{t.docs_file}</Label>
                     <Input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required className="text-sm" />
-                    <p className="text-[10px] sm:text-xs text-muted-foreground">PDF, images ou documents. Max 20 Mo.</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">{t.docs_file_hint}</p>
                   </div>
                   <Button type="submit" className="w-full text-sm" disabled={uploading}>
                     {uploading && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
-                    Enregistrer
+                    {t.save}
                   </Button>
                 </form>
               </DialogContent>
@@ -222,10 +224,11 @@ const DocumentsPage: React.FC = () => {
           <Card className="shadow-soft">
             <CardContent className="py-10 sm:py-12 text-center">
               <FolderOpen className="h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground font-medium">Aucun document enregistré.</p>
-              <p className="text-xs text-muted-foreground mt-1">Centralisez vos documents importants ici.</p>
+              <p className="text-sm text-muted-foreground font-medium">{t.docs_empty}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t.docs_empty_desc}</p>
             </CardContent>
           </Card>
+
         ) : (
           <div className="space-y-2.5 sm:space-y-3">
             {documents.map((doc) => (
