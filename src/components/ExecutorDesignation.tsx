@@ -1,15 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info, Shield, FileText, UserCheck } from 'lucide-react';
-import type { CircleMember, MemberFamilyLabel, AppRole, FamilyLabel } from '@/types/database';
-import { FamilyLabelBadge } from './FamilyLabelsManager';
-
-const roleLabels: Record<string, string> = {
-  proposed_executor: 'Exécuteur pressenti (rôle applicatif)',
-  verified_executor: 'Exécuteur documenté (rôle applicatif vérifié)',
-};
+import type { CircleMember, MemberFamilyLabel } from '@/types/database';
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface Props {
   members: CircleMember[];
@@ -28,7 +22,7 @@ interface ExecutorInfo {
 }
 
 export const ExecutorDesignation: React.FC<Props> = ({ members, labels }) => {
-  // Build executor info from 3 layers
+  const { t } = useLocale();
   const executorMap = new Map<string, ExecutorInfo>();
 
   const getMemberName = (memberId: string) => {
@@ -43,37 +37,35 @@ export const ExecutorDesignation: React.FC<Props> = ({ members, labels }) => {
     return executorMap.get(memberId)!;
   };
 
-  // Layer 1: Family labels (proposed_executor_label, testament_named_executor)
   labels.forEach(l => {
     if (l.label === 'proposed_executor_label') {
       ensureEntry(l.member_id).designations.push({
         type: 'family_proposed',
-        label: 'Désignation familiale',
+        label: t.exec_desg_family_proposed,
         icon: UserCheck,
-        description: 'Identifié par la famille comme exécuteur pressenti.',
+        description: t.exec_desg_family_proposed_desc,
       });
     }
     if (l.label === 'testament_named_executor') {
       ensureEntry(l.member_id).designations.push({
         type: 'testament_named',
-        label: 'Mention documentaire',
+        label: t.exec_desg_testament_named,
         icon: FileText,
-        description: 'Mentionné dans un testament ou document comme exécuteur.',
+        description: t.exec_desg_testament_named_desc,
       });
     }
   });
 
-  // Layer 2: App roles (proposed_executor, verified_executor)
   members.forEach(m => {
     if (m.role === 'proposed_executor' || m.role === 'verified_executor') {
       const entry = ensureEntry(m.id);
       entry.designations.push({
         type: 'app_verified',
-        label: m.role === 'verified_executor' ? 'Accès applicatif vérifié' : 'Accès applicatif pressenti',
+        label: m.role === 'verified_executor' ? t.exec_desg_app_verified : t.exec_desg_app_proposed,
         icon: Shield,
         description: m.role === 'verified_executor'
-          ? 'Dispose d\'un accès applicatif vérifié à l\'espace exécuteur.'
-          : 'Dispose d\'un accès limité à l\'espace exécuteur.',
+          ? t.exec_desg_app_verified_desc
+          : t.exec_desg_app_proposed_desc,
       });
     }
   });
@@ -85,19 +77,17 @@ export const ExecutorDesignation: React.FC<Props> = ({ members, labels }) => {
       <CardHeader>
         <CardTitle className="font-heading text-lg flex items-center gap-2">
           <Shield className="h-5 w-5 text-accent" />
-          Désignation de l'exécuteur
+          {t.exec_desg_title}
         </CardTitle>
         <CardDescription>
-          Trois niveaux distincts : désignation familiale, mention documentaire, et accès applicatif.
+          {t.exec_desg_subtitle}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {executors.length === 0 ? (
           <div className="text-center py-6 space-y-2">
-            <p className="text-sm text-muted-foreground">Aucune désignation d'exécuteur pour le moment.</p>
-            <p className="text-xs text-muted-foreground">
-              Utilisez les labels familiaux pour identifier un exécuteur pressenti ou nommé au testament.
-            </p>
+            <p className="text-sm text-muted-foreground">{t.exec_desg_none}</p>
+            <p className="text-xs text-muted-foreground">{t.exec_desg_none_desc}</p>
           </div>
         ) : (
           executors.map(exec => (
@@ -121,21 +111,19 @@ export const ExecutorDesignation: React.FC<Props> = ({ members, labels }) => {
           ))
         )}
 
-        {/* 3-tier explanation */}
         <div className="rounded-lg bg-secondary/30 p-4 space-y-2">
-          <p className="text-xs font-medium text-foreground">Comprendre les niveaux :</p>
+          <p className="text-xs font-medium text-foreground">{t.exec_desg_levels_title}</p>
           <div className="space-y-1 text-xs text-muted-foreground">
-            <p>• <strong>Désignation familiale</strong> — Coordination familiale. Ne confère pas de pouvoir légal.</p>
-            <p>• <strong>Mention documentaire</strong> — Basée sur un document existant. À confirmer selon les vérifications applicables.</p>
-            <p>• <strong>Accès applicatif vérifié</strong> — Donne accès à l'espace exécuteur dans l'application. Ne constitue pas une nomination légale.</p>
+            <p>• {t.exec_desg_level_family}</p>
+            <p>• {t.exec_desg_level_documentary}</p>
+            <p>• {t.exec_desg_level_app}</p>
           </div>
         </div>
 
         <Alert className="border-amber-200 bg-amber-50">
           <Info className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-xs text-amber-800">
-            Les désignations affichées ici soutiennent la coordination familiale et la préparation du dossier.
-            Elles ne remplacent pas les vérifications légales ni les documents officiels.
+            {t.exec_desg_disclaimer}
           </AlertDescription>
         </Alert>
       </CardContent>

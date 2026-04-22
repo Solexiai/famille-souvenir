@@ -77,6 +77,8 @@ type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLocale();
+  const categoryLabelsT = t.checklist_categories as Record<ChecklistCategory, string>;
+  const statusLabelsT = t.checklist_statuses as Record<ChecklistStatus, string>;
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
@@ -193,9 +195,9 @@ const ChecklistPage: React.FC = () => {
     if (editItem) {
       const updatePayload: ChecklistUpdate = payload;
       const { error } = await supabase.from('checklist_items').update(updatePayload).eq('id', editItem.id);
-      if (error) { toast.error('Erreur lors de la mise à jour.'); }
+      if (error) { toast.error(t.checklist_update_error); }
       else {
-        toast.success('Élément mis à jour.');
+        toast.success(t.checklist_updated);
         // Audit changes
         if (editItem.status !== formStatus) await auditLog('checklist_status_change', { item_id: editItem.id, old: editItem.status, new: formStatus });
         if (editItem.assigned_to !== (assignedTo || null)) await auditLog('checklist_assignment_change', { item_id: editItem.id, old: editItem.assigned_to, new: assignedTo || null });
@@ -203,9 +205,9 @@ const ChecklistPage: React.FC = () => {
       }
     } else {
       const { data: newItem, error } = await supabase.from('checklist_items').insert(payload).select().single();
-      if (error) { toast.error('Erreur lors de la création.'); }
+      if (error) { toast.error(t.checklist_create_error); }
       else {
-        toast.success('Élément ajouté à la checklist.');
+        toast.success(t.checklist_created);
         await auditLog('checklist_item_created', { item_id: newItem?.id, title: title.trim(), category });
       }
     }
@@ -218,7 +220,7 @@ const ChecklistPage: React.FC = () => {
 
   const handleQuickStatus = async (item: ChecklistItem, newStatus: ChecklistStatus) => {
     const { error } = await supabase.from('checklist_items').update({ status: newStatus }).eq('id', item.id);
-    if (error) toast.error('Erreur.');
+    if (error) toast.error(t.error_generic);
     else {
       await auditLog('checklist_status_change', { item_id: item.id, old: item.status, new: newStatus });
       loadData();
@@ -294,60 +296,60 @@ const ChecklistPage: React.FC = () => {
           <div>
             <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
               <CheckSquare className="h-6 w-6 text-accent" />
-              Checklist de préparation
+              {t.checklist_title}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Suivi structuré de la préparation du dossier familial. Ne constitue pas une certification légale.
+              {t.checklist_subtitle}
             </p>
           </div>
           {canEdit && (
             <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
               <DialogTrigger asChild>
-                <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
+                <Button size="lg" className="gap-2"><Plus className="h-4 w-4" />{t.add}</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="font-heading">{editItem ? 'Modifier l\'élément' : 'Ajouter un élément'}</DialogTitle>
+                  <DialogTitle className="font-heading">{editItem ? t.checklist_edit_title : t.checklist_add_title}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSave} className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Catégorie</Label>
+                    <Label>{t.checklist_category}</Label>
                     <Select value={category} onValueChange={(v) => setCategory(v as ChecklistCategory)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {categoryOrder.map(k => <SelectItem key={k} value={k}>{categoryLabels[k]}</SelectItem>)}
+                        {categoryOrder.map(k => <SelectItem key={k} value={k}>{categoryLabelsT[k]}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Titre</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Localiser le testament" required />
+                    <Label>{t.checklist_title_label}</Label>
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.checklist_title_placeholder} required />
                   </div>
                   <div className="space-y-2">
-                    <Label>Description</Label>
-                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails, notes..." rows={2} />
+                    <Label>{t.checklist_description}</Label>
+                    <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t.checklist_description_placeholder} rows={2} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Statut</Label>
+                    <Label>{t.checklist_status}</Label>
                     <Select value={formStatus} onValueChange={(v) => setFormStatus(v as ChecklistStatus)}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                        {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   {formStatus === 'blocked' && (
                     <div className="space-y-2">
-                      <Label>Raison du blocage</Label>
-                      <Input value={blockedReason} onChange={(e) => setBlockedReason(e.target.value)} placeholder="Pourquoi cet élément est bloqué..." />
+                      <Label>{t.checklist_blocked_reason}</Label>
+                      <Input value={blockedReason} onChange={(e) => setBlockedReason(e.target.value)} placeholder={t.checklist_blocked_placeholder} />
                     </div>
                   )}
                   <div className="space-y-2">
-                    <Label>Attribué à</Label>
+                    <Label>{t.checklist_assigned_to}</Label>
                     <Select value={assignedTo || 'none'} onValueChange={(v) => setAssignedTo(v === 'none' ? '' : v)}>
-                      <SelectTrigger><SelectValue placeholder="Non attribué" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t.checklist_unassigned} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Non attribué</SelectItem>
+                        <SelectItem value="none">{t.checklist_unassigned}</SelectItem>
                         {members.map(m => (
                           <SelectItem key={m.user_id} value={m.user_id}>
                             {m.profiles?.full_name || m.profiles?.email || 'Membre'}
@@ -357,41 +359,41 @@ const ChecklistPage: React.FC = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Échéance</Label>
+                    <Label>{t.checklist_due_date}</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {dueDate ? format(dueDate, 'PPP', { locale: fr }) : 'Pas d\'échéance'}
+                          {dueDate ? format(dueDate, 'PPP', { locale: fr }) : t.checklist_no_due_date}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus className={cn("p-3 pointer-events-auto")} />
                       </PopoverContent>
                     </Popover>
-                    {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">Retirer l'échéance</Button>}
+                    {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">{t.checklist_remove_date}</Button>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Document lié</Label>
+                    <Label>{t.checklist_linked_doc}</Label>
                     <Select value={linkedDocId || 'none'} onValueChange={(v) => setLinkedDocId(v === 'none' ? '' : v)}>
-                      <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t.none} /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">Aucun</SelectItem>
+                        <SelectItem value="none">{t.none}</SelectItem>
                         {documents.map(d => <SelectItem key={d.id} value={d.id}>{d.title}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Note justificative</Label>
-                    <Input value={evidenceNote} onChange={(e) => setEvidenceNote(e.target.value)} placeholder="Source ou preuve..." />
+                    <Label>{t.checklist_evidence_note}</Label>
+                    <Input value={evidenceNote} onChange={(e) => setEvidenceNote(e.target.value)} placeholder={t.checklist_evidence_placeholder} />
                   </div>
                   <div className="flex items-center gap-3">
                     <Switch checked={requiresPro} onCheckedChange={setRequiresPro} />
-                    <Label className="text-sm">À revoir avec un professionnel</Label>
+                    <Label className="text-sm">{t.checklist_pro_review}</Label>
                   </div>
                   <Button type="submit" className="w-full" disabled={saving}>
                     {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {editItem ? 'Enregistrer' : 'Ajouter'}
+                    {editItem ? t.save : t.add}
                   </Button>
                 </form>
               </DialogContent>
@@ -405,31 +407,31 @@ const ChecklistPage: React.FC = () => {
             <Card className="shadow-soft">
               <CardContent className="p-3 sm:py-4 text-center">
                 <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.completed}/{stats.total}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground">Complets</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">{t.checklist_complete_count}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 sm:py-4 text-center">
                 <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.needsReview}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground">À vérifier</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">{t.checklist_to_verify}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 sm:py-4 text-center">
                 <p className="text-xl sm:text-2xl font-semibold text-amber-600">{stats.blocked}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground">Bloqués</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">{t.checklist_blocked_label}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft">
               <CardContent className="p-3 sm:py-4 text-center">
                 <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.proReview}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground">Revue pro</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">{t.checklist_pro_count}</p>
               </CardContent>
             </Card>
             <Card className="shadow-soft col-span-2 sm:col-span-1">
               <CardContent className="p-3 sm:py-4 text-center">
                 <p className="text-xl sm:text-2xl font-semibold text-foreground">{stats.withDoc}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground">Appuyés par document</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground">{t.checklist_doc_backed}</p>
               </CardContent>
             </Card>
           </div>
@@ -441,21 +443,21 @@ const ChecklistPage: React.FC = () => {
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-2 sm:mb-0 sm:hidden">
                 <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">Filtres</span>
+                <span className="text-xs font-medium text-muted-foreground">{"Filtres"}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Statut" /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder={t.checklist_status} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les statuts</SelectItem>
-                    {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                    <SelectItem value="all">{t.checklist_all_statuses}</SelectItem>
+                    {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={filterAssigned} onValueChange={setFilterAssigned}>
-                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Attribué à" /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder={t.checklist_assigned_to} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les membres</SelectItem>
-                    <SelectItem value="unassigned">Non attribué</SelectItem>
+                    <SelectItem value="all">{t.checklist_all_members}</SelectItem>
+                    <SelectItem value="unassigned">{t.checklist_unassigned}</SelectItem>
                     {members.map(m => (
                       <SelectItem key={m.user_id} value={m.user_id}>
                         {m.profiles?.full_name || 'Membre'}
@@ -467,11 +469,11 @@ const ChecklistPage: React.FC = () => {
                   value={sortBy}
                   onValueChange={(v: 'default' | 'incomplete' | 'due_date') => setSortBy(v)}
                 >
-                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder="Tri" /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder={'Tri'} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="default">Par catégorie</SelectItem>
-                    <SelectItem value="incomplete">Urgence</SelectItem>
-                    <SelectItem value="due_date">Échéance</SelectItem>
+                    <SelectItem value="default">{t.checklist_sort_category}</SelectItem>
+                    <SelectItem value="incomplete">{t.checklist_sort_urgency}</SelectItem>
+                    <SelectItem value="due_date">{t.checklist_sort_due_date}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -485,9 +487,9 @@ const ChecklistPage: React.FC = () => {
             <CardContent className="py-12 text-center">
               <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                {items.length === 0 ? 'Aucun élément dans la checklist.' : 'Aucun élément correspondant aux filtres.'}
+                {items.length === 0 ? t.checklist_empty : t.checklist_no_filter_match}
               </p>
-              {items.length === 0 && <p className="text-sm text-muted-foreground mt-1">Commencez à préparer votre dossier familial.</p>}
+              {items.length === 0 && <p className="text-sm text-muted-foreground mt-1">{t.checklist_empty_desc}</p>}
             </CardContent>
           </Card>
         ) : (
@@ -502,7 +504,7 @@ const ChecklistPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         {isCollapsed ? <ChevronRight className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                        <CardTitle className="font-heading text-base">{categoryLabels[cat]}</CardTitle>
+                        <CardTitle className="font-heading text-base">{categoryLabelsT[cat]}</CardTitle>
                       </div>
                       <Badge variant="outline" className="text-xs">{catCompleted}/{catItems.length}</Badge>
                     </div>
@@ -517,7 +519,7 @@ const ChecklistPage: React.FC = () => {
                             {!canEdit && (
                               <Badge className={`text-xs shrink-0 ${statusColors[item.status]}`}>
                                 {statusIcons[item.status]}
-                                {statusLabels[item.status]}
+                                {statusLabelsT[item.status]}
                               </Badge>
                             )}
                           </div>
@@ -569,11 +571,11 @@ const ChecklistPage: React.FC = () => {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                  {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                               <Button variant="outline" size="sm" className="text-xs h-8 px-3 shrink-0" onClick={() => openEditDialog(item)}>
-                                Modifier
+                                {t.edit}
                               </Button>
                             </div>
                           )}

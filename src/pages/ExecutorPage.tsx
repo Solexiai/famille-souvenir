@@ -88,9 +88,9 @@ const ExecutorPage: React.FC = () => {
       title: title.trim(),
       content,
     });
-    if (error) toast.error('Erreur lors de la création.');
+    if (error) toast.error(t.exec_note_error);
     else {
-      toast.success('Note ajoutée.');
+      toast.success(t.exec_note_added);
       setTitle(''); setContent('');
       setDialogOpen(false);
       loadData();
@@ -99,24 +99,24 @@ const ExecutorPage: React.FC = () => {
   };
 
   const dossierLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      initial: 'Initial',
-      in_progress: 'En cours',
-      partial: 'Partiel',
-      ready_for_professional_review: 'Prêt pour révision professionnelle',
-      executor_ready: 'Prêt pour l\'exécuteur',
+    const map: Record<string, string> = {
+      initial: t.docmgr_dossier_initial,
+      in_progress: t.docmgr_dossier_in_progress,
+      partial: t.docmgr_dossier_partial,
+      ready_for_professional_review: t.docmgr_dossier_ready_review,
+      executor_ready: t.dossier_executor_ready,
     };
-    return labels[status] || status;
+    return map[status] || status;
   };
 
   const docStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      unknown: 'Inconnu',
-      declared: 'Déclaré',
-      located: 'Localisé',
-      professionally_confirmed: 'Confirmé par professionnel',
+    const map: Record<string, string> = {
+      unknown: t.docmgr_doc_unknown,
+      declared: t.docmgr_doc_declared,
+      located: t.docmgr_doc_located,
+      professionally_confirmed: t.docmgr_doc_confirmed,
     };
-    return labels[status] || status;
+    return map[status] || status;
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
@@ -128,10 +128,10 @@ const ExecutorPage: React.FC = () => {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
             <Briefcase className="h-6 w-6 text-accent" />
-            Espace exécuteur
+            {t.exec_title}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Préparation et coordination pour la transmission du dossier.
+            {t.exec_subtitle}
           </p>
         </div>
 
@@ -139,9 +139,7 @@ const ExecutorPage: React.FC = () => {
         <Alert className="border-amber-200 bg-amber-50">
           <Info className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-sm text-amber-800">
-            Cet espace soutient la préparation, la coordination familiale et la transmission du dossier.
-            Il ne remplace pas les vérifications légales ni la reconnaissance officielle du liquidateur
-            ou de l'exécuteur testamentaire.
+            {t.exec_disclaimer}
           </AlertDescription>
         </Alert>
 
@@ -156,34 +154,34 @@ const ExecutorPage: React.FC = () => {
         {/* Readiness overview */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="font-heading text-lg">État de préparation du dossier</CardTitle>
+            <CardTitle className="font-heading text-lg">{t.exec_dossier_readiness}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium">Dossier</p>
+                <p className="text-xs text-muted-foreground font-medium">{t.exec_dossier}</p>
                 <Badge variant="outline">{dossierLabel(circle.dossier_readiness_status)}</Badge>
               </div>
               <div className="space-y-2">
-                <p className="text-xs text-muted-foreground font-medium">Décès</p>
-                <Badge variant="outline">{circle.death_status === 'not_reported' ? 'Non signalé' : circle.death_status === 'reported' ? 'Signalé' : 'Vérifié manuellement'}</Badge>
+                <p className="text-xs text-muted-foreground font-medium">{t.exec_death}</p>
+                <Badge variant="outline">{circle.death_status === 'not_reported' ? t.exec_death_not_reported : circle.death_status === 'reported' ? t.exec_death_reported : t.exec_death_verified}</Badge>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Testament</p>
+                <p className="text-xs text-muted-foreground">{(t.docmgr_fields as Record<string,string>).testament_status}</p>
                 <p className="text-sm text-foreground">{docStatusLabel(circle.testament_status)}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Mandat</p>
+                <p className="text-xs text-muted-foreground">{(t.docmgr_fields as Record<string,string>).mandate_status}</p>
                 <p className="text-sm text-foreground">{docStatusLabel(circle.mandate_status)}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Notaire</p>
+                <p className="text-xs text-muted-foreground">{(t.docmgr_fields as Record<string,string>).notary_status}</p>
                 <p className="text-sm text-foreground">{docStatusLabel(circle.notary_status)}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Bénéficiaires</p>
+                <p className="text-xs text-muted-foreground">{(t.docmgr_fields as Record<string,string>).beneficiary_designation_status}</p>
                 <p className="text-sm text-foreground">{docStatusLabel(circle.beneficiary_designation_status)}</p>
               </div>
             </div>
@@ -193,28 +191,28 @@ const ExecutorPage: React.FC = () => {
         {/* Checklist summary */}
         <Card className="shadow-soft">
           <CardHeader>
-            <CardTitle className="font-heading text-base">Checklist — Résumé</CardTitle>
+            <CardTitle className="font-heading text-base">{t.exec_checklist_summary}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm">{checklistSummary.completed}/{checklistSummary.total} complets</span>
+                <span className="text-sm">{t.exec_complete.replace('{done}', String(checklistSummary.completed)).replace('{total}', String(checklistSummary.total))}</span>
               </div>
               {checklistSummary.needsReview > 0 && (
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm">{checklistSummary.needsReview} à vérifier</span>
+                  <span className="text-sm">{checklistSummary.needsReview} {t.checklist_to_verify.toLowerCase()}</span>
                 </div>
               )}
               {checklistSummary.blocked > 0 && (
                 <div className="flex items-center gap-2">
                   <XCircle className="h-4 w-4 text-destructive" />
-                  <span className="text-sm">{checklistSummary.blocked} bloqué{checklistSummary.blocked > 1 ? 's' : ''}</span>
+                  <span className="text-sm">{checklistSummary.blocked} {t.checklist_blocked_label.toLowerCase()}</span>
                 </div>
               )}
               {checklistSummary.total === 0 && (
-                <span className="text-sm text-muted-foreground">Aucun élément dans la checklist.</span>
+                <span className="text-sm text-muted-foreground">{t.exec_no_checklist}</span>
               )}
             </div>
           </CardContent>
@@ -224,7 +222,7 @@ const ExecutorPage: React.FC = () => {
         {govItems.length > 0 && (
           <Card className="shadow-soft">
             <CardHeader>
-              <CardTitle className="font-heading text-base">Coordination — Responsabilités actives</CardTitle>
+              <CardTitle className="font-heading text-base">{t.exec_coordination}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {govItems.map(g => (
@@ -233,7 +231,7 @@ const ExecutorPage: React.FC = () => {
                     <p className="text-sm font-medium text-foreground">{g.title}</p>
                     {g.description && <p className="text-xs text-muted-foreground">{g.description}</p>}
                   </div>
-                  <Badge variant="outline" className="text-xs">{g.status === 'blocked' ? 'Bloqué' : g.status === 'in_progress' ? 'En cours' : g.status === 'needs_attention' ? 'Attention' : g.status}</Badge>
+                  <Badge variant="outline" className="text-xs">{(t.gov_statuses as Record<string,string>)[g.status] || g.status}</Badge>
                 </div>
               ))}
             </CardContent>
@@ -242,28 +240,28 @@ const ExecutorPage: React.FC = () => {
 
         {/* Notes */}
         <div className="flex items-center justify-between">
-          <h2 className="font-heading text-lg font-medium text-foreground">Notes de préparation</h2>
+          <h2 className="font-heading text-lg font-medium text-foreground">{t.exec_prep_notes}</h2>
           {isManager && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="gap-2"><Plus className="h-4 w-4" />Ajouter</Button>
+                <Button size="sm" className="gap-2"><Plus className="h-4 w-4" />{t.exec_add_note}</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                  <DialogTitle className="font-heading">Ajouter une note</DialogTitle>
+                  <DialogTitle className="font-heading">{t.exec_note_title}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleCreate} className="space-y-4">
                   <div className="space-y-2">
-                    <Label>Titre</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Contacts importants" required />
+                    <Label>{t.checklist_title_label}</Label>
+                    <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
                   </div>
                   <div className="space-y-2">
-                    <Label>Contenu</Label>
-                    <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Détails..." rows={5} />
+                    <Label>{t.exec_note_content}</Label>
+                    <Textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder={t.exec_note_placeholder} rows={5} />
                   </div>
                   <Button type="submit" className="w-full" disabled={saving}>
                     {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    Ajouter
+                    {t.exec_add_note}
                   </Button>
                 </form>
               </DialogContent>
@@ -274,7 +272,7 @@ const ExecutorPage: React.FC = () => {
         {notes.length === 0 ? (
           <Card className="shadow-soft">
             <CardContent className="py-8 text-center">
-              <p className="text-sm text-muted-foreground">Aucune note de préparation pour le moment.</p>
+              <p className="text-sm text-muted-foreground">{t.exec_no_notes}</p>
             </CardContent>
           </Card>
         ) : (
