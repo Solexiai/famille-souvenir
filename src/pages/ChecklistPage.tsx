@@ -296,7 +296,7 @@ const ChecklistPage: React.FC = () => {
           <div>
             <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
               <CheckSquare className="h-6 w-6 text-accent" />
-              Checklist de préparation
+              {t.checklist_title}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {t.checklist_subtitle}
