@@ -112,10 +112,8 @@ const AcceptInvitationPage: React.FC = () => {
   // Error without invitation info
   if (error && !invitation) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-card">
-          <CardContent className="py-12 flex flex-col items-center gap-4 text-center">
-            <XCircle className="h-12 w-12 text-destructive" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="absolute top-4 right-4"><LanguageSwitcher variant="compact" /></div>
             <p className="text-foreground font-medium">{error}</p>
             <Link to="/"><Button variant="outline">{t.accept_back_home}</Button></Link>
           </CardContent>
@@ -127,10 +125,8 @@ const AcceptInvitationPage: React.FC = () => {
   // Success
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-card">
-          <CardContent className="py-12 flex flex-col items-center gap-4 text-center">
-            <CheckCircle className="h-12 w-12 text-accent" />
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="absolute top-4 right-4"><LanguageSwitcher variant="compact" /></div>
             <p className="text-foreground font-medium">{success}</p>
             <p className="text-sm text-muted-foreground">{t.accept_redirecting}</p>
           </CardContent>
@@ -144,23 +140,8 @@ const AcceptInvitationPage: React.FC = () => {
   // the invitation will be accepted automatically.
   if (!user && invitation) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-card">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
-              <Users className="h-7 w-7 text-accent" />
-            </div>
-            <CardTitle className="font-heading text-xl">{t.accept_join_circle}</CardTitle>
-            <CardDescription
-              dangerouslySetInnerHTML={{
-                __html: t.accept_invited_to
-                  .replace('{circle}', invitation.circle_name)
-                  .replace('{role}', roleLabel(invitation.role))
-              }}
-            />
-          </CardHeader>
-          <CardContent className="space-y-4 text-center">
-            <p className="text-sm text-muted-foreground">{t.accept_login_or_signup}</p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="absolute top-4 right-4"><LanguageSwitcher variant="compact" /></div>
             <div className="flex flex-col gap-2">
               <Link to="/login">
                 <Button className="w-full gap-2"><LogIn className="h-4 w-4" />{t.accept_login}</Button>
@@ -178,23 +159,8 @@ const AcceptInvitationPage: React.FC = () => {
   // Logged in — show accept button
   if (user && invitation) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-card">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
-              <Users className="h-7 w-7 text-accent" />
-            </div>
-            <CardTitle className="font-heading text-xl">{t.accept_join_circle}</CardTitle>
-            <CardDescription
-              dangerouslySetInnerHTML={{
-                __html: t.accept_invited_to
-                  .replace('{circle}', invitation.circle_name)
-                  .replace('{role}', roleLabel(invitation.role))
-              }}
-            />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg bg-secondary/50 p-4 space-y-2 text-sm">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="absolute top-4 right-4"><LanguageSwitcher variant="compact" /></div>
               <p><span className="text-muted-foreground">{t.accept_role} :</span> {roleLabel(invitation.role)}</p>
               <p><span className="text-muted-foreground">{t.accept_circle} :</span> {invitation.circle_name}</p>
             </div>
