@@ -88,9 +88,9 @@ const ExecutorPage: React.FC = () => {
       title: title.trim(),
       content,
     });
-    if (error) toast.error('Erreur lors de la création.');
+    if (error) toast.error(t.exec_note_error);
     else {
-      toast.success('Note ajoutée.');
+      toast.success(t.exec_note_added);
       setTitle(''); setContent('');
       setDialogOpen(false);
       loadData();
@@ -99,24 +99,11 @@ const ExecutorPage: React.FC = () => {
   };
 
   const dossierLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      initial: 'Initial',
-      in_progress: 'En cours',
-      partial: 'Partiel',
-      ready_for_professional_review: 'Prêt pour révision professionnelle',
-      executor_ready: 'Prêt pour l\'exécuteur',
-    };
-    return labels[status] || status;
+    return (t.dossier_labels as Record<string, string>)?.[status] || status;
   };
 
   const docStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      unknown: 'Inconnu',
-      declared: 'Déclaré',
-      located: 'Localisé',
-      professionally_confirmed: 'Confirmé par professionnel',
-    };
-    return labels[status] || status;
+    return (t.doc_status_labels as Record<string, string>)?.[status] || status;
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
