@@ -97,7 +97,8 @@ const AcceptInvitationPage: React.FC = () => {
   // Loading state
   if (authLoading || validating) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative">
+        <div className="absolute top-4 right-4"><LanguageSwitcher variant="compact" /></div>
         <Card className="w-full max-w-md shadow-card">
           <CardContent className="py-12 flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-accent" />
