@@ -443,7 +443,7 @@ const ChecklistPage: React.FC = () => {
             <CardContent className="p-3 sm:p-4">
               <div className="flex items-center gap-2 mb-2 sm:mb-0 sm:hidden">
                 <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">{t.filters || "Filtres"}</span>
+                <span className="text-xs font-medium text-muted-foreground">{"Filtres"}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -469,7 +469,7 @@ const ChecklistPage: React.FC = () => {
                   value={sortBy}
                   onValueChange={(v: 'default' | 'incomplete' | 'due_date') => setSortBy(v)}
                 >
-                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder={t.sort || 'Tri'} /></SelectTrigger>
+                  <SelectTrigger className="h-9 text-xs w-full"><SelectValue placeholder={'Tri'} /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="default">{t.checklist_sort_category}</SelectItem>
                     <SelectItem value="incomplete">{t.checklist_sort_urgency}</SelectItem>

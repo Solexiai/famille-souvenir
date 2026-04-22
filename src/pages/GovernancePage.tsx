@@ -414,7 +414,7 @@ const GovernancePage: React.FC = () => {
             <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="text-xs font-medium text-muted-foreground">{t.filters || "Filtres"}</span>
+                <span className="text-xs font-medium text-muted-foreground">{"Filtres"}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Select value={filterArea} onValueChange={setFilterArea}>
