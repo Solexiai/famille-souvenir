@@ -20,55 +20,44 @@ import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
 
-const categories = [
-  { value: 'identity', label: 'Identité' },
-  { value: 'testament', label: 'Testament' },
-  { value: 'mandate', label: 'Mandat / Inaptitude' },
-  { value: 'insurance', label: 'Assurances' },
-  { value: 'banking', label: 'Bancaire' },
-  { value: 'investments', label: 'Placements' },
-  { value: 'property', label: 'Immobilier' },
-  { value: 'vehicles', label: 'Véhicules' },
-  { value: 'debts', label: 'Dettes' },
-  { value: 'taxes', label: 'Impôts' },
-  { value: 'medical', label: 'Médical' },
-  { value: 'wishes', label: 'Volontés' },
-  { value: 'contracts', label: 'Contrats' },
-  { value: 'subscriptions', label: 'Abonnements' },
-  { value: 'digital_assets', label: 'Actifs numériques' },
-  { value: 'funeral', label: 'Funéraire' },
-  { value: 'other', label: 'Autre' },
-];
-
-const visibilityLabels: Record<DocumentVisibility, string> = {
-  private_owner: 'Moi uniquement',
-  managers_only: 'Gestionnaires',
-  family_circle: 'Tout le cercle',
-  heirs_only: 'Héritiers uniquement',
-  executor_workspace: 'Espace exécuteur',
-  verified_executor_only: 'Exécuteur vérifié',
-};
-
-const verificationLabels: Record<VerificationStatus, string> = {
-  unreviewed: 'Non examiné',
-  identified: 'Identifié',
-  needs_update: 'À mettre à jour',
-  needs_professional_review: 'Revoir pro.',
-  document_verified: 'Vérifié',
-};
-
-const verificationColors: Record<VerificationStatus, string> = {
-  unreviewed: 'bg-muted text-muted-foreground',
-  identified: 'bg-primary/10 text-primary',
-  needs_update: 'bg-amber-100 text-amber-800',
-  needs_professional_review: 'bg-orange-100 text-orange-800',
-  document_verified: 'bg-green-100 text-green-800',
-};
-
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
   const { plan } = usePlan();
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
+
+  const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' };
+
+  const categories = [
+    { value: 'identity', label: t.category_doc_identity },
+    { value: 'testament', label: t.category_doc_testament },
+    { value: 'mandate', label: t.category_doc_mandate },
+    { value: 'insurance', label: t.category_doc_insurance },
+    { value: 'banking', label: t.category_doc_banking },
+    { value: 'investments', label: t.category_doc_investments },
+    { value: 'property', label: t.category_doc_property },
+    { value: 'vehicles', label: t.category_doc_vehicles },
+    { value: 'debts', label: t.category_doc_debts },
+    { value: 'taxes', label: t.category_doc_taxes },
+    { value: 'medical', label: t.category_doc_medical },
+    { value: 'wishes', label: t.category_doc_wishes },
+    { value: 'contracts', label: t.category_doc_contracts },
+    { value: 'subscriptions', label: t.category_doc_subscriptions },
+    { value: 'digital_assets', label: t.category_doc_digital_assets },
+    { value: 'funeral', label: t.category_doc_funeral },
+    { value: 'other', label: t.category_doc_other },
+  ];
+
+  const visibilityLabels = t.docs_visibility_labels;
+  const verificationLabels = t.docs_verification_labels;
+
+  const verificationColors: Record<VerificationStatus, string> = {
+    unreviewed: 'bg-muted text-muted-foreground',
+    identified: 'bg-primary/10 text-primary',
+    needs_update: 'bg-amber-100 text-amber-800',
+    needs_professional_review: 'bg-orange-100 text-orange-800',
+    document_verified: 'bg-green-100 text-green-800',
+  };
+
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [documents, setDocuments] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
