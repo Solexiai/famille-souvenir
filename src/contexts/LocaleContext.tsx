@@ -64,7 +64,21 @@ export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 export function useLocale() {
   const ctx = useContext(LocaleContext);
   if (!ctx) {
-    throw new Error('useLocale must be used within LocaleProvider');
+    // Defensive fallback: during HMR or if a consumer renders outside the provider,
+    // return a usable shape instead of throwing (prevents a full blank-screen crash).
+    if (typeof console !== 'undefined') {
+      console.warn('[useLocale] called outside LocaleProvider — using English fallback.');
+    }
+    return {
+      lang: 'en' as SupportedLanguage,
+      setLang: () => {},
+      t: locales.en,
+      terms: getTerminology(null),
+      jurisdictionPack: null,
+      setJurisdictionPack: () => {},
+      countryGroup: null,
+      setCountryGroup: () => {},
+    };
   }
   return ctx;
 }
