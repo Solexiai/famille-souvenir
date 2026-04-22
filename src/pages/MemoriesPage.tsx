@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { AppLayout } from '@/components/AppLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,31 +16,13 @@ import type { Memory, MemoryType, MemoryVisibility, FamilyCircle } from '@/types
 import { z } from 'zod';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
-
-const memorySchema = z.object({
-  caption: z.string().trim().min(1, 'Veuillez ajouter une légende').max(500),
-  type: z.enum(['photo', 'video', 'audio', 'text']),
-  visibility: z.enum(['circle', 'managers', 'private']),
-});
+import { useLocale } from '@/contexts/LocaleContext';
 
 const typeIcons: Record<MemoryType, React.FC<{ className?: string }>> = {
   photo: Image,
   video: Video,
   audio: Mic,
   text: FileText,
-};
-
-const typeLabels: Record<MemoryType, string> = {
-  photo: 'Photo',
-  video: 'Vidéo',
-  audio: 'Audio',
-  text: 'Texte',
-};
-
-const visibilityLabels: Record<MemoryVisibility, string> = {
-  circle: 'Tout le cercle',
-  managers: 'Gestionnaires uniquement',
-  private: 'Privé (moi uniquement)',
 };
 
 type MemoryWithMedia = Memory & { mediaSrc?: string };
@@ -59,17 +41,25 @@ const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
 
 const MemoriesPage: React.FC = () => {
   const { user } = useAuth();
+  const { t, lang } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memories, setMemories] = useState<MemoryWithMedia[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Form state
   const [caption, setCaption] = useState('');
   const [type, setType] = useState<MemoryType>('text');
   const [visibility, setVisibility] = useState<MemoryVisibility>('circle');
   const [file, setFile] = useState<File | null>(null);
+
+  const memorySchema = z.object({
+    caption: z.string().trim().min(1, t.memories_validation_caption).max(500),
+    type: z.enum(['photo', 'video', 'audio', 'text']),
+    visibility: z.enum(['circle', 'managers', 'private']),
+  });
+
+  const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' };
 
   const loadData = async () => {
     if (!user) return;
@@ -149,18 +139,15 @@ const MemoriesPage: React.FC = () => {
 
     let media_url: string | null = null;
 
-    // Upload file if provided
     if (file && (type === 'photo' || type === 'video' || type === 'audio')) {
-      // Strip EXIF/GPS and resize images before upload
       let processedFile = file;
       if (type === 'photo') {
         processedFile = await prepareImageForUpload(file);
       }
 
-      // Server-side validation (MIME, magic bytes, quotas, plan limits)
       const validation = await validateUpload(processedFile, type, circle.id);
       if (!validation.allowed) {
-        toast.error(validation.error || 'Upload refusé');
+        toast.error(validation.error || t.memories_upload_error);
         setCreating(false);
         return;
       }
@@ -171,7 +158,7 @@ const MemoriesPage: React.FC = () => {
         .from('memories-media')
         .upload(filePath, processedFile);
       if (uploadError) {
-        toast.error("Erreur lors de l'envoi du fichier.");
+        toast.error(t.memories_upload_error);
         setCreating(false);
         return;
       }
@@ -196,9 +183,9 @@ const MemoriesPage: React.FC = () => {
     });
 
     if (error) {
-      toast.error('Erreur lors de la création du souvenir.');
+      toast.error(t.memories_error);
     } else {
-      toast.success('Souvenir ajouté !');
+      toast.success(t.memories_added);
       setCaption('');
       setType('text');
       setVisibility('circle');
@@ -223,8 +210,8 @@ const MemoriesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p>
-          <Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{t.must_create_circle_first}</p>
+          <Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button>
         </div>
       </AppLayout>
     );
@@ -234,36 +221,36 @@ const MemoriesPage: React.FC = () => {
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
-          <h1 className="font-heading text-2xl font-semibold text-foreground">Souvenirs</h1>
+          <h1 className="font-heading text-2xl font-semibold text-foreground">{t.memories_title}</h1>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button size="lg" className="gap-2">
                 <Plus className="h-4 w-4" />
-                Nouveau souvenir
+                {t.memories_new}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle className="font-heading">Ajouter un souvenir</DialogTitle>
+                <DialogTitle className="font-heading">{t.memories_add_title}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleCreate} className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>{t.memories_type}</Label>
                   <Select value={type} onValueChange={(v) => setType(v as MemoryType)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="text">Texte</SelectItem>
-                      <SelectItem value="photo">Photo</SelectItem>
-                      <SelectItem value="video">Vidéo</SelectItem>
-                      <SelectItem value="audio">Audio</SelectItem>
+                      <SelectItem value="text">{t.memories_type_labels.text}</SelectItem>
+                      <SelectItem value="photo">{t.memories_type_labels.photo}</SelectItem>
+                      <SelectItem value="video">{t.memories_type_labels.video}</SelectItem>
+                      <SelectItem value="audio">{t.memories_type_labels.audio}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="caption">Légende</Label>
+                  <Label htmlFor="caption">{t.memories_caption}</Label>
                   <Textarea
                     id="caption"
-                    placeholder="Décrivez ce souvenir..."
+                    placeholder={t.memories_caption_placeholder}
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
                     required
@@ -271,30 +258,30 @@ const MemoriesPage: React.FC = () => {
                 </div>
                 {type !== 'text' && (
                   <div className="space-y-2">
-                    <Label htmlFor="file">Fichier</Label>
+                    <Label htmlFor="file">{t.memories_file}</Label>
                     <Input
                       id="file"
                       type="file"
                       onChange={(e) => setFile(e.target.files?.[0] || null)}
                       accept={type === 'photo' ? 'image/*' : type === 'video' ? 'video/*' : 'audio/*'}
                     />
-                    <p className="text-xs text-muted-foreground">Maximum 50 Mo</p>
+                    <p className="text-xs text-muted-foreground">{t.memories_file_hint}</p>
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label>Visibilité</Label>
+                  <Label>{t.memories_visibility}</Label>
                   <Select value={visibility} onValueChange={(v) => setVisibility(v as MemoryVisibility)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="circle">Tout le cercle</SelectItem>
-                      <SelectItem value="managers">Gestionnaires uniquement</SelectItem>
-                      <SelectItem value="private">Privé</SelectItem>
+                      <SelectItem value="circle">{t.memories_visibility_labels.circle}</SelectItem>
+                      <SelectItem value="managers">{t.memories_visibility_labels.managers}</SelectItem>
+                      <SelectItem value="private">{t.memories_visibility_labels.private}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <Button type="submit" className="w-full" disabled={creating}>
                   {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Ajouter
+                  {t.add}
                 </Button>
               </form>
             </DialogContent>
@@ -305,9 +292,9 @@ const MemoriesPage: React.FC = () => {
           <Card className="shadow-soft">
             <CardContent className="py-12 text-center">
               <Image className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun souvenir partagé pour le moment.</p>
+              <p className="text-muted-foreground">{t.memories_empty}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Créez votre premier souvenir pour préserver vos moments précieux.
+                {t.memories_empty_desc}
               </p>
             </CardContent>
           </Card>
@@ -334,13 +321,13 @@ const MemoriesPage: React.FC = () => {
                         )}
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Badge variant="outline" className="text-xs">
-                            {typeLabels[memory.type]}
+                            {t.memories_type_labels[memory.type]}
                           </Badge>
                           <Badge variant="outline" className="text-xs">
-                            {visibilityLabels[memory.visibility]}
+                            {t.memories_visibility_labels[memory.visibility]}
                           </Badge>
                           <span>
-                            {new Date(memory.created_at).toLocaleDateString('fr-FR', {
+                            {new Date(memory.created_at).toLocaleDateString(localeMap[lang], {
                               day: 'numeric',
                               month: 'long',
                               year: 'numeric',
