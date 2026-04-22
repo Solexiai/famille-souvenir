@@ -99,11 +99,24 @@ const ExecutorPage: React.FC = () => {
   };
 
   const dossierLabel = (status: string) => {
-    return (t.dossier_labels as Record<string, string>)?.[status] || status;
+    const map: Record<string, string> = {
+      initial: t.docmgr_dossier_initial,
+      in_progress: t.docmgr_dossier_in_progress,
+      partial: t.docmgr_dossier_partial,
+      ready_for_professional_review: t.docmgr_dossier_ready_review,
+      executor_ready: t.dossier_executor_ready,
+    };
+    return map[status] || status;
   };
 
   const docStatusLabel = (status: string) => {
-    return (t.doc_status_labels as Record<string, string>)?.[status] || status;
+    const map: Record<string, string> = {
+      unknown: t.docmgr_doc_unknown,
+      declared: t.docmgr_doc_declared,
+      located: t.docmgr_doc_located,
+      professionally_confirmed: t.docmgr_doc_confirmed,
+    };
+    return map[status] || status;
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
