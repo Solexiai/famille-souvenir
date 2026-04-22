@@ -210,7 +210,7 @@ const GovernancePage: React.FC = () => {
   const handleQuickStatus = async (item: GovernanceResponsibility, newStatus: GovernanceStatus) => {
     const updatePayload: GovernanceUpdate = { status: newStatus };
     const { error } = await supabase.from('governance_responsibilities').update(updatePayload).eq('id', item.id);
-    if (error) toast.error(t.error);
+    if (error) toast.error(t.error_generic);
     else {
       await auditLog('governance_status_change', { id: item.id, old: item.status, new: newStatus });
       loadData();
@@ -220,7 +220,7 @@ const GovernancePage: React.FC = () => {
   const handleDelete = async (item: GovernanceResponsibility) => {
     if (!confirm(t.gov_delete_confirm)) return;
     const { error } = await supabase.from('governance_responsibilities').delete().eq('id', item.id);
-    if (error) toast.error(t.error);
+    if (error) toast.error(t.error_generic);
     else {
       toast.success(t.gov_deleted);
       await auditLog('governance_deleted', { id: item.id, title: item.title });
