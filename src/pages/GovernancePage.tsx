@@ -186,17 +186,17 @@ const GovernancePage: React.FC = () => {
     if (editItem) {
       const updatePayload: GovernanceUpdate = payload;
       const { error } = await supabase.from('governance_responsibilities').update(updatePayload).eq('id', editItem.id);
-      if (error) { toast.error('Erreur lors de la mise à jour.'); }
+      if (error) { toast.error(t.gov_update_error); }
       else {
-        toast.success('Responsabilité mise à jour.');
+        toast.success(t.gov_updated);
         if (editItem.status !== formStatus) await auditLog('governance_status_change', { id: editItem.id, old: editItem.status, new: formStatus });
         if (editItem.member_id !== memberId) await auditLog('governance_assignment_change', { id: editItem.id, old: editItem.member_id, new: memberId });
       }
     } else {
       const { data: newItem, error } = await supabase.from('governance_responsibilities').insert(payload).select().single();
-      if (error) { toast.error('Erreur lors de la création.'); }
+      if (error) { toast.error(t.gov_create_error); }
       else {
-        toast.success('Responsabilité ajoutée.');
+        toast.success(t.gov_created);
         await auditLog('governance_created', { id: newItem?.id, title: title.trim(), area });
       }
     }
@@ -210,7 +210,7 @@ const GovernancePage: React.FC = () => {
   const handleQuickStatus = async (item: GovernanceResponsibility, newStatus: GovernanceStatus) => {
     const updatePayload: GovernanceUpdate = { status: newStatus };
     const { error } = await supabase.from('governance_responsibilities').update(updatePayload).eq('id', item.id);
-    if (error) toast.error('Erreur.');
+    if (error) toast.error(t.error);
     else {
       await auditLog('governance_status_change', { id: item.id, old: item.status, new: newStatus });
       loadData();
@@ -218,11 +218,11 @@ const GovernancePage: React.FC = () => {
   };
 
   const handleDelete = async (item: GovernanceResponsibility) => {
-    if (!confirm('Supprimer cette responsabilité ?')) return;
+    if (!confirm(t.gov_delete_confirm)) return;
     const { error } = await supabase.from('governance_responsibilities').delete().eq('id', item.id);
-    if (error) toast.error('Erreur.');
+    if (error) toast.error(t.error);
     else {
-      toast.success('Responsabilité supprimée.');
+      toast.success(t.gov_deleted);
       await auditLog('governance_deleted', { id: item.id, title: item.title });
       loadData();
     }
@@ -272,7 +272,7 @@ const GovernancePage: React.FC = () => {
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
-  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button></div></AppLayout>;
+  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">{t.please_create_circle}</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button></div></AppLayout>;
 
   return (
     <AppLayout>
