@@ -283,45 +283,45 @@ const GovernancePage: React.FC = () => {
             <div className="min-w-0">
               <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
                 <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
-                Gouvernance
+                {t.gov_title}
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
-                Coordination des responsabilités familiales.
+                {t.gov_subtitle}
               </p>
             </div>
             {canEdit && (
               <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="gap-1.5 shrink-0"><Plus className="h-4 w-4" />Ajouter</Button>
+                  <Button size="sm" className="gap-1.5 shrink-0"><Plus className="h-4 w-4" />{t.add}</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle className="font-heading">{editItem ? 'Modifier la responsabilité' : 'Assigner une responsabilité'}</DialogTitle>
+                    <DialogTitle className="font-heading">{editItem ? t.gov_edit_title : t.gov_add_title}</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleSave} className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Domaine</Label>
+                      <Label>{t.gov_area}</Label>
                       <Select value={area} onValueChange={(v) => setArea(v as GovernanceArea)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
+                          {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabelsT[k]}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Titre</Label>
-                      <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Suivi du notaire" required />
+                      <Label>{t.gov_title_label}</Label>
+                      <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.gov_title_placeholder} required />
                     </div>
                     <div className="space-y-2">
-                      <Label>Description</Label>
-                      <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Détails..." rows={2} />
+                      <Label>{t.gov_description}</Label>
+                      <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t.gov_description_placeholder} rows={2} />
                     </div>
                     <div className="space-y-2">
-                      <Label>Responsable</Label>
+                      <Label>{t.gov_responsible}</Label>
                       <Select value={memberId || 'none'} onValueChange={(v) => setMemberId(v === 'none' ? '' : v)}>
-                        <SelectTrigger><SelectValue placeholder="Choisir un membre" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t.gov_responsible_placeholder} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">Non attribué</SelectItem>
+                          <SelectItem value="none">{t.gov_unassigned}</SelectItem>
                           {members.map(m => (
                             <SelectItem key={m.user_id} value={m.user_id}>
                               {m.profiles?.full_name || m.profiles?.email || 'Membre'}
@@ -331,56 +331,56 @@ const GovernancePage: React.FC = () => {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Statut</Label>
+                      <Label>{t.gov_status}</Label>
                       <Select value={formStatus} onValueChange={(v) => setFormStatus(v as GovernanceStatus)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                          {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Échéance</Label>
+                      <Label>{t.gov_due_date}</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}>
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dueDate ? format(dueDate, 'PPP', { locale: fr }) : 'Pas d\'échéance'}
+                            {dueDate ? format(dueDate, 'PPP', { locale: fr }) : t.gov_no_due_date}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus className={cn("p-3 pointer-events-auto")} />
                         </PopoverContent>
                       </Popover>
-                      {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">Retirer</Button>}
+                      {dueDate && <Button type="button" variant="ghost" size="sm" onClick={() => setDueDate(undefined)} className="text-xs">{t.gov_remove_date}</Button>}
                     </div>
                     <div className="space-y-2">
-                      <Label>Checklist lié</Label>
+                      <Label>{t.gov_linked_checklist}</Label>
                       <Select value={linkedChecklist || 'none'} onValueChange={(v) => setLinkedChecklist(v === 'none' ? '' : v)}>
-                        <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t.none} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">Aucun</SelectItem>
+                          <SelectItem value="none">{t.none}</SelectItem>
                           {checklists.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.title}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Document lié</Label>
+                      <Label>{t.gov_linked_doc}</Label>
                       <Select value={linkedDoc || 'none'} onValueChange={(v) => setLinkedDoc(v === 'none' ? '' : v)}>
-                        <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder={t.none} /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">Aucun</SelectItem>
+                          <SelectItem value="none">{t.none}</SelectItem>
                           {documents.map(d => <SelectItem key={d.id} value={d.id}>{d.title}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Note</Label>
-                      <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Remarques..." rows={2} />
+                      <Label>{t.gov_note}</Label>
+                      <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t.gov_note_placeholder} rows={2} />
                     </div>
                     <Button type="submit" className="w-full" disabled={saving || !memberId}>
                       {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                      {editItem ? 'Enregistrer' : 'Assigner'}
+                      {editItem ? t.save : t.gov_assign_btn}
                     </Button>
                   </form>
                 </DialogContent>
@@ -393,10 +393,10 @@ const GovernancePage: React.FC = () => {
         {stats.total > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {[
-              { value: stats.assigned, label: 'Assignées', color: 'text-foreground' },
-              { value: stats.completed, label: 'Complétées', color: 'text-green-600' },
-              { value: stats.blocked, label: 'Bloquées', color: 'text-destructive' },
-              { value: stats.needsAttention, label: 'Attention', color: 'text-amber-600' },
+              { value: stats.assigned, label: t.gov_assigned_count, color: 'text-foreground' },
+              { value: stats.completed, label: t.gov_completed_count, color: 'text-green-600' },
+              { value: stats.blocked, label: t.gov_blocked_count, color: 'text-destructive' },
+              { value: stats.needsAttention, label: t.gov_attention_count, color: 'text-amber-600' },
             ].map((s) => (
               <Card key={s.label} className="shadow-soft">
                 <CardContent className="p-3 sm:py-4 text-center">
@@ -414,27 +414,27 @@ const GovernancePage: React.FC = () => {
             <CardContent className="p-3">
               <div className="flex items-center gap-2 mb-2">
                 <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                <span className="text-xs font-medium text-muted-foreground">Filtres</span>
+                <span className="text-xs font-medium text-muted-foreground">{t.filters || "Filtres"}</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Select value={filterArea} onValueChange={setFilterArea}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Domaine" /></SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.gov_area} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les domaines</SelectItem>
-                    {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabels[k]}</SelectItem>)}
+                    <SelectItem value="all">{t.gov_all_areas}</SelectItem>
+                    {areaOrder.map(k => <SelectItem key={k} value={k}>{areaLabelsT[k]}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Statut" /></SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.gov_status} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les statuts</SelectItem>
-                    {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                    <SelectItem value="all">{t.gov_all_statuses}</SelectItem>
+                    {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 <Select value={filterMember} onValueChange={setFilterMember}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Responsable" /></SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.gov_responsible} /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Tous les membres</SelectItem>
+                    <SelectItem value="all">{t.gov_all_members}</SelectItem>
                     {members.map(m => (
                       <SelectItem key={m.user_id} value={m.user_id}>
                         {m.profiles?.full_name || 'Membre'}
@@ -454,12 +454,12 @@ const GovernancePage: React.FC = () => {
               <Shield className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">
                 {items.length === 0
-                  ? 'Aucune responsabilité assignée.'
-                  : 'Aucun élément correspondant aux filtres.'}
+                  ? t.gov_empty
+                  : t.gov_no_filter_match}
               </p>
               {items.length === 0 && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  Assignez des responsabilités à chaque membre.
+                  {t.gov_empty_desc}
                 </p>
               )}
             </CardContent>
@@ -478,7 +478,7 @@ const GovernancePage: React.FC = () => {
                         {isCollapsed
                           ? <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                           : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
-                        <CardTitle className="font-heading text-sm sm:text-base truncate">{areaLabels[a as GovernanceArea]}</CardTitle>
+                        <CardTitle className="font-heading text-sm sm:text-base truncate">{areaLabelsT[a as GovernanceArea]}</CardTitle>
                       </div>
                       <Badge variant="outline" className="text-[10px] sm:text-xs shrink-0 ml-2">{areaCompleted}/{areaItems.length}</Badge>
                     </div>
@@ -493,7 +493,7 @@ const GovernancePage: React.FC = () => {
                               {item.title}
                             </p>
                             <Badge className={`text-[10px] px-1.5 py-0.5 shrink-0 ${statusColors[item.status]}`}>
-                              {statusLabels[item.status]}
+                              {statusLabelsT[item.status]}
                             </Badge>
                           </div>
 
@@ -537,11 +537,11 @@ const GovernancePage: React.FC = () => {
                               <Select value={item.status} onValueChange={(v) => handleQuickStatus(item, v as GovernanceStatus)}>
                                 <SelectTrigger className="h-7 text-[11px] flex-1 max-w-[160px]"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                  {Object.entries(statusLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                                  {Object.entries(statusLabelsT).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
                                 </SelectContent>
                               </Select>
                               <Button variant="outline" size="sm" className="text-xs h-7 px-2.5" onClick={() => openEdit(item)}>
-                                Modifier
+                                {t.edit}
                               </Button>
                               <Button variant="ghost" size="sm" className="text-xs h-7 px-2 text-destructive hover:text-destructive" onClick={() => handleDelete(item)}>
                                 ×
