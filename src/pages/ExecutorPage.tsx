@@ -128,10 +128,10 @@ const ExecutorPage: React.FC = () => {
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground flex items-center gap-2">
             <Briefcase className="h-6 w-6 text-accent" />
-            Espace exécuteur
+            {t.exec_title}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Préparation et coordination pour la transmission du dossier.
+            {t.exec_subtitle}
           </p>
         </div>
 
@@ -139,9 +139,7 @@ const ExecutorPage: React.FC = () => {
         <Alert className="border-amber-200 bg-amber-50">
           <Info className="h-4 w-4 text-amber-600" />
           <AlertDescription className="text-sm text-amber-800">
-            Cet espace soutient la préparation, la coordination familiale et la transmission du dossier.
-            Il ne remplace pas les vérifications légales ni la reconnaissance officielle du liquidateur
-            ou de l'exécuteur testamentaire.
+            {t.exec_disclaimer}
           </AlertDescription>
         </Alert>
 
