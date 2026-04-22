@@ -5,28 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Mail, RefreshCw, XCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import type { Invitation, AppRole } from '@/types/database';
+import type { Invitation } from '@/types/database';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr as frLocale, enUS, es as esLocale } from 'date-fns/locale';
 import { sendInvitationEmail } from '@/lib/invitation-email';
-
-const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.FC<{ className?: string }> }> = {
-  pending: { label: 'En attente', variant: 'outline', icon: Clock },
-  accepted: { label: 'Acceptée', variant: 'default', icon: CheckCircle },
-  declined: { label: 'Déclinée', variant: 'destructive', icon: XCircle },
-  expired: { label: 'Expirée', variant: 'secondary', icon: AlertTriangle },
-};
-
-const roleLabels: Record<string, string> = {
-  owner: 'Propriétaire',
-  family_manager: 'Gestionnaire',
-  family_member: 'Membre',
-  heir: 'Héritier',
-  contributor: 'Contributeur',
-  viewer: 'Observateur',
-  proposed_executor: 'Exécuteur pressenti',
-  verified_executor: 'Exécuteur documenté',
-};
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface Props {
   circleId: string;
@@ -36,9 +19,21 @@ interface Props {
 }
 
 export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, refreshKey }) => {
+  const { t, lang } = useLocale();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const dateLocale = lang === 'fr' ? frLocale : lang === 'es' ? esLocale : enUS;
+
+  const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.FC<{ className?: string }> }> = {
+    pending: { label: t.invitations_pending, variant: 'outline', icon: Clock },
+    accepted: { label: t.invitations_accepted, variant: 'default', icon: CheckCircle },
+    declined: { label: t.invitations_declined, variant: 'destructive', icon: XCircle },
+    expired: { label: t.invitations_expired, variant: 'secondary', icon: AlertTriangle },
+  };
+
+  const roleLabel = (role: string) => t.member_roles[role] || role;
 
   const loadInvitations = async () => {
     const { data } = await supabase
@@ -66,14 +61,10 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
 
     if (!error) {
       const emailResult = await sendInvitationEmail({
-        circleId,
-        userId,
+        circleId, userId,
         invitation: {
-          token: inv.token,
-          email: inv.email,
-          role: inv.role,
-          firstName: inv.first_name,
-          lastName: inv.last_name,
+          token: inv.token, email: inv.email, role: inv.role,
+          firstName: inv.first_name, lastName: inv.last_name,
           invitationMessage: inv.invitation_message,
         },
       });
@@ -82,24 +73,21 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
         user_id: userId, circle_id: circleId,
         action: 'invitation_resent',
         details: {
-          email: inv.email,
-          invitation_id: inv.id,
+          email: inv.email, invitation_id: inv.id,
           email_delivery: emailResult.ok ? 'sent' : 'failed',
           email_error: emailResult.error || null,
         },
       });
 
       if (emailResult.ok) {
-        toast.success(`Invitation renvoyée à ${inv.first_name || inv.email}`);
+        toast.success(t.invite_resent_to.replace('{name}', inv.first_name || inv.email));
       } else {
-        toast.error(
-          `L'invitation a bien été renouvelée, mais le courriel n'a pas pu être envoyé. ${emailResult.error || ''}`.trim()
-        );
+        toast.error(`${t.invite_resent_failed} ${emailResult.error || ''}`.trim());
       }
 
       loadInvitations();
     } else {
-      toast.error("Erreur lors du renvoi.");
+      toast.error(t.invitations_resend_error);
     }
     setActionLoading(null);
   };
@@ -114,10 +102,10 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
         action: 'invitation_cancelled',
         details: { email: inv.email, invitation_id: inv.id },
       });
-      toast.success('Invitation annulée.');
+      toast.success(t.invitations_cancelled);
       loadInvitations();
     } else {
-      toast.error("Erreur lors de l'annulation.");
+      toast.error(t.invitations_cancel_error);
     }
     setActionLoading(null);
   };
@@ -139,13 +127,12 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
       <CardHeader>
         <CardTitle className="font-heading text-lg flex items-center gap-2">
           <Mail className="h-5 w-5 text-accent" />
-          Invitations ({invitations.length})
+          {t.invitations_title} ({invitations.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {invitations.map((inv) => {
           const config = statusConfig[inv.status] || statusConfig.pending;
-          const StatusIcon = config.icon;
           const displayName = inv.first_name ? `${inv.first_name} ${inv.last_name}`.trim() : inv.email;
           const isExpired = new Date(inv.expires_at) < new Date() && inv.status === 'pending';
           const effectiveStatus = isExpired ? 'expired' : inv.status;
@@ -154,25 +141,16 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
 
           return (
             <div key={inv.id} className="rounded-lg border border-border p-3 sm:p-4 space-y-3">
-              {/* Top: info + status */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div className="min-w-0 space-y-0.5">
+                <div className="min-w-0 space-y-0.5">
                   <p className="text-sm font-medium text-foreground">{displayName}</p>
                   <p className="text-xs text-muted-foreground break-all">{inv.email}</p>
-                  {inv.phone && (
-                    <p className="text-xs text-muted-foreground">📞 {inv.phone}</p>
-                  )}
-                  {inv.city && (
-                    <p className="text-xs text-muted-foreground">📍 {inv.city}</p>
-                  )}
-                  {inv.relationship_label && (
-                    <p className="text-xs text-muted-foreground">{inv.relationship_label}</p>
-                  )}
+                  {inv.phone && <p className="text-xs text-muted-foreground">📞 {inv.phone}</p>}
+                  {inv.city && <p className="text-xs text-muted-foreground">📍 {inv.city}</p>}
+                  {inv.relationship_label && <p className="text-xs text-muted-foreground">{inv.relationship_label}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0 self-start sm:self-center">
-                  <Badge variant="secondary" className="text-xs">
-                    {roleLabels[inv.role] || inv.role}
-                  </Badge>
+                  <Badge variant="secondary" className="text-xs">{roleLabel(inv.role)}</Badge>
                   <Badge variant={effectiveConfig.variant} className="flex items-center gap-1 text-xs">
                     <EffectiveIcon className="h-3 w-3" />
                     {effectiveConfig.label}
@@ -180,36 +158,24 @@ export const InvitationsList: React.FC<Props> = ({ circleId, userId, canManage, 
                 </div>
               </div>
 
-              {/* Meta */}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Envoyée le {format(new Date(inv.created_at), 'dd MMM yyyy', { locale: fr })}</span>
+                <span>{t.invitations_sent_on.replace('{date}', format(new Date(inv.created_at), 'dd MMM yyyy', { locale: dateLocale }))}</span>
                 {inv.resent_count > 0 && (
-                  <span>Renvoyée {inv.resent_count} fois</span>
+                  <span>{t.invitations_resent.replace('{count}', String(inv.resent_count))}</span>
                 )}
               </div>
 
-              {/* Actions */}
               {canManage && (effectiveStatus === 'pending' || effectiveStatus === 'expired') && (
                 <div className="flex gap-2 pt-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5 text-xs"
-                    onClick={() => handleResend(inv)}
-                    disabled={actionLoading === inv.id}
-                  >
+                  <Button variant="outline" size="sm" className="gap-1.5 text-xs"
+                    onClick={() => handleResend(inv)} disabled={actionLoading === inv.id}>
                     {actionLoading === inv.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
-                    Renvoyer
+                    {t.invitations_resend}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1.5 text-xs text-destructive hover:text-destructive"
-                    onClick={() => handleCancel(inv)}
-                    disabled={actionLoading === inv.id}
-                  >
+                  <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-destructive hover:text-destructive"
+                    onClick={() => handleCancel(inv)} disabled={actionLoading === inv.id}>
                     <XCircle className="h-3 w-3" />
-                    Annuler
+                    {t.invitations_cancel_btn}
                   </Button>
                 </div>
               )}
