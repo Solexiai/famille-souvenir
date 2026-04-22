@@ -120,7 +120,7 @@ const ExecutorPage: React.FC = () => {
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
-  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button></div></AppLayout>;
+  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">{t.please_create_circle}</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button></div></AppLayout>;
 
   return (
     <AppLayout>
