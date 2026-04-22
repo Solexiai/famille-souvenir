@@ -86,7 +86,7 @@ const SignupPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">{t.auth_full_name}</Label>
-                <Input id="fullName" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required />
+                <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t.auth_email}</Label>

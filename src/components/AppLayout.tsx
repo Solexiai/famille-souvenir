@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { NotificationBell } from '@/components/NotificationBell';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import {
   Home, Shield, FolderOpen, CheckSquare, Image, Briefcase, Settings, LogOut, Menu, X,
 } from 'lucide-react';
@@ -69,6 +70,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
               })}
             </nav>
             <NotificationBell />
+            <LanguageSwitcher variant="compact" />
             <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-2 text-muted-foreground">
               <LogOut className="h-4 w-4" />
             </Button>
@@ -76,6 +78,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
           <div className="flex items-center gap-2 lg:hidden">
             <NotificationBell />
+            <LanguageSwitcher variant="compact" />
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>

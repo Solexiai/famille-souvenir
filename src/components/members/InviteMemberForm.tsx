@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,16 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import type { AppRole } from '@/types/database';
 import { sendInvitationEmail } from '@/lib/invitation-email';
-
-const inviteSchema = z.object({
-  firstName: z.string().trim().min(1, 'Le prénom est requis').max(50),
-  lastName: z.string().trim().min(1, 'Le nom est requis').max(50),
-  email: z.string().trim().email('Adresse email invalide'),
-  phone: z.string().trim().max(20).optional().or(z.literal('')),
-  city: z.string().trim().max(100).optional().or(z.literal('')),
-  relationshipLabel: z.string().trim().max(100).optional().or(z.literal('')),
-  invitationMessage: z.string().trim().max(500).optional().or(z.literal('')),
-});
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface Props {
   circleId: string;
@@ -30,6 +21,18 @@ interface Props {
 }
 
 export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSent }) => {
+  const { t } = useLocale();
+
+  const inviteSchema = useMemo(() => z.object({
+    firstName: z.string().trim().min(1, t.invite_validation_first).max(50),
+    lastName: z.string().trim().min(1, t.invite_validation_last).max(50),
+    email: z.string().trim().email(t.invite_validation_email),
+    phone: z.string().trim().max(20).optional().or(z.literal('')),
+    city: z.string().trim().max(100).optional().or(z.literal('')),
+    relationshipLabel: z.string().trim().max(100).optional().or(z.literal('')),
+    invitationMessage: z.string().trim().max(500).optional().or(z.literal('')),
+  }), [t]);
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,7 +55,6 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     setInviting(true);
     setLastInviteLink(null);
 
-    // ── Check if this email is already a member of this circle ──
     const normalizedEmailForProfile = result.data.email.toLowerCase().trim();
     const { data: existingProfile } = await supabase
       .from('profiles')
@@ -69,13 +71,12 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
         .maybeSingle();
 
       if (existingMember) {
-        toast.error('Cette personne fait déjà partie du cercle.');
+        toast.error(t.invite_already_member);
         setInviting(false);
         return;
       }
     }
 
-    // ── Check if ANY invitation already exists for this email in this circle ──
     const normalizedEmail = result.data.email.toLowerCase().trim();
     const { data: existingInvitations } = await supabase
       .from('invitations')
@@ -88,10 +89,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     );
 
     if (activeInvitation) {
-      const msg = activeInvitation.status === 'accepted'
-        ? 'Cette personne a déjà accepté une invitation pour ce cercle.'
-        : 'Une invitation est déjà en attente pour cette adresse courriel.';
-      toast.error(msg);
+      toast.error(activeInvitation.status === 'accepted' ? t.invite_already_accepted_member : t.invite_already_pending);
       setInviting(false);
       return;
     }
@@ -110,7 +108,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     }).select('token').single();
 
     if (error) {
-      toast.error("Erreur lors de l'envoi de l'invitation.");
+      toast.error(t.invite_error);
     } else {
       const emailResult = await sendInvitationEmail({
         circleId,
@@ -127,7 +125,6 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
 
       setLastInviteLink(emailResult.link);
 
-      // Audit log
       await supabase.from('audit_logs').insert({
         user_id: userId,
         circle_id: circleId,
@@ -142,19 +139,13 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       });
 
       if (emailResult.ok) {
-        toast.success(`Invitation envoyée à ${result.data.firstName} ${result.data.lastName}`);
+        toast.success(t.invite_sent_to.replace('{name}', `${result.data.firstName} ${result.data.lastName}`));
       } else {
-        toast.error(
-          `Invitation créée, mais le courriel n'a pas pu être envoyé. Utilisez le lien généré. ${emailResult.error || ''}`.trim()
-        );
+        toast.error(`${t.invite_email_failed} ${emailResult.error || ''}`.trim());
       }
 
-      setFirstName('');
-      setLastName('');
-      setEmail('');
-      setPhone('');
-      setCity('');
-      setRelationshipLabel('');
+      setFirstName(''); setLastName(''); setEmail('');
+      setPhone(''); setCity(''); setRelationshipLabel('');
       setInvitationMessage('');
       onInviteSent();
     }
@@ -165,7 +156,7 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
     if (lastInviteLink) {
       navigator.clipboard.writeText(lastInviteLink);
       setLinkCopied(true);
-      toast.success('Lien copié !');
+      toast.success(t.invite_link_copied);
       setTimeout(() => setLinkCopied(false), 2000);
     }
   };
@@ -175,67 +166,67 @@ export const InviteMemberForm: React.FC<Props> = ({ circleId, userId, onInviteSe
       <CardHeader>
         <CardTitle className="font-heading text-lg flex items-center gap-2">
           <UserPlus className="h-5 w-5 text-accent" />
-          Inviter un membre
+          {t.invite_title}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleInvite} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="invFirstName">Prénom</Label>
-              <Input id="invFirstName" placeholder="Jean" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
+              <Label htmlFor="invFirstName">{t.invite_first_name}</Label>
+              <Input id="invFirstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="invLastName">Nom</Label>
-              <Input id="invLastName" placeholder="Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+              <Label htmlFor="invLastName">{t.invite_last_name}</Label>
+              <Input id="invLastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="invEmail">Courriel</Label>
-            <Input id="invEmail" type="email" placeholder="membre@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Label htmlFor="invEmail">{t.invite_email}</Label>
+            <Input id="invEmail" type="email" placeholder="email@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="invPhone">Téléphone</Label>
-              <Input id="invPhone" type="tel" placeholder="+33 6 12 34 56 78" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Label htmlFor="invPhone">{t.invite_phone}</Label>
+              <Input id="invPhone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="invCity">Ville</Label>
-              <Input id="invCity" placeholder="Paris" value={city} onChange={(e) => setCity(e.target.value)} />
+              <Label htmlFor="invCity">{t.invite_city}</Label>
+              <Input id="invCity" value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="invRelation">Lien avec la famille</Label>
-              <Input id="invRelation" placeholder="Fils, cousine, ami proche…" value={relationshipLabel} onChange={(e) => setRelationshipLabel(e.target.value)} />
+              <Label htmlFor="invRelation">{t.invite_relationship}</Label>
+              <Input id="invRelation" placeholder={t.invite_relationship_placeholder} value={relationshipLabel} onChange={(e) => setRelationshipLabel(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label>Rôle</Label>
+              <Label>{t.invite_role}</Label>
               <Select value={role} onValueChange={(v) => setRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="family_manager">Gestionnaire</SelectItem>
-                  <SelectItem value="family_member">Membre</SelectItem>
-                  <SelectItem value="heir">Héritier</SelectItem>
+                  <SelectItem value="family_manager">{t.invite_role_manager}</SelectItem>
+                  <SelectItem value="family_member">{t.invite_role_member}</SelectItem>
+                  <SelectItem value="heir">{t.invite_role_heir}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="invMessage">Message d'invitation (optionnel)</Label>
-            <Textarea id="invMessage" placeholder="Un mot personnel pour accompagner l'invitation…" value={invitationMessage} onChange={(e) => setInvitationMessage(e.target.value)} rows={3} />
+            <Label htmlFor="invMessage">{t.invite_message}</Label>
+            <Textarea id="invMessage" placeholder={t.invite_message_placeholder} value={invitationMessage} onChange={(e) => setInvitationMessage(e.target.value)} rows={3} />
           </div>
           <Button type="submit" disabled={inviting} className="w-full">
             {inviting && <Loader2 className="h-4 w-4 animate-spin" />}
-            Créer l'invitation
+            {t.invite_submit}
           </Button>
 
           {lastInviteLink && (
             <Alert className="border-accent/30 bg-accent/5">
               <CheckCircle className="h-4 w-4 text-accent" />
               <AlertDescription className="space-y-2">
-                <p className="text-sm font-medium text-foreground">Invitation créée avec succès !</p>
-                <p className="text-xs text-muted-foreground">Partagez ce lien avec la personne invitée :</p>
+                <p className="text-sm font-medium text-foreground">{t.invite_success}</p>
+                <p className="text-xs text-muted-foreground">{t.invite_success_desc}</p>
                 <div className="flex items-center gap-2">
                   <code className="flex-1 text-xs bg-secondary rounded px-2 py-1.5 truncate">{lastInviteLink}</code>
                   <Button type="button" variant="outline" size="sm" onClick={copyLink}>

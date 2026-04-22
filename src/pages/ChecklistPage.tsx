@@ -27,6 +27,7 @@ import type {
 } from '@/types/database';
 import { hasPermission } from '@/components/PermissionMatrix';
 import type { Database } from '@/integrations/supabase/types';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const categoryLabels: Record<ChecklistCategory, string> = {
   legal: 'Juridique',
@@ -75,6 +76,7 @@ type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [items, setItems] = useState<ChecklistItem[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
@@ -282,7 +284,7 @@ const ChecklistPage: React.FC = () => {
   };
 
   if (loading) return <AppLayout><div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div></AppLayout>;
-  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button></div></AppLayout>;
+  if (!circle) return <AppLayout><div className="text-center py-20"><p className="text-muted-foreground">{t.please_create_circle}</p><Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button></div></AppLayout>;
 
   return (
     <AppLayout>
