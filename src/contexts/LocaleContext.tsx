@@ -24,7 +24,9 @@ const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 export const LocaleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [lang, setLangState] = useState<SupportedLanguage>(() => {
     const saved = localStorage.getItem('solexi_lang');
-    return (saved === 'en' || saved === 'es' || saved === 'fr') ? saved : 'fr';
+    if (saved === 'en' || saved === 'es' || saved === 'fr') return saved;
+    // New users: default to English (preserve existing user choices via the localStorage check above)
+    return 'en';
   });
   const [jurisdictionPack, setJurisdictionPackState] = useState<JurisdictionPack | null>(() => {
     return (localStorage.getItem('solexi_jurisdiction') as JurisdictionPack) || null;

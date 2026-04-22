@@ -489,6 +489,13 @@ export interface Translations {
   invite_validation_first: string;
   invite_validation_last: string;
   invite_validation_email: string;
+  invite_already_member: string;
+  invite_already_pending: string;
+  invite_already_accepted_member: string;
+  invite_email_failed: string;
+  invite_sent_to: string;
+  invite_resent_to: string;
+  invite_resent_failed: string;
 
   // Invitations list
   invitations_title: string;
@@ -503,6 +510,21 @@ export interface Translations {
   invitations_resend_error: string;
   invitations_cancel_error: string;
   invitations_cancelled: string;
+
+  // Auth callback
+  auth_cb_verifying: string;
+  auth_cb_attaching: string;
+  auth_cb_joined: string;
+  auth_cb_redirecting: string;
+  auth_cb_attach_error: string;
+  auth_cb_session_invalid: string;
+  auth_cb_session_not_found: string;
+  auth_cb_unexpected: string;
+  auth_cb_go_dashboard: string;
+
+  // Generic create-circle CTA
+  please_create_circle: string;
+  create_circle: string;
 
   // Accept invitation page
   accept_title: string;
