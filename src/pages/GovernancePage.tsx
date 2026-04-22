@@ -26,6 +26,7 @@ import type {
 } from '@/types/database';
 import { hasPermission } from '@/components/PermissionMatrix';
 import type { Database } from '@/integrations/supabase/types';
+import { useLocale } from '@/contexts/LocaleContext';
 
 type AuditLogDetails = Database['public']['Tables']['audit_logs']['Insert']['details'];
 type GovernanceInsert = Database['public']['Tables']['governance_responsibilities']['Insert'];
@@ -68,6 +69,9 @@ const statusColors: Record<GovernanceStatus, string> = {
 
 const GovernancePage: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLocale();
+  const areaLabelsT = t.gov_areas as Record<GovernanceArea, string>;
+  const statusLabelsT = t.gov_statuses as Record<GovernanceStatus, string>;
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [items, setItems] = useState<GovernanceResponsibility[]>([]);
   const [members, setMembers] = useState<CircleMember[]>([]);
