@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Info, Shield, FileText, UserCheck } from 'lucide-react';
 import type { CircleMember, MemberFamilyLabel, AppRole, FamilyLabel } from '@/types/database';
-import { familyLabelsFr, FamilyLabelBadge } from './FamilyLabelsManager';
+import { FamilyLabelBadge } from './FamilyLabelsManager';
 
 const roleLabels: Record<string, string> = {
   proposed_executor: 'Exécuteur pressenti (rôle applicatif)',
