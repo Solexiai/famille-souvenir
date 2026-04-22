@@ -12,17 +12,17 @@ project_id = "kgutbdtsemvccwmdcuza"
   [functions.preview-transactional-email]
     verify_jwt = false
   [functions.process-email-queue]
-    verify_jwt = true
+    verify_jwt = false
   [functions.security-alert]
-    verify_jwt = true
+    verify_jwt = false
   [functions.send-transactional-email]
     verify_jwt = false
   [functions.validate-upload]
-    verify_jwt = true
+    verify_jwt = false
 
   [functions.create-checkout-session]
-    verify_jwt = true
+    verify_jwt = false
   [functions.customer-portal]
-    verify_jwt = true
+    verify_jwt = false
   [functions.stripe-webhook]
     verify_jwt = false
