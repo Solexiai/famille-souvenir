@@ -86,7 +86,7 @@ const OnboardingPage: React.FC = () => {
       .single();
 
     if (error || !data) {
-      toast.error('Error creating circle.');
+      toast.error(t.onboarding_circle_create_error);
       setSaving(false);
       return;
     }
@@ -121,7 +121,7 @@ const OnboardingPage: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="fullName">{t.onboarding_full_name}</Label>
-                <Input id="fullName" placeholder="Jean Dupont" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                <Input id="fullName" placeholder={t.onboarding_full_name_placeholder} value={fullName} onChange={(e) => setFullName(e.target.value)} />
               </div>
               <Button onClick={handleStep1} className="w-full" size="lg" disabled={saving || !fullName.trim()}>
                 {saving && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -140,7 +140,7 @@ const OnboardingPage: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="circleName">{t.onboarding_circle_name}</Label>
-                <Input id="circleName" placeholder="Famille Dupont" value={circleName} onChange={(e) => setCircleName(e.target.value)} />
+                <Input id="circleName" placeholder={t.onboarding_circle_name_placeholder} value={circleName} onChange={(e) => setCircleName(e.target.value)} />
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep(1)} className="flex-1">{t.back}</Button>

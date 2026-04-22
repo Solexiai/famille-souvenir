@@ -604,6 +604,100 @@ export interface Translations {
   mfa_challenge_desc: string;
   mfa_challenge_submit: string;
   mfa_challenge_error: string;
+
+  // Settings billing
+  settings_billing: string;
+  settings_billing_status: string;
+  settings_billing_upgrade: string;
+  settings_billing_manage: string;
+  settings_billing_owner_required: string;
+  settings_billing_checkout_error: string;
+  settings_billing_portal_error: string;
+
+  // Members page extras
+  members_page_title: string;
+  members_tab_executor_short: string;
+  members_count_label: string;
+  members_empty: string;
+
+  // Circle page extras
+  circle_page_title: string;
+  circle_create_subtitle: string;
+  circle_name_input: string;
+  circle_desc_input_optional: string;
+  circle_desc_default_placeholder: string;
+  circle_create_btn_long: string;
+  circle_edit_btn: string;
+  circle_save: string;
+  circle_cancel: string;
+  circle_default_card_desc: string;
+  circle_create_error: string;
+  circle_create_success: string;
+  circle_update_error: string;
+  circle_update_success: string;
+
+  // Documentary status manager extras
+  docmgr_card_title: string;
+  docmgr_field_testament: string;
+  docmgr_field_mandate: string;
+  docmgr_field_notary: string;
+  docmgr_field_beneficiaries: string;
+  docmgr_field_critical_docs: string;
+  docmgr_field_dossier: string;
+  docmgr_field_death_status: string;
+  docmgr_disclaimer_full: string;
+  docmgr_doc_unknown: string;
+  docmgr_doc_declared: string;
+  docmgr_doc_located: string;
+  docmgr_doc_confirmed: string;
+  docmgr_death_not_reported: string;
+  docmgr_death_reported: string;
+  docmgr_death_verified: string;
+  docmgr_dossier_initial: string;
+  docmgr_dossier_in_progress: string;
+  docmgr_dossier_partial: string;
+  docmgr_dossier_ready_review: string;
+  docmgr_dossier_executor_ready: string;
+  docmgr_critical_incomplete: string;
+  docmgr_critical_partial: string;
+  docmgr_critical_ready: string;
+  docmgr_critical_needs_review: string;
+
+  // Family labels manager extras
+  labels_card_title: string;
+  labels_card_desc: string;
+  labels_assign_dialog_title: string;
+  labels_select_member: string;
+  labels_select_label: string;
+  labels_note_optional: string;
+  labels_note_input_placeholder: string;
+  labels_assign_btn_long: string;
+  labels_empty_state: string;
+  labels_disclaimer_full: string;
+  labels_member_default: string;
+  labels_protected_person: string;
+  labels_family_manager: string;
+  labels_caregiver: string;
+  labels_heir: string;
+  labels_trusted_contact: string;
+  labels_proposed_executor: string;
+  labels_testament_executor: string;
+  labels_external_pro: string;
+
+  // Onboarding extras
+  onboarding_circle_create_error: string;
+  onboarding_full_name_placeholder: string;
+  onboarding_circle_name_placeholder: string;
+
+  // Member roles
+  role_owner: string;
+  role_family_manager: string;
+  role_family_member: string;
+  role_heir: string;
+  role_contributor: string;
+  role_viewer: string;
+  role_proposed_executor: string;
+  role_verified_executor: string;
 }
 
 export interface TerminologyPack {

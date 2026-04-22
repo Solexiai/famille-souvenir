@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 import type { CircleMember, MemberFamilyLabel, AppRole } from '@/types/database';
 import { MemberCard } from './MemberCard';
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface Props {
   members: CircleMember[];
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export const MembersList: React.FC<Props> = ({ members, memberLabels, currentUserRole }) => {
-  // Contact visibility: owner/manager see all; family_member sees visible_to_family; others see limited
+  const { t } = useLocale();
   const canViewContact = currentUserRole === 'owner' || currentUserRole === 'family_manager';
 
   return (
@@ -19,7 +20,7 @@ export const MembersList: React.FC<Props> = ({ members, memberLabels, currentUse
       <CardHeader>
         <CardTitle className="font-heading text-lg flex items-center gap-2">
           <Users className="h-5 w-5 text-accent" />
-          {members.length} membre{members.length !== 1 ? 's' : ''}
+          {t.members_count_label.replace('{count}', String(members.length))}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -36,7 +37,7 @@ export const MembersList: React.FC<Props> = ({ members, memberLabels, currentUse
           );
         })}
         {members.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-4">Aucun membre dans le cercle.</p>
+          <p className="text-sm text-muted-foreground text-center py-4">{t.members_empty}</p>
         )}
       </CardContent>
     </Card>

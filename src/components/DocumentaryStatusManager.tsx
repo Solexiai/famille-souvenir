@@ -1,40 +1,13 @@
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocale } from '@/contexts/LocaleContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { FileCheck, AlertTriangle, Shield } from 'lucide-react';
+import { FileCheck, AlertTriangle } from 'lucide-react';
 import type { FamilyCircle, DocumentaryStatus, DeathStatus, DossierReadinessStatus } from '@/types/database';
-
-const documentaryStatusLabels: Record<DocumentaryStatus, string> = {
-  unknown: 'Inconnu',
-  declared: 'Déclaré',
-  located: 'Localisé',
-  professionally_confirmed: 'Confirmé par un professionnel',
-};
-
-const deathStatusLabels: Record<DeathStatus, string> = {
-  not_reported: 'Non signalé',
-  reported: 'Décès signalé',
-  manually_verified: 'Décès vérifié manuellement',
-};
-
-const dossierReadinessLabels: Record<DossierReadinessStatus, string> = {
-  initial: 'Initial',
-  in_progress: 'En cours de préparation',
-  partial: 'Partiel',
-  ready_for_professional_review: 'Prêt pour révision professionnelle',
-  executor_ready: 'Prêt pour l\'exécuteur',
-};
-
-const criticalDocsLabels: Record<string, string> = {
-  incomplete: 'Incomplet',
-  partial: 'Partiel',
-  ready: 'Complet',
-  needs_review: 'À vérifier',
-};
 
 const statusColor = (val: string) => {
   if (['unknown', 'not_reported', 'incomplete', 'initial'].includes(val)) return 'bg-muted text-muted-foreground';
@@ -50,34 +23,59 @@ interface Props {
   onUpdate: (updated: Partial<FamilyCircle>) => void;
 }
 
-type StatusField = {
-  key:
-    | 'testament_status'
-    | 'mandate_status'
-    | 'notary_status'
-    | 'beneficiary_designation_status'
-    | 'critical_documents_status'
-    | 'dossier_readiness_status'
-    | 'death_status';
-  label: string;
-  options: Record<string, string>;
-};
-
-const statusFields: StatusField[] = [
-  { key: 'testament_status', label: 'Testament', options: documentaryStatusLabels },
-  { key: 'mandate_status', label: 'Mandat / Inaptitude', options: documentaryStatusLabels },
-  { key: 'notary_status', label: 'Notaire', options: documentaryStatusLabels },
-  { key: 'beneficiary_designation_status', label: 'Désignation de bénéficiaires', options: documentaryStatusLabels },
-  { key: 'critical_documents_status', label: 'Documents critiques', options: criticalDocsLabels },
-  { key: 'dossier_readiness_status', label: 'État du dossier', options: dossierReadinessLabels },
-  { key: 'death_status', label: 'Statut de décès', options: deathStatusLabels },
-];
+type FieldKey =
+  | 'testament_status'
+  | 'mandate_status'
+  | 'notary_status'
+  | 'beneficiary_designation_status'
+  | 'critical_documents_status'
+  | 'dossier_readiness_status'
+  | 'death_status';
 
 export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onUpdate }) => {
   const { user } = useAuth();
+  const { t } = useLocale();
   const [saving, setSaving] = useState<string | null>(null);
 
-  const handleChange = async (field: StatusField['key'], value: string) => {
+  const documentaryStatusLabels: Record<DocumentaryStatus, string> = {
+    unknown: t.docmgr_doc_unknown,
+    declared: t.docmgr_doc_declared,
+    located: t.docmgr_doc_located,
+    professionally_confirmed: t.docmgr_doc_confirmed,
+  };
+
+  const deathStatusLabels: Record<DeathStatus, string> = {
+    not_reported: t.docmgr_death_not_reported,
+    reported: t.docmgr_death_reported,
+    manually_verified: t.docmgr_death_verified,
+  };
+
+  const dossierReadinessLabels: Record<DossierReadinessStatus, string> = {
+    initial: t.docmgr_dossier_initial,
+    in_progress: t.docmgr_dossier_in_progress,
+    partial: t.docmgr_dossier_partial,
+    ready_for_professional_review: t.docmgr_dossier_ready_review,
+    executor_ready: t.docmgr_dossier_executor_ready,
+  };
+
+  const criticalDocsLabels: Record<string, string> = {
+    incomplete: t.docmgr_critical_incomplete,
+    partial: t.docmgr_critical_partial,
+    ready: t.docmgr_critical_ready,
+    needs_review: t.docmgr_critical_needs_review,
+  };
+
+  const statusFields: Array<{ key: FieldKey; label: string; options: Record<string, string> }> = [
+    { key: 'testament_status', label: t.docmgr_field_testament, options: documentaryStatusLabels },
+    { key: 'mandate_status', label: t.docmgr_field_mandate, options: documentaryStatusLabels },
+    { key: 'notary_status', label: t.docmgr_field_notary, options: documentaryStatusLabels },
+    { key: 'beneficiary_designation_status', label: t.docmgr_field_beneficiaries, options: documentaryStatusLabels },
+    { key: 'critical_documents_status', label: t.docmgr_field_critical_docs, options: criticalDocsLabels },
+    { key: 'dossier_readiness_status', label: t.docmgr_field_dossier, options: dossierReadinessLabels },
+    { key: 'death_status', label: t.docmgr_field_death_status, options: deathStatusLabels },
+  ];
+
+  const handleChange = async (field: FieldKey, value: string) => {
     setSaving(field);
     const updatePayload = { [field]: value } as Partial<FamilyCircle>;
     const { error } = await supabase
@@ -86,12 +84,11 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
       .eq('id', circle.id);
 
     if (error) {
-      toast.error('Erreur lors de la mise à jour.');
+      toast.error(t.docmgr_update_error);
     } else {
-      toast.success('Statut mis à jour.');
+      toast.success(t.docmgr_status_updated);
       onUpdate({ [field]: value });
 
-      // Audit log
       await supabase.from('audit_logs').insert({
         user_id: user?.id,
         circle_id: circle.id,
@@ -107,11 +104,9 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
       <CardHeader className="pb-3">
         <CardTitle className="font-heading text-lg flex items-center gap-2">
           <FileCheck className="h-5 w-5 text-accent" />
-          Statuts documentaires
+          {t.docmgr_card_title}
         </CardTitle>
-        <CardDescription>
-          Suivi de la préparation du dossier familial. Ces statuts sont indicatifs et ne constituent pas une validation juridique.
-        </CardDescription>
+        <CardDescription>{t.docmgr_subtitle}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {statusFields.map((sf) => {
@@ -148,10 +143,7 @@ export const DocumentaryStatusManager: React.FC<Props> = ({ circle, canEdit, onU
         <div className="pt-3 border-t border-border">
           <div className="flex items-start gap-2 text-xs text-muted-foreground">
             <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-            <p>
-              Ces statuts reflètent l'état de préparation tel que déclaré par la famille.
-              Ils ne remplacent pas une vérification par un professionnel (notaire, conseiller juridique).
-            </p>
+            <p>{t.docmgr_disclaimer_full}</p>
           </div>
         </div>
       </CardContent>
