@@ -154,7 +154,7 @@ const SettingsPage: React.FC = () => {
         .maybeSingle();
 
       if (!ownedCircle?.id) {
-        toast.error('Vous devez être propriétaire du cercle pour souscrire.');
+        toast.error(t.settings_billing_owner_required);
         return;
       }
 
@@ -163,7 +163,7 @@ const SettingsPage: React.FC = () => {
       });
 
       if (error || !data?.checkoutUrl) {
-        toast.error('Impossible de démarrer le paiement.');
+        toast.error(t.settings_billing_checkout_error);
         return;
       }
 
@@ -178,7 +178,7 @@ const SettingsPage: React.FC = () => {
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
       if (error || !data?.portalUrl) {
-        toast.error('Portail de facturation indisponible.');
+        toast.error(t.settings_billing_portal_error);
         return;
       }
       window.location.href = data.portalUrl;
@@ -242,18 +242,18 @@ const SettingsPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="font-heading text-lg flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-accent" />
-              Facturation
+              {t.settings_billing}
             </CardTitle>
             <CardDescription>
-              Statut actuel: <span className="font-medium">{subscriptionStatus}</span>
+              {t.settings_billing_status}: <span className="font-medium">{subscriptionStatus}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button onClick={openCheckout} disabled={billingLoading} className="w-full">
-              {billingLoading && <Loader2 className="h-4 w-4 animate-spin" />} Passer au plan annuel
+              {billingLoading && <Loader2 className="h-4 w-4 animate-spin" />} {t.settings_billing_upgrade}
             </Button>
             <Button variant="outline" onClick={openBillingPortal} disabled={billingLoading} className="w-full">
-              Gérer mon abonnement Stripe
+              {t.settings_billing_manage}
             </Button>
           </CardContent>
         </Card>

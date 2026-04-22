@@ -78,8 +78,8 @@ const MembersPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Veuillez d'abord créer un cercle familial.</p>
-          <Button className="mt-4" onClick={() => window.location.href = '/circle'}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{t.please_create_circle}</p>
+          <Button className="mt-4" onClick={() => window.location.href = '/circle'}>{t.create_circle}</Button>
         </div>
       </AppLayout>
     );
@@ -90,16 +90,16 @@ const MembersPage: React.FC = () => {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-        <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground">Membres du cercle</h1>
+        <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground">{t.members_page_title}</h1>
 
         <LimitWarning current={members.length} max={FREE_LIMITS.maxMembers} label={t.plan_gate_member_limit} />
 
         <Tabs defaultValue="members" className="space-y-4">
           <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${isManager ? 4 : 3}, 1fr)` }}>
-            <TabsTrigger value="members" className="text-xs sm:text-sm px-2">Membres</TabsTrigger>
-            {isManager && <TabsTrigger value="invitations" className="text-xs sm:text-sm px-2">Invitations</TabsTrigger>}
-            <TabsTrigger value="labels" className="text-xs sm:text-sm px-2">Labels</TabsTrigger>
-            <TabsTrigger value="executor" className="text-xs sm:text-sm px-2">Exécuteur</TabsTrigger>
+            <TabsTrigger value="members" className="text-xs sm:text-sm px-2">{t.members_tab_members}</TabsTrigger>
+            {isManager && <TabsTrigger value="invitations" className="text-xs sm:text-sm px-2">{t.members_tab_invitations}</TabsTrigger>}
+            <TabsTrigger value="labels" className="text-xs sm:text-sm px-2">{t.members_tab_labels}</TabsTrigger>
+            <TabsTrigger value="executor" className="text-xs sm:text-sm px-2">{t.members_tab_executor_short}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
