@@ -698,6 +698,83 @@ export interface Translations {
   role_viewer: string;
   role_proposed_executor: string;
   role_verified_executor: string;
+
+  // Wave 3: Vault, Privacy, Terms, NotFound, Unsubscribe, common page chrome
+  vault_title: string;
+  vault_archives_badge: string;
+  vault_subtitle: string;
+  vault_banner_title: string;
+  vault_banner_desc: string;
+  vault_banner_cta: string;
+  vault_empty: string;
+  vault_download_error: string;
+  vault_visibility_owner: string;
+  vault_visibility_managers: string;
+  vault_visibility_circle: string;
+
+  privacy_title: string;
+  privacy_intro: string;
+  privacy_collected_title: string;
+  privacy_collected_desc: string;
+  privacy_use_title: string;
+  privacy_use_desc: string;
+  privacy_security_title: string;
+  privacy_security_desc: string;
+  privacy_rights_title: string;
+  privacy_rights_desc: string;
+  privacy_back_home: string;
+
+  terms_title: string;
+  terms_intro: string;
+  terms_service_title: string;
+  terms_service_desc: string;
+  terms_responsibility_title: string;
+  terms_responsibility_desc: string;
+  terms_ip_title: string;
+  terms_ip_desc: string;
+  terms_back_home: string;
+
+  notfound_title: string;
+  notfound_message: string;
+  notfound_back: string;
+
+  unsub_loading: string;
+  unsub_valid_title: string;
+  unsub_valid_desc: string;
+  unsub_confirm_btn: string;
+  unsub_already_title: string;
+  unsub_already_desc: string;
+  unsub_success_title: string;
+  unsub_success_desc: string;
+  unsub_error_title: string;
+  unsub_error_desc: string;
+
+  filters_label: string;
+  filter_status_placeholder: string;
+  filter_assigned_placeholder: string;
+  filter_sort_placeholder: string;
+  filter_area_placeholder: string;
+  filter_responsible_placeholder: string;
+  must_create_circle_first: string;
+  modify_btn: string;
+  add_btn: string;
+  category_doc_identity: string;
+  category_doc_testament: string;
+  category_doc_mandate: string;
+  category_doc_insurance: string;
+  category_doc_banking: string;
+  category_doc_investments: string;
+  category_doc_property: string;
+  category_doc_vehicles: string;
+  category_doc_debts: string;
+  category_doc_taxes: string;
+  category_doc_medical: string;
+  category_doc_wishes: string;
+  category_doc_contracts: string;
+  category_doc_subscriptions: string;
+  category_doc_digital_assets: string;
+  category_doc_funeral: string;
+  category_doc_other: string;
 }
 
 export interface TerminologyPack {
