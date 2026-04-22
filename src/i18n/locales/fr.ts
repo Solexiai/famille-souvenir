@@ -538,6 +538,13 @@ const fr: Translations = {
   invite_validation_first: 'Le prénom est requis',
   invite_validation_last: 'Le nom est requis',
   invite_validation_email: 'Adresse email invalide',
+  invite_already_member: 'Cette personne fait déjà partie du cercle.',
+  invite_already_pending: 'Une invitation est déjà en attente pour cette adresse courriel.',
+  invite_already_accepted_member: 'Cette personne a déjà accepté une invitation pour ce cercle.',
+  invite_email_failed: 'Invitation créée, mais le courriel n\'a pas pu être envoyé. Utilisez le lien généré.',
+  invite_sent_to: 'Invitation envoyée à {name}',
+  invite_resent_to: 'Invitation renvoyée à {name}',
+  invite_resent_failed: 'L\'invitation a bien été renouvelée, mais le courriel n\'a pas pu être envoyé.',
 
   // Invitations list
   invitations_title: 'Invitations',
@@ -552,6 +559,20 @@ const fr: Translations = {
   invitations_resend_error: 'Erreur lors du renvoi.',
   invitations_cancel_error: 'Erreur lors de l\'annulation.',
   invitations_cancelled: 'Invitation annulée.',
+
+  // Auth callback
+  auth_cb_verifying: 'Vérification de votre compte…',
+  auth_cb_attaching: 'Rattachement au cercle en cours…',
+  auth_cb_joined: 'Vous avez rejoint le cercle avec succès !',
+  auth_cb_redirecting: 'Redirection en cours…',
+  auth_cb_attach_error: 'Erreur lors du rattachement au cercle',
+  auth_cb_session_invalid: 'Session invalide : ',
+  auth_cb_session_not_found: 'Session non trouvée',
+  auth_cb_unexpected: 'Erreur inattendue',
+  auth_cb_go_dashboard: 'Aller au tableau de bord',
+
+  please_create_circle: 'Veuillez d\'abord créer un cercle familial.',
+  create_circle: 'Créer un cercle',
 
   // Accept invitation page
   accept_title: 'Rejoindre le cercle',

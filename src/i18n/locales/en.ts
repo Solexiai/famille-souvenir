@@ -528,6 +528,13 @@ const en: Translations = {
   invite_validation_first: 'First name is required',
   invite_validation_last: 'Last name is required',
   invite_validation_email: 'Invalid email address',
+  invite_already_member: 'This person is already part of the circle.',
+  invite_already_pending: 'An invitation is already pending for this email address.',
+  invite_already_accepted_member: 'This person has already accepted an invitation for this circle.',
+  invite_email_failed: 'Invitation created, but the email could not be sent. Use the generated link.',
+  invite_sent_to: 'Invitation sent to {name}',
+  invite_resent_to: 'Invitation resent to {name}',
+  invite_resent_failed: 'The invitation was renewed, but the email could not be sent.',
 
   // Invitations
   invitations_title: 'Invitations',
@@ -542,6 +549,20 @@ const en: Translations = {
   invitations_resend_error: 'Error resending.',
   invitations_cancel_error: 'Error cancelling.',
   invitations_cancelled: 'Invitation cancelled.',
+
+  // Auth callback
+  auth_cb_verifying: 'Verifying your account…',
+  auth_cb_attaching: 'Attaching to circle…',
+  auth_cb_joined: 'You have successfully joined the circle!',
+  auth_cb_redirecting: 'Redirecting…',
+  auth_cb_attach_error: 'Error attaching to the circle',
+  auth_cb_session_invalid: 'Invalid session: ',
+  auth_cb_session_not_found: 'Session not found',
+  auth_cb_unexpected: 'Unexpected error',
+  auth_cb_go_dashboard: 'Go to dashboard',
+
+  please_create_circle: 'Please create a family circle first.',
+  create_circle: 'Create a circle',
 
   // Accept invitation page
   accept_title: 'Join the circle',

@@ -528,6 +528,13 @@ const es: Translations = {
   invite_validation_first: 'El nombre es obligatorio',
   invite_validation_last: 'El apellido es obligatorio',
   invite_validation_email: 'Correo electrónico inválido',
+  invite_already_member: 'Esta persona ya forma parte del círculo.',
+  invite_already_pending: 'Ya hay una invitación pendiente para este correo electrónico.',
+  invite_already_accepted_member: 'Esta persona ya aceptó una invitación para este círculo.',
+  invite_email_failed: 'Invitación creada, pero no se pudo enviar el correo. Use el enlace generado.',
+  invite_sent_to: 'Invitación enviada a {name}',
+  invite_resent_to: 'Invitación reenviada a {name}',
+  invite_resent_failed: 'La invitación se renovó, pero el correo no se pudo enviar.',
 
   // Invitations
   invitations_title: 'Invitaciones',
@@ -542,6 +549,20 @@ const es: Translations = {
   invitations_resend_error: 'Error al reenviar.',
   invitations_cancel_error: 'Error al cancelar.',
   invitations_cancelled: 'Invitación cancelada.',
+
+  // Auth callback
+  auth_cb_verifying: 'Verificando su cuenta…',
+  auth_cb_attaching: 'Uniéndose al círculo…',
+  auth_cb_joined: '¡Se ha unido al círculo con éxito!',
+  auth_cb_redirecting: 'Redirigiendo…',
+  auth_cb_attach_error: 'Error al unirse al círculo',
+  auth_cb_session_invalid: 'Sesión inválida: ',
+  auth_cb_session_not_found: 'Sesión no encontrada',
+  auth_cb_unexpected: 'Error inesperado',
+  auth_cb_go_dashboard: 'Ir al panel',
+
+  please_create_circle: 'Por favor, cree primero un círculo familiar.',
+  create_circle: 'Crear un círculo',
 
   // Accept invitation page
   accept_title: 'Unirse al círculo',
