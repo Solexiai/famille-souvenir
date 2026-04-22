@@ -27,7 +27,7 @@ export const ExecutorDesignation: React.FC<Props> = ({ members, labels }) => {
 
   const getMemberName = (memberId: string) => {
     const m = members.find(m => m.id === memberId);
-    return m?.profiles?.full_name || m?.profiles?.email || t.member_default || 'Membre';
+    return m?.profiles?.full_name || m?.profiles?.email || 'Membre';
   };
 
   const ensureEntry = (memberId: string): ExecutorInfo => {
