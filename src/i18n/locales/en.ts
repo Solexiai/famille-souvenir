@@ -29,7 +29,7 @@ const en: Translations = {
   landing_hero_title: 'Protect the people you love',
   landing_hero_subtitle: 'Your essential wishes, documents, and memories in a secure space designed to last up to 100 years.',
   landing_cta_start: 'Get started',
-  landing_cta_microcopy: 'Start simply and choose the protection that fits you.',
+  landing_cta_microcopy: 'Start simply and choose the protection that is right for you.',
   landing_cta_login: 'I already have an account',
   landing_why_title: 'What Solexi.ai helps you do',
   landing_why_subtitle: 'Build a clearer family dossier step by step. Preparation reduces confusion and risk.',
