@@ -364,7 +364,7 @@ const ChoosePlanPage: React.FC = () => {
           <div className="mt-10 md:mt-12 text-center">
             <Link
               to="/pricing"
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-5 py-2.5 text-[13.5px] md:text-sm font-medium text-foreground/80 hover:text-accent hover:border-accent/40 hover:bg-card transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-5 py-2.5 text-[14px] md:text-sm font-medium text-foreground/85 hover:text-accent hover:border-accent/40 hover:bg-card transition-colors"
             >
               {c.compareLink}
               <ArrowRight className="h-3.5 w-3.5" />
