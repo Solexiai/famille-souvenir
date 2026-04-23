@@ -28,7 +28,7 @@ const fr: Translations = {
 
   // Landing
   landing_hero_title: 'Protégez ceux que vous aimez',
-  landing_hero_subtitle: 'Vos volontés, documents et souvenirs essentiels dans un espace sécurisé conçu pour durer jusqu’à 100 ans.',
+  landing_hero_subtitle: 'Vos volontés, documents et souvenirs essentiels dans un espace sécurisé pensé pour durer jusqu’à 100 ans.',
   landing_cta_start: 'Protéger mes proches',
   landing_cta_microcopy: 'Commencez simplement et choisissez la protection qui vous convient.',
   landing_cta_login: 'J\'ai déjà un compte',
