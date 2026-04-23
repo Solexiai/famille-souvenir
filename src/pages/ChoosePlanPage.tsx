@@ -423,7 +423,7 @@ const ChoosePlanPage: React.FC = () => {
 
         {/* ─── Final reassurance ─── */}
         <section className="container max-w-2xl px-6 md:px-6 pb-16 md:pb-24 text-center">
-          <p className="text-[14px] md:text-base text-foreground/65 leading-[1.7]">
+          <p className="text-[15px] md:text-base text-foreground/75 leading-[1.7]">
             {c.finalReassurance}
           </p>
         </section>
