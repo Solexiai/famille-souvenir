@@ -132,7 +132,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Add what matters', desc: 'Gather your wishes, documents, and important memories.' },
       { title: 'Protect your loved ones', desc: 'Offer them clear guidance when they need it most.' },
     ],
-    trust: ['Secure space', 'Built for your loved ones', 'Preserved for up to 100 years'],
+    trust: ['Secure space', 'Built for your loved ones', 'Up to 100 years of preservation'],
     finalReassurance:
       'Choose your protection with confidence. You can complete your space at your own pace afterwards.',
   },
