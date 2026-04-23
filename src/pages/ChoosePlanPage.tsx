@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft } from 'lucide-react';
+import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft, Leaf, Users, Gem } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -278,23 +278,35 @@ const ChoosePlanPage: React.FC = () => {
 
         {/* ─── Plan cards ─── */}
         <section className="container max-w-6xl px-4 md:px-6 pt-2 md:pt-4 pb-8 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7 md:items-stretch">
             {PLAN_ORDER.map((key) => {
               const plan = c.plans[key];
               const isRecommended = key === 'family';
+              const PlanIcon = key === 'essential' ? Leaf : key === 'family' ? Users : Gem;
 
               return (
                 <article
                   key={key}
                   className={[
-                    'relative flex flex-col rounded-2xl bg-card transition-all duration-300',
+                    'relative flex flex-col rounded-2xl transition-all duration-300 overflow-hidden',
                     isRecommended
-                      ? 'border-2 border-accent/70 shadow-elevated md:-translate-y-1.5'
-                      : 'border border-border/50 shadow-soft hover:shadow-card hover:-translate-y-0.5',
+                      ? 'bg-card border-2 border-accent shadow-elevated md:-translate-y-2 ring-1 ring-accent/20'
+                      : 'bg-card/80 border border-border shadow-soft hover:shadow-card hover:-translate-y-0.5 hover:border-foreground/20',
                   ].join(' ')}
                 >
+                  {/* Top accent bar — distinct per plan */}
+                  <div
+                    aria-hidden="true"
+                    className={[
+                      'h-1 w-full',
+                      key === 'essential' && 'bg-gradient-to-r from-transparent via-foreground/30 to-transparent',
+                      key === 'family' && 'bg-gradient-to-r from-accent/60 via-accent to-accent/60',
+                      key === 'legacy' && 'bg-gradient-to-r from-transparent via-primary/40 to-transparent',
+                    ].filter(Boolean).join(' ')}
+                  />
+
                   {isRecommended && plan.recommendedBadge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 -translate-y-1/2">
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5 text-[11px] md:text-xs font-semibold text-accent-foreground shadow-[0_8px_24px_-8px_hsl(var(--accent)/0.6)] whitespace-nowrap">
                         <Sparkles className="h-3 w-3" aria-hidden="true" />
                         {plan.recommendedBadge}
@@ -302,8 +314,27 @@ const ChoosePlanPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="px-6 py-7 md:px-7 md:py-8 flex flex-col flex-1">
+                  <div className={[
+                    'px-6 py-7 md:px-7 md:py-8 flex flex-col flex-1',
+                    isRecommended ? 'pt-9 md:pt-10' : '',
+                  ].join(' ')}>
                     <header className="text-center md:text-left">
+                      <div className="flex justify-center md:justify-start mb-4">
+                        <span
+                          className={[
+                            'inline-flex h-11 w-11 items-center justify-center rounded-xl',
+                            isRecommended
+                              ? 'bg-accent/15 text-accent ring-1 ring-accent/30'
+                              : key === 'legacy'
+                                ? 'bg-primary/10 text-primary ring-1 ring-primary/15'
+                                : 'bg-muted text-foreground/70 ring-1 ring-border',
+                          ].join(' ')}
+                          aria-hidden="true"
+                        >
+                          <PlanIcon className="h-5 w-5" />
+                        </span>
+                      </div>
+
                       <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
                         {plan.name}
                       </h2>
@@ -323,7 +354,11 @@ const ChoosePlanPage: React.FC = () => {
                           <span
                             className={[
                               'mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full',
-                              isRecommended ? 'bg-accent/15 text-accent' : 'bg-muted text-foreground/70',
+                              isRecommended
+                                ? 'bg-accent/15 text-accent'
+                                : key === 'legacy'
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'bg-muted text-foreground/70',
                             ].join(' ')}
                             aria-hidden="true"
                           >
