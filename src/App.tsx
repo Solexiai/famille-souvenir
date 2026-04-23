@@ -27,7 +27,6 @@ import VaultPage from "./pages/VaultPage";
 import SettingsPage from "./pages/SettingsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
-import PricingPage from "./pages/PricingPage";
 import ChoosePlanPage from "./pages/ChoosePlanPage";
 import SelectedPlanPage from "./pages/SelectedPlanPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
