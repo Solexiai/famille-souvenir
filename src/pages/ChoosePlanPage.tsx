@@ -304,10 +304,10 @@ const ChoosePlanPage: React.FC = () => {
 
                   <div className="px-6 py-7 md:px-7 md:py-8 flex flex-col flex-1">
                     <header className="text-center md:text-left">
-                      <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
+                      <h2 className="font-heading text-[1.625rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-2 text-[13.5px] md:text-sm text-muted-foreground leading-relaxed">
+                      <p className="mt-2 text-[14.5px] md:text-sm text-foreground/70 leading-relaxed">
                         {plan.fit}
                       </p>
                     </header>
@@ -317,13 +317,13 @@ const ChoosePlanPage: React.FC = () => {
                       aria-hidden="true"
                     />
 
-                    <ul className="space-y-3 md:space-y-3.5 flex-1">
+                    <ul className="space-y-3.5 md:space-y-3.5 flex-1">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-3 text-[14px] md:text-[15px] leading-[1.55] text-foreground/85">
+                        <li key={i} className="flex items-start gap-3 text-[15px] md:text-[15px] leading-[1.55] text-foreground/90">
                           <span
                             className={[
                               'mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full',
-                              isRecommended ? 'bg-accent/15 text-accent' : 'bg-muted text-foreground/65',
+                              isRecommended ? 'bg-accent/15 text-accent' : 'bg-muted text-foreground/70',
                             ].join(' ')}
                             aria-hidden="true"
                           >
