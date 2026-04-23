@@ -164,13 +164,14 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
         ],
         cta: 'Elegir Familia',
         recommendedBadge: 'Recomendado para la mayoría de las familias',
+        microReassurance: 'El mejor equilibrio para proteger lo esencial',
       },
       legacy: {
         name: 'Legado',
         fit: 'Para una protección más completa',
         benefits: [
           'Voluntades, documentos y recuerdos enriquecidos',
-          'Una experiencia más duradera y completa',
+          'Protección más completa',
           'Pensado para transmitir aún más',
         ],
         cta: 'Elegir Legado',
