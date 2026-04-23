@@ -262,25 +262,41 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* ─── Header ─── */}
+      {/* ─── Header — refined, light, premium ─── */}
       <header className="absolute top-0 left-0 right-0 z-50">
-        <div className="container flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center">
-            <span className="text-xl md:text-3xl lg:text-4xl font-heading font-bold text-white drop-shadow-md">Solexi.ai</span>
-          </div>
-           <div className="flex items-center gap-3 md:gap-4">
+        <div className="container flex h-14 md:h-20 items-center justify-between px-4 md:px-6">
+          {/* Single brand reference */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_hsl(var(--accent)/0.7)]" aria-hidden="true" />
+            <span className="text-lg md:text-2xl lg:text-3xl font-heading font-semibold text-white tracking-tight">
+              Solexi.ai
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-1.5 md:gap-3">
+            {/* Compact, refined language switcher */}
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
-              <SelectTrigger className="w-[7.5rem] md:w-[8.5rem] h-10 md:h-11 text-sm bg-accent border-2 border-accent text-black rounded-full font-bold justify-center">
-                <SelectValue />
+              <SelectTrigger
+                aria-label="Language"
+                className="h-9 md:h-10 w-auto min-w-0 gap-1.5 px-2.5 md:px-3 text-xs md:text-sm bg-white/5 hover:bg-white/10 border border-white/15 text-white rounded-full font-medium backdrop-blur-sm transition-colors [&>svg]:text-white/70"
+              >
+                <Globe className="h-3.5 w-3.5 md:h-4 md:w-4 text-white/80" />
+                <span className="font-medium">{lang.toUpperCase()}</span>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent align="end">
                 {LANGUAGE_ORDER.map(l => (
                   <SelectItem key={l} value={l}>{LANGUAGE_LABELS[l]}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Secondary login — ghost / understated */}
             <Link to="/login">
-              <Button size="sm" className="w-[7.5rem] md:w-[8.5rem] h-10 md:h-11 bg-accent border-0 text-black hover:bg-accent/90 text-sm whitespace-nowrap rounded-full font-bold justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-9 md:h-10 px-3 md:px-4 text-xs md:text-sm text-white/85 hover:text-white hover:bg-white/10 rounded-full font-medium"
+              >
                 {t.sign_in}
               </Button>
             </Link>
@@ -288,17 +304,21 @@ const LandingPage: React.FC = () => {
         </div>
       </header>
 
-      {/* ─── Hero ─── */}
+      {/* ─── Hero — calm, dignified, conversion-focused ─── */}
       <section
-        className="relative pt-28 pb-12 md:pt-40 md:pb-14 overflow-hidden"
+        className="relative pt-24 pb-16 md:pt-40 md:pb-20 overflow-hidden"
         style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
-        <div className="absolute inset-0 bg-primary/80" />
-        <div className="container relative z-10 text-center px-6">
-          <p className="text-sm font-medium text-accent mb-4 tracking-widest uppercase">
-            {t.app_name}
-          </p>
-          <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold text-primary-foreground leading-[1.1] max-w-4xl mx-auto">
+        {/* Layered overlays for depth + readability */}
+        <div className="absolute inset-0 bg-primary/85" aria-hidden="true" />
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-primary/40 via-transparent to-primary/70"
+          aria-hidden="true"
+        />
+
+        <div className="container relative z-10 text-center px-6 max-w-2xl md:max-w-4xl">
+          {/* Headline — elegant serif, generous line-height */}
+          <h1 className="font-heading text-[2rem] leading-[1.15] sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-primary-foreground tracking-tight">
             {t.landing_hero_title.split(',').length > 1 ? (
               <>
                 {t.landing_hero_title.split(',')[0]},
@@ -309,19 +329,37 @@ const LandingPage: React.FC = () => {
               <>{t.landing_hero_title}</>
             )}
           </h1>
-          <p className="mt-4 sm:mt-6 text-base sm:text-lg md:text-xl text-primary-foreground/70 max-w-2xl mx-auto leading-relaxed">
+
+          {/* Supporting text — refined, breathable */}
+          <p className="mt-6 md:mt-8 text-[15px] leading-[1.7] sm:text-lg md:text-xl text-primary-foreground/75 max-w-md sm:max-w-xl md:max-w-2xl mx-auto">
             {t.landing_hero_subtitle}
           </p>
-          <div className="mt-10 flex items-center justify-center">
-            <Link to="/setup" className="relative inline-block rounded-md p-[2px] bg-[linear-gradient(110deg,rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2))] bg-[length:200%_100%] animate-shimmer-border shadow-[0_0_20px_rgba(255,255,255,0.4)]">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2 border-0 rounded-[calc(var(--radius)-2px)]">
+
+          {/* Primary CTA — single dominant action */}
+          <div className="mt-9 md:mt-12 flex flex-col items-center">
+            <Link
+              to="/setup"
+              className="relative inline-block rounded-full p-[1.5px] bg-[linear-gradient(110deg,rgba(255,255,255,0.15),rgba(255,255,255,0.95),rgba(255,255,255,0.15),rgba(255,255,255,0.95),rgba(255,255,255,0.15))] bg-[length:200%_100%] animate-shimmer-border shadow-[0_10px_40px_-10px_hsl(var(--accent)/0.55)] focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 focus-within:ring-offset-primary"
+            >
+              <Button
+                size="lg"
+                className="h-14 md:h-[3.75rem] bg-accent text-accent-foreground hover:bg-accent/95 active:bg-accent text-[15px] md:text-base font-semibold px-8 md:px-10 gap-2 border-0 rounded-full transition-transform duration-200 hover:-translate-y-px"
+              >
                 {t.landing_cta_start}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+
+            {/* Micro-copy under CTA — gentle, reassuring */}
+            <p className="mt-4 md:mt-5 text-xs md:text-sm text-primary-foreground/60 max-w-xs sm:max-w-md leading-relaxed">
+              {t.landing_cta_microcopy}
+            </p>
           </div>
         </div>
       </section>
+
+      {/* Spacer — separates hero from social proof on mobile */}
+      <div className="h-4 md:h-6 bg-background" aria-hidden="true" />
 
       {/* ─── Testimonials Carousel ─── */}
       <TestimonialsCarousel />

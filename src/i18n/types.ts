@@ -34,6 +34,7 @@ export interface Translations {
   landing_hero_title: string;
   landing_hero_subtitle: string;
   landing_cta_start: string;
+  landing_cta_microcopy: string;
   landing_cta_login: string;
   landing_why_title: string;
   landing_why_subtitle: string;
