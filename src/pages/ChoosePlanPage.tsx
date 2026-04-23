@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft, Leaf, Users, Gem } from 'lucide-react';
+import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft, Leaf, Users, Gem, FolderHeart, Compass } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,180 +10,232 @@ type PlanKey = 'essential' | 'family' | 'legacy';
 
 interface PlanCopy {
   name: string;
-  fit: string;
+  subtitle: string;
+  description: string;
   benefits: string[];
+  price: string;
+  priceNote?: string;
   cta: string;
+  smallLine: string;
   recommendedBadge?: string;
-  microReassurance?: string;
+}
+
+interface BenefitLine {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
 }
 
 interface PageCopy {
   step: string;
   back: string;
+  signin: string;
   headline: string;
   supporting: string;
   reassurance: string;
+  benefitLines: BenefitLine[];
   plans: Record<PlanKey, PlanCopy>;
-  compareLink: string;
-  howTitle: string;
-  steps: { title: string; desc: string }[];
   trust: string[];
   finalReassurance: string;
 }
 
 const COPY: Record<SupportedLanguage, PageCopy> = {
   fr: {
-    step: 'Étape 1 sur 2 · Choisir votre protection',
+    step: 'Étape 1 sur 1 · Choisir votre protection',
     back: 'Retour',
+    signin: 'Se connecter',
     headline: 'Choisissez la protection qui vous convient',
     supporting:
       'Que vous commenciez seul, à deux ou pour votre famille, Solexi vous aide à protéger l’essentiel avec clarté, simplicité et sérénité.',
     reassurance: 'Un parcours simple pour avancer à votre rythme.',
+    benefitLines: [
+      { icon: Sparkles, label: 'Vos volontés mieux organisées' },
+      { icon: FolderHeart, label: 'Vos documents réunis au même endroit' },
+      { icon: Compass, label: 'Vos proches mieux guidés' },
+    ],
     plans: {
       essential: {
         name: 'Essentiel',
-        fit: 'Pour commencer simplement, seul ou à deux',
+        subtitle: 'Pour commencer simplement, seul ou à deux',
+        description:
+          'Un guide structuré pour organiser vos volontés et vos informations essentielles.',
         benefits: [
-          'Volontés et documents essentiels',
-          'Espace sécurisé personnel',
-          'Mise en place facile',
+          'Sections claires pour ne rien oublier',
+          'Informations importantes réunies au même endroit',
+          'À compléter chez vous, à votre rythme',
         ],
-        cta: 'Choisir Essentiel',
+        price: '49,99 $',
+        priceNote: 'accès immédiat',
+        cta: 'Continuer avec Essentiel',
+        smallLine: 'Téléchargement immédiat · À imprimer et compléter',
       },
       family: {
         name: 'Famille',
-        fit: 'Le plus choisi',
+        subtitle: 'Le plus choisi',
+        description:
+          'La plateforme Solexi.ai pour organiser, partager et protéger l’essentiel en famille.',
         benefits: [
-          'Volontés, documents et souvenirs',
-          'Accès pensé pour les proches',
-          'Meilleure protection familiale',
+          'Créez votre cercle familial et invitez vos proches',
+          'Centralisez volontés, documents et souvenirs',
+          'Définissez vos priorités et votre organisation',
+          'Accès structuré et sécurisé pour les membres',
         ],
-        cta: 'Choisir Famille',
+        price: '149,99 $',
+        priceNote: 'par an',
+        cta: 'Continuer avec Famille',
+        smallLine: 'Accès à la plateforme · Mise en place immédiate',
         recommendedBadge: 'Recommandé pour la plupart des familles',
-        microReassurance: 'Le meilleur équilibre pour protéger l’essentiel',
       },
       legacy: {
         name: 'Héritage',
-        fit: 'Pour une protection plus complète, avec accompagnement notarial',
+        subtitle: 'Pour aller plus loin avec votre famille',
+        description:
+          'La plateforme Solexi.ai avec préparation testamentaire pour votre cercle familial.',
         benefits: [
-          'Volontés, documents et souvenirs enrichis',
-          'Protection plus complète',
-          'Pensé pour transmettre davantage',
+          'Tout ce qui est inclus dans Famille',
+          'Accès à un testament pour votre cercle familial',
+          'Orientation vers un notaire',
+          'Transmission plus structurée et sécurisée',
         ],
-        cta: 'Choisir Héritage',
+        price: '299,99 $',
+        priceNote: 'par an',
+        cta: 'Continuer avec Héritage',
+        smallLine: 'Accès à la plateforme · Accompagnement avancé',
       },
     },
-    compareLink: 'Comparer les protections',
-    howTitle: 'Comment ça fonctionne',
-    steps: [
-      { title: 'Créez votre espace', desc: 'Commencez simplement dans un environnement sécurisé.' },
-      { title: 'Ajoutez l’essentiel', desc: 'Réunissez vos volontés, documents et souvenirs importants.' },
-      { title: 'Protégez vos proches', desc: 'Offrez-leur des repères clairs lorsqu’ils en auront le plus besoin.' },
-    ],
     trust: ['Espace sécurisé', 'Pensé pour vos proches', 'Jusqu’à 100 ans de conservation'],
     finalReassurance:
       'Choisissez votre protection en toute simplicité. Vous pourrez ensuite compléter votre espace à votre rythme.',
   },
   en: {
-    step: 'Step 1 of 2 · Choose your protection',
+    step: 'Step 1 of 1 · Choose your protection',
     back: 'Back',
+    signin: 'Sign in',
     headline: 'Choose the protection that is right for you',
     supporting:
-      'Whether you are starting for yourself or for your family, Solexi helps you protect what matters with clarity, simplicity, and peace of mind.',
+      'Whether you start on your own, as a couple, or for your family, Solexi helps you protect what matters with clarity, simplicity, and peace of mind.',
     reassurance: 'A simple path, at your own pace.',
+    benefitLines: [
+      { icon: Sparkles, label: 'Your wishes better organized' },
+      { icon: FolderHeart, label: 'Your documents in one place' },
+      { icon: Compass, label: 'Your loved ones better guided' },
+    ],
     plans: {
       essential: {
         name: 'Essential',
-        fit: 'A simple way to begin',
+        subtitle: 'A simple way to begin, alone or as a couple',
+        description:
+          'A structured guide to organize your wishes and your essential information.',
         benefits: [
-          'Essential wishes and documents',
-          'Personal secure space',
-          'Easy to set up',
+          'Clear sections so nothing is forgotten',
+          'Important information gathered in one place',
+          'Complete at home, at your own pace',
         ],
-        cta: 'Choose Essential',
+        price: '$49.99',
+        priceNote: 'instant access',
+        cta: 'Continue with Essential',
+        smallLine: 'Instant download · Print and complete',
       },
       family: {
         name: 'Family',
-        fit: 'Most chosen',
+        subtitle: 'Most chosen',
+        description:
+          'The Solexi.ai platform to organize, share, and protect what matters as a family.',
         benefits: [
-          'Wishes, documents, and memories',
-          'Access designed for loved ones',
-          'Stronger family protection',
+          'Create your family circle and invite loved ones',
+          'Centralize wishes, documents, and memories',
+          'Define your priorities and organization',
+          'Structured, secure access for members',
         ],
-        cta: 'Choose Family',
+        price: '$149.99',
+        priceNote: 'per year',
+        cta: 'Continue with Family',
+        smallLine: 'Platform access · Immediate setup',
         recommendedBadge: 'Recommended for most families',
-        microReassurance: 'The best balance to protect what matters',
       },
       legacy: {
         name: 'Legacy',
-        fit: 'For more complete protection',
+        subtitle: 'To go further with your family',
+        description:
+          'The Solexi.ai platform with will preparation for your family circle.',
         benefits: [
-          'Enriched wishes, documents, and memories',
-          'More complete protection',
-          'Designed to pass on more',
+          'Everything included in Family',
+          'Access to a will for your family circle',
+          'Guidance toward a notary',
+          'More structured and secure transmission',
         ],
-        cta: 'Choose Legacy',
+        price: '$299.99',
+        priceNote: 'per year',
+        cta: 'Continue with Legacy',
+        smallLine: 'Platform access · Advanced support',
       },
     },
-    compareLink: 'Compare protections',
-    howTitle: 'How it works',
-    steps: [
-      { title: 'Create your space', desc: 'Begin simply in a secure environment.' },
-      { title: 'Add what matters', desc: 'Gather your wishes, documents, and important memories.' },
-      { title: 'Protect your loved ones', desc: 'Offer them clear guidance when they need it most.' },
-    ],
     trust: ['Secure space', 'Built for your loved ones', 'Up to 100 years of preservation'],
     finalReassurance:
       'Choose your protection with confidence. You can complete your space at your own pace afterwards.',
   },
   es: {
-    step: 'Paso 1 de 2 · Elija su protección',
+    step: 'Paso 1 de 1 · Elija su protección',
     back: 'Atrás',
+    signin: 'Iniciar sesión',
     headline: 'Elija la protección que más le convenga',
     supporting:
-      'Ya sea que comience por usted o por su familia, Solexi le ayuda a proteger lo esencial con claridad, sencillez y serenidad.',
+      'Ya sea que comience solo, en pareja o por su familia, Solexi le ayuda a proteger lo esencial con claridad, sencillez y serenidad.',
     reassurance: 'Un camino sencillo para avanzar a su ritmo.',
+    benefitLines: [
+      { icon: Sparkles, label: 'Sus voluntades mejor organizadas' },
+      { icon: FolderHeart, label: 'Sus documentos reunidos en un solo lugar' },
+      { icon: Compass, label: 'Sus seres queridos mejor guiados' },
+    ],
     plans: {
       essential: {
         name: 'Esencial',
-        fit: 'Para comenzar de forma sencilla',
+        subtitle: 'Para comenzar de forma sencilla, solo o en pareja',
+        description:
+          'Una guía estructurada para organizar sus voluntades y su información esencial.',
         benefits: [
-          'Voluntades y documentos esenciales',
-          'Espacio seguro personal',
-          'Configuración fácil',
+          'Secciones claras para no olvidar nada',
+          'Información importante reunida en un solo lugar',
+          'Para completar en casa, a su ritmo',
         ],
-        cta: 'Elegir Esencial',
+        price: '$49.99',
+        priceNote: 'acceso inmediato',
+        cta: 'Continuar con Esencial',
+        smallLine: 'Descarga inmediata · Para imprimir y completar',
       },
       family: {
         name: 'Familia',
-        fit: 'El más elegido',
+        subtitle: 'El más elegido',
+        description:
+          'La plataforma Solexi.ai para organizar, compartir y proteger lo esencial en familia.',
         benefits: [
-          'Voluntades, documentos y recuerdos',
-          'Acceso pensado para los seres queridos',
-          'Mejor protección familiar',
+          'Cree su círculo familiar e invite a sus seres queridos',
+          'Centralice voluntades, documentos y recuerdos',
+          'Defina sus prioridades y su organización',
+          'Acceso estructurado y seguro para los miembros',
         ],
-        cta: 'Elegir Familia',
+        price: '$149.99',
+        priceNote: 'por año',
+        cta: 'Continuar con Familia',
+        smallLine: 'Acceso a la plataforma · Configuración inmediata',
         recommendedBadge: 'Recomendado para la mayoría de las familias',
-        microReassurance: 'El mejor equilibrio para proteger lo esencial',
       },
       legacy: {
         name: 'Legado',
-        fit: 'Para una protección más completa',
+        subtitle: 'Para ir más lejos con su familia',
+        description:
+          'La plataforma Solexi.ai con preparación testamentaria para su círculo familiar.',
         benefits: [
-          'Voluntades, documentos y recuerdos enriquecidos',
-          'Protección más completa',
-          'Pensado para transmitir aún más',
+          'Todo lo incluido en Familia',
+          'Acceso a un testamento para su círculo familiar',
+          'Orientación hacia un notario',
+          'Transmisión más estructurada y segura',
         ],
-        cta: 'Elegir Legado',
+        price: '$299.99',
+        priceNote: 'por año',
+        cta: 'Continuar con Legado',
+        smallLine: 'Acceso a la plataforma · Acompañamiento avanzado',
       },
     },
-    compareLink: 'Comparar protecciones',
-    howTitle: 'Cómo funciona',
-    steps: [
-      { title: 'Cree su espacio', desc: 'Comience de forma sencilla en un entorno seguro.' },
-      { title: 'Añada lo esencial', desc: 'Reúna sus voluntades, documentos y recuerdos importantes.' },
-      { title: 'Proteja a sus seres queridos', desc: 'Ofrézcales puntos de referencia claros cuando más lo necesiten.' },
-    ],
     trust: ['Espacio seguro', 'Pensado para sus seres queridos', 'Hasta 100 años de conservación'],
     finalReassurance:
       'Elija su protección con toda tranquilidad. Después podrá completar su espacio a su propio ritmo.',
@@ -198,7 +250,8 @@ const ChoosePlanPage: React.FC = () => {
   const c = COPY[lang];
 
   const handleChoose = (plan: PlanKey) => {
-    navigate(`/setup?plan=${plan}`);
+    // Direct to signup/checkout — no intermediate steps
+    navigate(`/signup?plan=${plan}`);
   };
 
   return (
@@ -214,6 +267,12 @@ const ChoosePlanPage: React.FC = () => {
           </Link>
 
           <div className="flex items-center gap-1.5 md:gap-3">
+            <Link
+              to="/login"
+              className="hidden sm:inline-flex text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors px-2"
+            >
+              {c.signin}
+            </Link>
             <Select value={lang} onValueChange={(v) => setLang(v as SupportedLanguage)}>
               <SelectTrigger
                 aria-label="Language"
@@ -234,7 +293,6 @@ const ChoosePlanPage: React.FC = () => {
       <main>
         {/* ─── Intro ─── */}
         <section className="relative overflow-hidden">
-          {/* Subtle premium ambient background */}
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/[0.04] via-background to-background"
@@ -244,7 +302,7 @@ const ChoosePlanPage: React.FC = () => {
             className="absolute -top-32 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 md:h-[420px] md:w-[420px] rounded-full bg-accent/10 blur-3xl"
           />
 
-          <div className="container max-w-3xl px-5 md:px-6 pt-8 md:pt-20 pb-10 md:pb-16 text-center">
+          <div className="container max-w-3xl px-5 md:px-6 pt-8 md:pt-20 pb-8 md:pb-12 text-center">
             {/* Back link */}
             <div className="mb-7 md:mb-10 flex justify-center">
               <Link
@@ -286,15 +344,28 @@ const ChoosePlanPage: React.FC = () => {
               {c.supporting}
             </p>
 
-            <p className="mt-6 md:mt-9 text-[13.5px] md:text-sm leading-relaxed text-foreground/55 italic max-w-md mx-auto">
+            <p className="mt-5 md:mt-7 text-[13.5px] md:text-sm leading-relaxed text-foreground/55 italic max-w-md mx-auto">
               {c.reassurance}
             </p>
+
+            {/* 3 benefit lines */}
+            <ul className="mt-7 md:mt-9 flex flex-col sm:flex-row sm:flex-wrap sm:justify-center items-center gap-3 sm:gap-x-6 sm:gap-y-2.5">
+              {c.benefitLines.map(({ icon: Icon, label }, i) => (
+                <li
+                  key={i}
+                  className="inline-flex items-center gap-2 text-[13.5px] md:text-sm text-foreground/75"
+                >
+                  <Icon className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
         {/* ─── Plan cards ─── */}
         <section className="container max-w-6xl px-4 md:px-6 pt-2 md:pt-4 pb-8 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7 md:items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 lg:gap-7 md:items-stretch">
             {PLAN_ORDER.map((key) => {
               const plan = c.plans[key];
               const isRecommended = key === 'family';
@@ -310,7 +381,7 @@ const ChoosePlanPage: React.FC = () => {
                       : 'bg-card/80 border border-border shadow-soft hover:shadow-card hover:-translate-y-0.5 hover:border-foreground/20',
                   ].join(' ')}
                 >
-                  {/* Top accent bar — distinct per plan */}
+                  {/* Top accent bar */}
                   <div
                     aria-hidden="true"
                     className={[
@@ -354,10 +425,27 @@ const ChoosePlanPage: React.FC = () => {
                       <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-2 text-[14px] md:text-sm text-foreground/70 leading-relaxed">
-                        {plan.fit}
+                      <p className="mt-1.5 text-[13px] md:text-[13px] uppercase tracking-wider font-medium text-accent/90">
+                        {plan.subtitle}
+                      </p>
+                      <p className="mt-3 text-[14px] md:text-sm text-foreground/70 leading-relaxed">
+                        {plan.description}
                       </p>
                     </header>
+
+                    {/* Price */}
+                    <div className="mt-6 md:mt-7 text-center md:text-left">
+                      <div className="flex items-baseline justify-center md:justify-start gap-2 flex-wrap">
+                        <span className="font-heading text-[2rem] md:text-[2.25rem] leading-none font-semibold text-foreground tracking-tight">
+                          {plan.price}
+                        </span>
+                        {plan.priceNote && (
+                          <span className="text-[13.5px] md:text-sm text-foreground/60">
+                            {plan.priceNote}
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
                     <div
                       className="my-5 md:my-6 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent"
@@ -385,12 +473,6 @@ const ChoosePlanPage: React.FC = () => {
                       ))}
                     </ul>
 
-                    {isRecommended && plan.microReassurance && (
-                      <p className="mt-5 md:mt-6 text-center md:text-left text-[13px] md:text-xs text-accent italic leading-relaxed">
-                        {plan.microReassurance}
-                      </p>
-                    )}
-
                     <Button
                       onClick={() => handleChoose(key)}
                       size="lg"
@@ -405,16 +487,19 @@ const ChoosePlanPage: React.FC = () => {
                       {plan.cta}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
+
+                    <p className="mt-3.5 text-center text-[12.5px] md:text-xs text-foreground/55 leading-relaxed">
+                      {plan.smallLine}
+                    </p>
                   </div>
                 </article>
               );
             })}
           </div>
-
         </section>
 
         {/* ─── Trust strip ─── */}
-        <section className="container max-w-4xl px-5 md:px-6 py-10 md:py-16">
+        <section className="container max-w-4xl px-5 md:px-6 py-8 md:py-14">
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-4">
             {[
               { icon: Shield, label: c.trust[0] },
