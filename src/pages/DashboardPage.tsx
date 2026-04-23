@@ -162,53 +162,57 @@ const DashboardPage: React.FC = () => {
 
         {/* No circle CTA */}
         {!loading && !circle && (
-          <Card className="shadow-card border-dashed border-2">
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <Users className="h-12 w-12 text-accent mb-4" />
-              <h2 className="font-heading text-xl font-medium text-foreground">{t.dash_create_circle}</h2>
-              <p className="mt-2 text-muted-foreground max-w-sm">{t.dash_create_circle_desc}</p>
-              <Button size="lg" className="mt-6" onClick={() => navigate('/circle')}>{t.dash_create_circle_btn}</Button>
+          <Card className="shadow-card border-dashed border-2 border-accent/40 bg-card">
+            <CardContent className="flex flex-col items-center justify-center py-14 text-center">
+              <div className="h-14 w-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-5">
+                <Users className="h-7 w-7 text-accent" />
+              </div>
+              <h2 className="font-heading text-2xl font-semibold text-primary">{t.dash_create_circle}</h2>
+              <p className="mt-3 text-muted-foreground max-w-sm leading-relaxed">{t.dash_create_circle_desc}</p>
+              <Button size="lg" className="mt-7 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8" onClick={() => navigate('/circle')}>
+                {t.dash_create_circle_btn}
+              </Button>
             </CardContent>
           </Card>
         )}
 
         {circle && (
           <>
-            {/* Stats row — stacked on mobile, side by side on tablet+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+            {/* Stats row — sanctuary-toned */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
                     <Users className="h-5 w-5 text-accent" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-2xl font-semibold text-foreground leading-none">{memberCount}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{memberCount !== 1 ? t.members : t.member}</p>
+                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{memberCount}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{memberCount !== 1 ? t.members : t.member}</p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                    <FolderOpen className="h-5 w-5 text-blue-600" />
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <FolderOpen className="h-5 w-5 text-primary" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-2xl font-semibold text-foreground leading-none">{docCount}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{t.dash_documents}</p>
+                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{docCount}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_documents}</p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
-                    <CheckSquare className="h-5 w-5 text-violet-600" />
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-secondary flex items-center justify-center shrink-0">
+                    <CheckSquare className="h-5 w-5 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-1.5">
-                      <p className="text-2xl font-semibold text-foreground leading-none">{checklistSummary.completed}</p>
+                      <p className="font-heading text-3xl font-semibold text-primary leading-none">{checklistSummary.completed}</p>
                       <p className="text-sm text-muted-foreground">/ {checklistSummary.total}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{t.dash_checklist}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_checklist}</p>
                     {checklistSummary.total > 0 && (
                       <Progress value={checklistProgress} className="mt-2 h-1.5" />
                     )}
@@ -221,13 +225,13 @@ const DashboardPage: React.FC = () => {
             {(checklistSummary.needsReview > 0 || checklistSummary.blocked > 0 || checklistSummary.proReview > 0) && (
               <div className="flex flex-wrap gap-2">
                 {checklistSummary.needsReview > 0 && (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1.5 py-1 px-3 text-xs">
+                  <Badge variant="outline" className="bg-warning/10 text-warning-foreground border-warning/40 gap-1.5 py-1 px-3 text-xs">
                     <AlertTriangle className="h-3 w-3" />
                     {t.dash_to_verify.replace('{count}', String(checklistSummary.needsReview))}
                   </Badge>
                 )}
                 {checklistSummary.blocked > 0 && (
-                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1.5 py-1 px-3 text-xs">
+                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 gap-1.5 py-1 px-3 text-xs">
                     <AlertTriangle className="h-3 w-3" />
                     {t.dash_blocked.replace('{count}', String(checklistSummary.blocked))}
                   </Badge>
