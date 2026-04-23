@@ -262,15 +262,15 @@ const ChoosePlanPage: React.FC = () => {
               {c.step}
             </div>
 
-            <h1 className="mt-8 md:mt-10 font-heading text-[1.75rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-7 md:mt-10 font-heading text-[1.875rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-6 md:mt-7 text-[15px] md:text-lg leading-[1.7] text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-5 md:mt-7 text-[16px] md:text-lg leading-[1.65] text-foreground/75 max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-8 md:mt-9 text-[13px] md:text-sm leading-relaxed text-muted-foreground/80 italic max-w-md mx-auto">
+            <p className="mt-7 md:mt-9 text-[14px] md:text-sm leading-relaxed text-foreground/60 italic max-w-md mx-auto">
               {c.reassurance}
             </p>
           </div>
