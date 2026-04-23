@@ -37,7 +37,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
     back: 'Retour',
     headline: 'Choisissez la protection qui vous convient',
     supporting:
-      'Que vous commenciez pour vous-même ou pour votre famille, Solexi vous aide à protéger l’essentiel avec clarté, simplicité et sérénité.',
+      'Que vous commenciez seul, à deux ou pour votre famille, Solexi vous aide à protéger l’essentiel avec clarté, simplicité et sérénité.',
     reassurance: 'Un parcours simple pour avancer à votre rythme.',
     plans: {
       essential: {
@@ -244,9 +244,9 @@ const ChoosePlanPage: React.FC = () => {
             className="absolute -top-32 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 md:h-[420px] md:w-[420px] rounded-full bg-accent/10 blur-3xl"
           />
 
-          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-20 pb-12 md:pb-16 text-center">
+          <div className="container max-w-3xl px-5 md:px-6 pt-8 md:pt-20 pb-10 md:pb-16 text-center">
             {/* Back link */}
-            <div className="mb-8 md:mb-10 flex justify-center">
+            <div className="mb-7 md:mb-10 flex justify-center">
               <Link
                 to="/"
                 className="inline-flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -262,23 +262,23 @@ const ChoosePlanPage: React.FC = () => {
               {c.step}
             </div>
 
-            <h1 className="mt-7 md:mt-10 font-heading text-[1.875rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-6 md:mt-10 font-heading text-[1.75rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-5 md:mt-7 text-[16px] md:text-lg leading-[1.65] text-foreground/75 max-w-xl mx-auto">
+            <p className="mt-5 md:mt-7 text-[15.5px] md:text-lg leading-[1.65] text-foreground/75 max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-7 md:mt-9 text-[14px] md:text-sm leading-relaxed text-foreground/60 italic max-w-md mx-auto">
+            <p className="mt-6 md:mt-9 text-[13.5px] md:text-sm leading-relaxed text-foreground/55 italic max-w-md mx-auto">
               {c.reassurance}
             </p>
           </div>
         </section>
 
         {/* ─── Plan cards ─── */}
-        <section className="container max-w-6xl px-4 md:px-6 pt-2 md:pt-4 pb-10 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-6 lg:gap-7">
+        <section className="container max-w-6xl px-4 md:px-6 pt-2 md:pt-4 pb-8 md:pb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7">
             {PLAN_ORDER.map((key) => {
               const plan = c.plans[key];
               const isRecommended = key === 'family';
@@ -289,7 +289,7 @@ const ChoosePlanPage: React.FC = () => {
                   className={[
                     'relative flex flex-col rounded-2xl bg-card transition-all duration-300',
                     isRecommended
-                      ? 'border-2 border-accent/80 shadow-elevated md:-translate-y-1.5'
+                      ? 'border-2 border-accent/70 shadow-elevated md:-translate-y-1.5'
                       : 'border border-border/50 shadow-soft hover:shadow-card hover:-translate-y-0.5',
                   ].join(' ')}
                 >
@@ -304,10 +304,10 @@ const ChoosePlanPage: React.FC = () => {
 
                   <div className="px-6 py-7 md:px-7 md:py-8 flex flex-col flex-1">
                     <header className="text-center md:text-left">
-                      <h2 className="font-heading text-[1.625rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
+                      <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-2 text-[14.5px] md:text-sm text-foreground/70 leading-relaxed">
+                      <p className="mt-2 text-[14px] md:text-sm text-foreground/70 leading-relaxed">
                         {plan.fit}
                       </p>
                     </header>
@@ -317,9 +317,9 @@ const ChoosePlanPage: React.FC = () => {
                       aria-hidden="true"
                     />
 
-                    <ul className="space-y-3.5 md:space-y-3.5 flex-1">
+                    <ul className="space-y-3 md:space-y-3.5 flex-1">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-3 text-[15px] md:text-[15px] leading-[1.55] text-foreground/90">
+                        <li key={i} className="flex items-start gap-3 text-[14.5px] md:text-[15px] leading-[1.55] text-foreground/90">
                           <span
                             className={[
                               'mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full',
@@ -335,7 +335,7 @@ const ChoosePlanPage: React.FC = () => {
                     </ul>
 
                     {isRecommended && plan.microReassurance && (
-                      <p className="mt-5 md:mt-6 text-center md:text-left text-[13.5px] md:text-xs text-accent italic leading-relaxed">
+                      <p className="mt-5 md:mt-6 text-center md:text-left text-[13px] md:text-xs text-accent italic leading-relaxed">
                         {plan.microReassurance}
                       </p>
                     )}
@@ -363,8 +363,8 @@ const ChoosePlanPage: React.FC = () => {
         </section>
 
         {/* ─── Trust strip ─── */}
-        <section className="container max-w-4xl px-5 md:px-6 py-14 md:py-16">
-          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        <section className="container max-w-4xl px-5 md:px-6 py-10 md:py-16">
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-4">
             {[
               { icon: Shield, label: c.trust[0] },
               { icon: Heart, label: c.trust[1] },
@@ -372,7 +372,7 @@ const ChoosePlanPage: React.FC = () => {
             ].map(({ icon: Icon, label }, i) => (
               <li
                 key={i}
-                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/50 px-4 py-3 text-[14px] md:text-sm font-medium text-foreground/85"
+                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/50 px-4 py-2.5 md:py-3 text-[13.5px] md:text-sm font-medium text-foreground/85"
               >
                 <Icon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                 <span>{label}</span>
@@ -382,8 +382,8 @@ const ChoosePlanPage: React.FC = () => {
         </section>
 
         {/* ─── Final reassurance ─── */}
-        <section className="container max-w-2xl px-6 md:px-6 pb-16 md:pb-24 text-center">
-          <p className="text-[15px] md:text-base text-foreground/75 leading-[1.7]">
+        <section className="container max-w-2xl px-6 md:px-6 pb-14 md:pb-24 text-center">
+          <p className="text-[14.5px] md:text-base text-foreground/70 leading-[1.7]">
             {c.finalReassurance}
           </p>
         </section>
