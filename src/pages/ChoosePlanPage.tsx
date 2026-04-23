@@ -373,26 +373,26 @@ const ChoosePlanPage: React.FC = () => {
         </section>
 
         {/* ─── How it works ─── */}
-        <section className="border-y border-border/60 bg-muted/30">
-          <div className="container max-w-5xl px-5 md:px-6 py-12 md:py-16">
+        <section className="border-y border-border/50 bg-muted/25">
+          <div className="container max-w-5xl px-5 md:px-6 py-14 md:py-20">
             <h2 className="text-center font-heading text-2xl md:text-3xl font-semibold text-foreground tracking-tight">
               {c.howTitle}
             </h2>
 
-            <ol className="mt-9 md:mt-12 grid grid-cols-1 md:grid-cols-3 gap-7 md:gap-8">
+            <ol className="mt-12 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-10">
               {c.steps.map((step, i) => (
                 <li key={i} className="text-center md:text-left">
                   <div className="flex md:block flex-col items-center md:items-start">
                     <span
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-accent/40 bg-background text-sm font-heading font-semibold text-accent"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-background text-[15px] font-heading font-semibold text-accent shadow-soft"
                       aria-hidden="true"
                     >
                       {i + 1}
                     </span>
-                    <h3 className="mt-4 font-heading text-lg md:text-xl font-semibold text-foreground">
+                    <h3 className="mt-5 font-heading text-lg md:text-xl font-semibold text-foreground tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="mt-2 text-sm md:text-[15px] leading-relaxed text-muted-foreground max-w-xs md:max-w-none">
+                    <p className="mt-2.5 text-sm md:text-[15px] leading-relaxed text-muted-foreground max-w-[20rem] md:max-w-none">
                       {step.desc}
                     </p>
                   </div>
@@ -403,8 +403,8 @@ const ChoosePlanPage: React.FC = () => {
         </section>
 
         {/* ─── Trust strip ─── */}
-        <section className="container max-w-4xl px-5 md:px-6 py-10 md:py-14">
-          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        <section className="container max-w-4xl px-5 md:px-6 py-12 md:py-16">
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-4">
             {[
               { icon: Shield, label: c.trust[0] },
               { icon: Heart, label: c.trust[1] },
@@ -412,9 +412,9 @@ const ChoosePlanPage: React.FC = () => {
             ].map(({ icon: Icon, label }, i) => (
               <li
                 key={i}
-                className="flex items-center justify-center gap-2.5 rounded-xl border border-border/60 bg-card/60 px-4 py-3.5 text-sm font-medium text-foreground/85"
+                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-[13px] md:text-sm font-medium text-foreground/80"
               >
-                <Icon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
+                <Icon className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
                 <span>{label}</span>
               </li>
             ))}
