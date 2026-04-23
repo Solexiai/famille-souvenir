@@ -314,7 +314,7 @@ const LandingPage: React.FC = () => {
           </p>
           <div className="mt-10 flex items-center justify-center">
             <Link to="/setup">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2 border-2 border-white">
                 {t.landing_cta_start}
                 <ArrowRight className="h-4 w-4" />
               </Button>
