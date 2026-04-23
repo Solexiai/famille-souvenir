@@ -279,7 +279,7 @@ const LandingPage: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Link to="/login" className="relative inline-block rounded-full p-[2px] bg-[linear-gradient(110deg,rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2))] bg-[length:200%_100%] animate-shimmer-border shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+            <Link to="/login">
               <Button size="sm" className="w-[7.5rem] md:w-[8.5rem] h-10 md:h-11 bg-accent border-0 text-black hover:bg-accent/90 text-sm whitespace-nowrap rounded-full font-bold justify-center">
                 {t.sign_in}
               </Button>
