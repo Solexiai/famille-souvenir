@@ -116,7 +116,7 @@ const MembersPage: React.FC = () => {
                 {memberLimitReached && (
                   <div className="rounded-lg border border-dashed border-accent/40 bg-secondary/50 p-4 text-center">
                     <p className="text-sm text-muted-foreground">{t.plan_gate_member_limit}</p>
-                    <Button size="sm" variant="outline" className="mt-2" onClick={() => window.location.href = '/pricing'}>
+                    <Button size="sm" variant="outline" className="mt-2" onClick={() => window.location.href = '/choose-plan'}>
                       {t.upgrade}
                     </Button>
                   </div>

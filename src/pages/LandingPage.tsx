@@ -507,7 +507,7 @@ const LandingPage: React.FC = () => {
           <div className="flex gap-6">
             <Link to="/privacy" className="hover:text-foreground transition-colors">{t.landing_privacy}</Link>
             <Link to="/terms" className="hover:text-foreground transition-colors">{t.landing_terms}</Link>
-            <Link to="/pricing" className="hover:text-foreground transition-colors">{t.landing_pricing}</Link>
+            <Link to="/choose-plan" className="hover:text-foreground transition-colors">{t.landing_pricing}</Link>
           </div>
         </div>
       </footer>

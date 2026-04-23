@@ -360,16 +360,6 @@ const ChoosePlanPage: React.FC = () => {
             })}
           </div>
 
-          {/* Compare link */}
-          <div className="mt-10 md:mt-12 text-center">
-            <Link
-              to="/pricing"
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-5 py-2.5 text-[14px] md:text-sm font-medium text-foreground/85 hover:text-accent hover:border-accent/40 hover:bg-card transition-colors"
-            >
-              {c.compareLink}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
         </section>
 
         {/* ─── Trust strip ─── */}

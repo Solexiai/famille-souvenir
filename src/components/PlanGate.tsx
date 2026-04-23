@@ -27,7 +27,7 @@ export const PlanGate: React.FC<Props> = ({ featureName, reason, variant = 'card
           <p className="text-sm font-medium text-foreground">{featureName ?? t.plan_upgrade_title}</p>
           {reason && <p className="text-xs text-muted-foreground mt-0.5">{reason}</p>}
         </div>
-        <Button size="sm" variant="outline" onClick={() => navigate('/pricing')} className="shrink-0">
+        <Button size="sm" variant="outline" onClick={() => navigate('/choose-plan')} className="shrink-0">
           <Crown className="h-3.5 w-3.5 mr-1.5" />
           {t.upgrade}
         </Button>
@@ -46,7 +46,7 @@ export const PlanGate: React.FC<Props> = ({ featureName, reason, variant = 'card
         <CardDescription>{reason ?? t.plan_upgrade_desc}</CardDescription>
       </CardHeader>
       <CardContent className="text-center">
-        <Button onClick={() => navigate('/pricing')} size="lg">
+        <Button onClick={() => navigate('/choose-plan')} size="lg">
           <Crown className="h-4 w-4 mr-2" />
           {t.upgrade}
         </Button>
@@ -67,7 +67,7 @@ export const LimitWarning: React.FC<{ current: number; max: number; label: strin
     <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2 mt-2">
       <span>{label}: {current}/{max}</span>
       {pct >= 100 && (
-        <Button size="sm" variant="link" className="text-xs h-auto p-0 text-accent" onClick={() => navigate('/pricing')}>
+        <Button size="sm" variant="link" className="text-xs h-auto p-0 text-accent" onClick={() => navigate('/choose-plan')}>
           {t.upgrade}
         </Button>
       )}
