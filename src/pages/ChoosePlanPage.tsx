@@ -263,7 +263,33 @@ const ChoosePlanPage: React.FC = () => {
             </div>
 
             <h1 className="mt-6 md:mt-10 font-heading text-[1.75rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
-              {c.headline}
+              {(() => {
+                const words = c.headline.trim().split(' ');
+                const last = words.pop() ?? '';
+                const rest = words.join(' ');
+                return (
+                  <>
+                    {rest}{' '}
+                    <span className="relative inline-block">
+                      <span className="relative z-10">{last}</span>
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 200 12"
+                        preserveAspectRatio="none"
+                        className="absolute left-0 right-0 -bottom-2 md:-bottom-3 w-full h-[8px] md:h-[12px] text-accent"
+                      >
+                        <path
+                          d="M3 7 C 40 2, 90 10, 130 5 S 190 6, 197 4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </span>
+                  </>
+                );
+              })()}
             </h1>
 
             <p className="mt-5 md:mt-7 text-[15.5px] md:text-lg leading-[1.65] text-foreground/75 max-w-xl mx-auto">
