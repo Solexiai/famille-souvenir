@@ -28,7 +28,7 @@ const en: Translations = {
 
   landing_hero_title: 'Protect the people you love',
   landing_hero_subtitle: 'A secure space to organize your family dossier, coordinate with loved ones, and prepare what matters — step by step.',
-  landing_cta_start: 'Get started for free',
+  landing_cta_start: 'Get started',
   landing_cta_login: 'I already have an account',
   landing_why_title: 'What Solexi.ai helps you do',
   landing_why_subtitle: 'Build a clearer family dossier step by step. Preparation reduces confusion and risk.',
