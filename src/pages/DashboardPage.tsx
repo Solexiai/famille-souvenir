@@ -133,14 +133,32 @@ const DashboardPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-6 animate-fade-in">
-        {/* Greeting */}
-        <div className="space-y-1">
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground leading-tight">
-            {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">{t.dash_subtitle}</p>
-        </div>
+      <div className="space-y-8 animate-fade-in">
+        {/* Sanctuary hero */}
+        <section className="relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary via-primary to-[hsl(220,45%,18%)] text-primary-foreground shadow-elevated">
+          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-accent/15 blur-3xl" aria-hidden="true" />
+          <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
+          <div className="relative px-6 sm:px-10 py-10 sm:py-12">
+            <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent mb-3">
+              {t.app_name} · {t.app_tagline}
+            </p>
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] max-w-2xl">
+              {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
+            </h1>
+            <p className="mt-4 text-sm sm:text-base text-primary-foreground/75 max-w-xl leading-relaxed">
+              {t.dash_subtitle}
+            </p>
+            {circle && checklistSummary.total > 0 && (
+              <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-primary-foreground/10 backdrop-blur px-4 py-2 border border-primary-foreground/15">
+                <CircleDot className="h-3.5 w-3.5 text-accent" />
+                <span className="text-xs sm:text-sm text-primary-foreground/85">
+                  {t.dash_completed.replace('{count}', `${checklistSummary.completed}/${checklistSummary.total}`)} · {dossierLabel(circle.dossier_readiness_status)}
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* No circle CTA */}
         {!loading && !circle && (
