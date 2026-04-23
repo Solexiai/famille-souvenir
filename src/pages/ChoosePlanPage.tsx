@@ -14,6 +14,7 @@ interface PlanCopy {
   benefits: string[];
   cta: string;
   recommendedBadge?: string;
+  microReassurance?: string;
 }
 
 interface PageCopy {
