@@ -46,7 +46,7 @@ export const PlanGate: React.FC<Props> = ({ featureName, reason, variant = 'card
         <CardDescription>{reason ?? t.plan_upgrade_desc}</CardDescription>
       </CardHeader>
       <CardContent className="text-center">
-        <Button onClick={() => navigate('/pricing')} size="lg">
+        <Button onClick={() => navigate('/choose-plan')} size="lg">
           <Crown className="h-4 w-4 mr-2" />
           {t.upgrade}
         </Button>
