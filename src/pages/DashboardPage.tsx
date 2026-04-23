@@ -133,64 +133,86 @@ const DashboardPage: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="space-y-6 animate-fade-in">
-        {/* Greeting */}
-        <div className="space-y-1">
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground leading-tight">
-            {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">{t.dash_subtitle}</p>
-        </div>
+      <div className="space-y-8 animate-fade-in">
+        {/* Sanctuary hero */}
+        <section className="relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary via-primary to-[hsl(220,45%,18%)] text-primary-foreground shadow-elevated">
+          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-accent/15 blur-3xl" aria-hidden="true" />
+          <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
+          <div className="relative px-6 sm:px-10 py-10 sm:py-12">
+            <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent mb-3">
+              {t.app_name} · {t.app_tagline}
+            </p>
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] max-w-2xl">
+              {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
+            </h1>
+            <p className="mt-4 text-sm sm:text-base text-primary-foreground/75 max-w-xl leading-relaxed">
+              {t.dash_subtitle}
+            </p>
+            {circle && checklistSummary.total > 0 && (
+              <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-primary-foreground/10 backdrop-blur px-4 py-2 border border-primary-foreground/15">
+                <CircleDot className="h-3.5 w-3.5 text-accent" />
+                <span className="text-xs sm:text-sm text-primary-foreground/85">
+                  {t.dash_completed.replace('{count}', `${checklistSummary.completed}/${checklistSummary.total}`)} · {dossierLabel(circle.dossier_readiness_status)}
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* No circle CTA */}
         {!loading && !circle && (
-          <Card className="shadow-card border-dashed border-2">
-            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-              <Users className="h-12 w-12 text-accent mb-4" />
-              <h2 className="font-heading text-xl font-medium text-foreground">{t.dash_create_circle}</h2>
-              <p className="mt-2 text-muted-foreground max-w-sm">{t.dash_create_circle_desc}</p>
-              <Button size="lg" className="mt-6" onClick={() => navigate('/circle')}>{t.dash_create_circle_btn}</Button>
+          <Card className="shadow-card border-dashed border-2 border-accent/40 bg-card">
+            <CardContent className="flex flex-col items-center justify-center py-14 text-center">
+              <div className="h-14 w-14 rounded-2xl bg-accent/15 flex items-center justify-center mb-5">
+                <Users className="h-7 w-7 text-accent" />
+              </div>
+              <h2 className="font-heading text-2xl font-semibold text-primary">{t.dash_create_circle}</h2>
+              <p className="mt-3 text-muted-foreground max-w-sm leading-relaxed">{t.dash_create_circle_desc}</p>
+              <Button size="lg" className="mt-7 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8" onClick={() => navigate('/circle')}>
+                {t.dash_create_circle_btn}
+              </Button>
             </CardContent>
           </Card>
         )}
 
         {circle && (
           <>
-            {/* Stats row — stacked on mobile, side by side on tablet+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+            {/* Stats row — sanctuary-toned */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
                     <Users className="h-5 w-5 text-accent" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-2xl font-semibold text-foreground leading-none">{memberCount}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{memberCount !== 1 ? t.members : t.member}</p>
+                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{memberCount}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{memberCount !== 1 ? t.members : t.member}</p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                    <FolderOpen className="h-5 w-5 text-blue-600" />
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <FolderOpen className="h-5 w-5 text-primary" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-2xl font-semibold text-foreground leading-none">{docCount}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{t.dash_documents}</p>
+                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{docCount}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_documents}</p>
                   </div>
                 </CardContent>
               </Card>
-              <Card className="shadow-card">
-                <CardContent className="flex items-center gap-4 py-4 px-4">
-                  <div className="h-11 w-11 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
-                    <CheckSquare className="h-5 w-5 text-violet-600" />
+              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
+                <CardContent className="flex items-center gap-4 py-5 px-5">
+                  <div className="h-12 w-12 rounded-2xl bg-secondary flex items-center justify-center shrink-0">
+                    <CheckSquare className="h-5 w-5 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-1.5">
-                      <p className="text-2xl font-semibold text-foreground leading-none">{checklistSummary.completed}</p>
+                      <p className="font-heading text-3xl font-semibold text-primary leading-none">{checklistSummary.completed}</p>
                       <p className="text-sm text-muted-foreground">/ {checklistSummary.total}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{t.dash_checklist}</p>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_checklist}</p>
                     {checklistSummary.total > 0 && (
                       <Progress value={checklistProgress} className="mt-2 h-1.5" />
                     )}
@@ -203,13 +225,13 @@ const DashboardPage: React.FC = () => {
             {(checklistSummary.needsReview > 0 || checklistSummary.blocked > 0 || checklistSummary.proReview > 0) && (
               <div className="flex flex-wrap gap-2">
                 {checklistSummary.needsReview > 0 && (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1.5 py-1 px-3 text-xs">
+                  <Badge variant="outline" className="bg-warning/10 text-warning-foreground border-warning/40 gap-1.5 py-1 px-3 text-xs">
                     <AlertTriangle className="h-3 w-3" />
                     {t.dash_to_verify.replace('{count}', String(checklistSummary.needsReview))}
                   </Badge>
                 )}
                 {checklistSummary.blocked > 0 && (
-                  <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1.5 py-1 px-3 text-xs">
+                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 gap-1.5 py-1 px-3 text-xs">
                     <AlertTriangle className="h-3 w-3" />
                     {t.dash_blocked.replace('{count}', String(checklistSummary.blocked))}
                   </Badge>
@@ -268,13 +290,13 @@ const DashboardPage: React.FC = () => {
                   {(govSummary.blocked > 0 || govSummary.needsAttention > 0) && (
                     <div className="flex flex-wrap gap-2">
                       {govSummary.blocked > 0 && (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1 text-xs py-0.5">
+                        <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 gap-1 text-xs py-0.5">
                           <AlertTriangle className="h-3 w-3" />
                           {t.dash_blocked.replace('{count}', String(govSummary.blocked))}
                         </Badge>
                       )}
                       {govSummary.needsAttention > 0 && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1 text-xs py-0.5">
+                        <Badge variant="outline" className="bg-warning/10 text-warning-foreground border-warning/40 gap-1 text-xs py-0.5">
                           <AlertTriangle className="h-3 w-3" />
                           {t.dash_attention_required.replace('{count}', String(govSummary.needsAttention))}
                         </Badge>
@@ -324,22 +346,25 @@ const DashboardPage: React.FC = () => {
               </Card>
             )}
 
-            {/* Quick actions — 3 cols on mobile, clean icons */}
-            <div>
-              <h3 className="font-heading text-sm font-semibold text-foreground mb-3">Accès rapide</h3>
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+            {/* Sanctuary pillars */}
+            <div className="pt-2">
+              <div className="flex items-baseline justify-between mb-4">
+                <h3 className="font-heading text-xl sm:text-2xl font-semibold text-primary">Accès rapide</h3>
+                <span className="hidden sm:block h-px flex-1 mx-4 bg-gradient-to-r from-accent/40 to-transparent" aria-hidden="true" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {visibleActions.map((action) => {
                   const Icon = action.icon;
                   return (
                     <button
                       key={action.label}
                       onClick={action.action}
-                      className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 sm:p-4 hover:border-accent/40 hover:shadow-card transition-all duration-200"
+                      className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-border/70 bg-card p-5 hover:border-accent/50 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200"
                     >
-                      <div className="h-10 w-10 rounded-xl bg-secondary/80 group-hover:bg-accent/10 flex items-center justify-center transition-colors">
-                        <Icon className={`h-5 w-5 ${action.color}`} />
+                      <div className="h-12 w-12 rounded-2xl bg-secondary group-hover:bg-accent/15 flex items-center justify-center transition-colors">
+                        <Icon className="h-5 w-5 text-primary group-hover:text-accent transition-colors" />
                       </div>
-                      <span className="text-[11px] sm:text-xs font-medium text-foreground text-center leading-tight">{action.label}</span>
+                      <span className="font-heading text-xs sm:text-sm font-medium text-primary text-center leading-tight">{action.label}</span>
                     </button>
                   );
                 })}

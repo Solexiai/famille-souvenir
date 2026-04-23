@@ -47,11 +47,13 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75 shadow-soft">
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" aria-hidden="true" />
         <div className="container flex h-16 items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <span className="font-heading text-xl font-semibold text-foreground">{t.app_name}</span>
-            <span className="text-sm text-muted-foreground">{t.app_tagline}</span>
+          <Link to="/dashboard" className="flex items-center gap-2.5 group">
+            <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_hsl(var(--accent)/0.6)] group-hover:scale-110 transition-transform" aria-hidden="true" />
+            <span className="font-heading text-xl font-semibold text-primary tracking-tight">{t.app_name}</span>
+            <span className="hidden sm:inline text-xs uppercase tracking-[0.18em] text-muted-foreground">{t.app_tagline}</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
@@ -109,9 +111,21 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
         )}
       </header>
 
-      <main className="container py-8">
+      <main className="container py-8 md:py-10">
         {children}
       </main>
+
+      <footer className="border-t border-border/60 bg-card/40 mt-12">
+        <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+          <p className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+            <span className="font-heading text-sm text-primary/80">{t.app_name}</span>
+            <span>·</span>
+            <span>{t.app_tagline}</span>
+          </p>
+          <p className="tracking-wide">{t.landing_trust_security ?? ''} · {t.landing_trust_privacy ?? ''}</p>
+        </div>
+      </footer>
     </div>
   );
 };
