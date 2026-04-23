@@ -28,7 +28,7 @@ const es: Translations = {
 
   landing_hero_title: 'Proteja a quienes ama',
   landing_hero_subtitle: 'Un espacio seguro para organizar su expediente familiar, coordinar con sus seres queridos y preparar lo esencial — paso a paso.',
-  landing_cta_start: 'Comenzar gratis',
+  landing_cta_start: 'Comenzar',
   landing_cta_login: 'Ya tengo una cuenta',
   landing_why_title: 'Lo que Solexi.ai le ayuda a hacer',
   landing_why_subtitle: 'Organice su expediente familiar paso a paso. La preparación reduce la confusión y el riesgo.',
