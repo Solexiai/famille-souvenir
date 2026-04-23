@@ -14,6 +14,7 @@ interface PlanCopy {
   benefits: string[];
   cta: string;
   recommendedBadge?: string;
+  microReassurance?: string;
 }
 
 interface PageCopy {
@@ -59,14 +60,15 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
         ],
         cta: 'Choisir Famille',
         recommendedBadge: 'Recommandé pour la plupart des familles',
+        microReassurance: 'Le meilleur équilibre pour protéger l’essentiel',
       },
       legacy: {
         name: 'Héritage',
         fit: 'Pour une protection plus complète',
         benefits: [
           'Volontés, documents et souvenirs enrichis',
-          'Expérience plus durable et complète',
-          'Approche pensée pour transmettre davantage',
+          'Protection plus complète',
+          'Pensé pour transmettre davantage',
         ],
         cta: 'Choisir Héritage',
       },
@@ -78,7 +80,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Ajoutez l’essentiel', desc: 'Réunissez vos volontés, documents et souvenirs importants.' },
       { title: 'Protégez vos proches', desc: 'Offrez-leur des repères clairs lorsqu’ils en auront le plus besoin.' },
     ],
-    trust: ['Espace sécurisé', 'Pensé pour vos proches', 'Conservation jusqu’à 100 ans'],
+    trust: ['Espace sécurisé', 'Pensé pour vos proches', 'Jusqu’à 100 ans de conservation'],
     finalReassurance:
       'Choisissez votre protection en toute simplicité. Vous pourrez ensuite compléter votre espace à votre rythme.',
   },
@@ -110,13 +112,14 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
         ],
         cta: 'Choose Family',
         recommendedBadge: 'Recommended for most families',
+        microReassurance: 'The best balance to protect what matters',
       },
       legacy: {
         name: 'Legacy',
         fit: 'For more complete protection',
         benefits: [
           'Enriched wishes, documents, and memories',
-          'A more lasting, complete experience',
+          'More complete protection',
           'Designed to pass on more',
         ],
         cta: 'Choose Legacy',
@@ -129,7 +132,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Add what matters', desc: 'Gather your wishes, documents, and important memories.' },
       { title: 'Protect your loved ones', desc: 'Offer them clear guidance when they need it most.' },
     ],
-    trust: ['Secure space', 'Built for your loved ones', 'Preserved for up to 100 years'],
+    trust: ['Secure space', 'Built for your loved ones', 'Up to 100 years of preservation'],
     finalReassurance:
       'Choose your protection with confidence. You can complete your space at your own pace afterwards.',
   },
@@ -161,13 +164,14 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
         ],
         cta: 'Elegir Familia',
         recommendedBadge: 'Recomendado para la mayoría de las familias',
+        microReassurance: 'El mejor equilibrio para proteger lo esencial',
       },
       legacy: {
         name: 'Legado',
         fit: 'Para una protección más completa',
         benefits: [
           'Voluntades, documentos y recuerdos enriquecidos',
-          'Una experiencia más duradera y completa',
+          'Protección más completa',
           'Pensado para transmitir aún más',
         ],
         cta: 'Elegir Legado',
@@ -180,7 +184,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Añada lo esencial', desc: 'Reúna sus voluntades, documentos y recuerdos importantes.' },
       { title: 'Proteja a sus seres queridos', desc: 'Ofrézcales puntos de referencia claros cuando más lo necesiten.' },
     ],
-    trust: ['Espacio seguro', 'Pensado para sus seres queridos', 'Conservación hasta 100 años'],
+    trust: ['Espacio seguro', 'Pensado para sus seres queridos', 'Hasta 100 años de conservación'],
     finalReassurance:
       'Elija su protección con toda tranquilidad. Después podrá completar su espacio a su propio ritmo.',
   },
@@ -240,9 +244,9 @@ const ChoosePlanPage: React.FC = () => {
             className="absolute -top-32 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 md:h-[420px] md:w-[420px] rounded-full bg-accent/10 blur-3xl"
           />
 
-          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-16 pb-8 md:pb-12 text-center">
+          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-16 pb-10 md:pb-14 text-center">
             {/* Back link */}
-            <div className="mb-6 md:mb-8 flex justify-center">
+            <div className="mb-7 md:mb-9 flex justify-center">
               <Link
                 to="/"
                 className="inline-flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -258,23 +262,23 @@ const ChoosePlanPage: React.FC = () => {
               {c.step}
             </div>
 
-            <h1 className="mt-5 md:mt-7 font-heading text-[1.75rem] leading-[1.15] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-7 md:mt-8 font-heading text-[1.75rem] leading-[1.18] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-4 md:mt-5 text-[15px] md:text-lg leading-relaxed text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-5 md:mt-6 text-[15px] md:text-lg leading-relaxed text-muted-foreground max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-4 md:mt-5 text-xs md:text-sm text-muted-foreground/80 italic">
+            <p className="mt-6 md:mt-7 text-[11px] md:text-xs uppercase tracking-[0.18em] text-muted-foreground/60 font-normal">
               {c.reassurance}
             </p>
           </div>
         </section>
 
         {/* ─── Plan cards ─── */}
-        <section className="container max-w-6xl px-4 md:px-6 pb-10 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-7">
+        <section className="container max-w-6xl px-4 md:px-6 pb-8 md:pb-14">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7">
             {PLAN_ORDER.map((key) => {
               const plan = c.plans[key];
               const isRecommended = key === 'family';
@@ -286,7 +290,7 @@ const ChoosePlanPage: React.FC = () => {
                     'relative flex flex-col rounded-2xl bg-card transition-all duration-300',
                     isRecommended
                       ? 'border-2 border-accent shadow-elevated md:-translate-y-1.5 md:scale-[1.015]'
-                      : 'border border-border/70 shadow-card hover:shadow-elevated hover:-translate-y-0.5',
+                      : 'border border-border/60 shadow-soft hover:shadow-card hover:-translate-y-0.5',
                   ].join(' ')}
                 >
                   {isRecommended && plan.recommendedBadge && (
@@ -298,24 +302,24 @@ const ChoosePlanPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="p-6 md:p-7 lg:p-8 flex flex-col flex-1">
+                  <div className="px-6 py-7 md:px-7 md:py-8 lg:px-8 lg:py-9 flex flex-col flex-1">
                     <header className="text-center md:text-left">
-                      <h2 className="font-heading text-2xl md:text-[1.625rem] font-semibold text-foreground tracking-tight">
+                      <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-1.5 text-sm text-muted-foreground">
+                      <p className="mt-2 text-sm text-muted-foreground">
                         {plan.fit}
                       </p>
                     </header>
 
                     <div
-                      className="my-5 md:my-6 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent"
+                      className="my-6 md:my-7 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent"
                       aria-hidden="true"
                     />
 
-                    <ul className="space-y-3 md:space-y-3.5 flex-1">
+                    <ul className="space-y-3.5 md:space-y-4 flex-1">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm md:text-[15px] leading-relaxed text-foreground/85">
+                        <li key={i} className="flex items-start gap-3 text-sm md:text-[15px] leading-relaxed text-foreground/85">
                           <span
                             className={[
                               'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
@@ -329,6 +333,12 @@ const ChoosePlanPage: React.FC = () => {
                         </li>
                       ))}
                     </ul>
+
+                    {isRecommended && plan.microReassurance && (
+                      <p className="mt-5 md:mt-6 text-center md:text-left text-[12.5px] md:text-xs text-accent/90 italic leading-relaxed">
+                        {plan.microReassurance}
+                      </p>
+                    )}
 
                     <Button
                       onClick={() => handleChoose(key)}
@@ -351,37 +361,38 @@ const ChoosePlanPage: React.FC = () => {
           </div>
 
           {/* Compare link */}
-          <div className="mt-7 md:mt-9 text-center">
+          <div className="mt-8 md:mt-10 text-center">
             <Link
               to="/pricing"
-              className="text-xs md:text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-foreground/70 hover:text-accent underline-offset-[6px] underline decoration-border hover:decoration-accent/60 transition-colors"
             >
               {c.compareLink}
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </section>
 
         {/* ─── How it works ─── */}
-        <section className="border-y border-border/60 bg-muted/30">
-          <div className="container max-w-5xl px-5 md:px-6 py-12 md:py-16">
+        <section className="border-y border-border/50 bg-muted/25">
+          <div className="container max-w-5xl px-5 md:px-6 py-14 md:py-20">
             <h2 className="text-center font-heading text-2xl md:text-3xl font-semibold text-foreground tracking-tight">
               {c.howTitle}
             </h2>
 
-            <ol className="mt-9 md:mt-12 grid grid-cols-1 md:grid-cols-3 gap-7 md:gap-8">
+            <ol className="mt-12 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-10">
               {c.steps.map((step, i) => (
                 <li key={i} className="text-center md:text-left">
                   <div className="flex md:block flex-col items-center md:items-start">
                     <span
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-accent/40 bg-background text-sm font-heading font-semibold text-accent"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-background text-[15px] font-heading font-semibold text-accent shadow-soft"
                       aria-hidden="true"
                     >
                       {i + 1}
                     </span>
-                    <h3 className="mt-4 font-heading text-lg md:text-xl font-semibold text-foreground">
+                    <h3 className="mt-5 font-heading text-lg md:text-xl font-semibold text-foreground tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="mt-2 text-sm md:text-[15px] leading-relaxed text-muted-foreground max-w-xs md:max-w-none">
+                    <p className="mt-2.5 text-sm md:text-[15px] leading-relaxed text-muted-foreground max-w-[20rem] md:max-w-none">
                       {step.desc}
                     </p>
                   </div>
@@ -392,8 +403,8 @@ const ChoosePlanPage: React.FC = () => {
         </section>
 
         {/* ─── Trust strip ─── */}
-        <section className="container max-w-4xl px-5 md:px-6 py-10 md:py-14">
-          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        <section className="container max-w-4xl px-5 md:px-6 py-12 md:py-16">
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 md:gap-4">
             {[
               { icon: Shield, label: c.trust[0] },
               { icon: Heart, label: c.trust[1] },
@@ -401,9 +412,9 @@ const ChoosePlanPage: React.FC = () => {
             ].map(({ icon: Icon, label }, i) => (
               <li
                 key={i}
-                className="flex items-center justify-center gap-2.5 rounded-xl border border-border/60 bg-card/60 px-4 py-3.5 text-sm font-medium text-foreground/85"
+                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/40 px-4 py-3 text-[13px] md:text-sm font-medium text-foreground/80"
               >
-                <Icon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
+                <Icon className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
                 <span>{label}</span>
               </li>
             ))}
