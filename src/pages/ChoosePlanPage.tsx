@@ -60,14 +60,15 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
         ],
         cta: 'Choisir Famille',
         recommendedBadge: 'Recommandé pour la plupart des familles',
+        microReassurance: 'Le meilleur équilibre pour protéger l’essentiel',
       },
       legacy: {
         name: 'Héritage',
         fit: 'Pour une protection plus complète',
         benefits: [
           'Volontés, documents et souvenirs enrichis',
-          'Expérience plus durable et complète',
-          'Approche pensée pour transmettre davantage',
+          'Protection plus complète',
+          'Pensé pour transmettre davantage',
         ],
         cta: 'Choisir Héritage',
       },
@@ -79,7 +80,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Ajoutez l’essentiel', desc: 'Réunissez vos volontés, documents et souvenirs importants.' },
       { title: 'Protégez vos proches', desc: 'Offrez-leur des repères clairs lorsqu’ils en auront le plus besoin.' },
     ],
-    trust: ['Espace sécurisé', 'Pensé pour vos proches', 'Conservation jusqu’à 100 ans'],
+    trust: ['Espace sécurisé', 'Pensé pour vos proches', 'Jusqu’à 100 ans de conservation'],
     finalReassurance:
       'Choisissez votre protection en toute simplicité. Vous pourrez ensuite compléter votre espace à votre rythme.',
   },
