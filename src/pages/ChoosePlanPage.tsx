@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft } from 'lucide-react';
+import { ArrowRight, Check, Shield, Heart, Clock, Sparkles, ChevronLeft, Leaf, Users, Gem } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
