@@ -290,7 +290,7 @@ const LandingPage: React.FC = () => {
 
       {/* ─── Hero ─── */}
       <section
-        className="relative pt-28 pb-12 md:pt-40 md:pb-14 overflow-hidden"
+        className="relative pt-28 pb-12 md:pt-40 md:pb-14 overflow-hidden ring-2 ring-transparent [background-clip:padding-box,border-box] before:content-[''] before:absolute before:inset-0 before:p-[3px] before:rounded-none before:bg-[linear-gradient(110deg,rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2))] before:bg-[length:200%_100%] before:animate-shimmer-border before:[mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)] before:[mask-composite:exclude] before:pointer-events-none before:z-20"
         style={{ backgroundImage: `url(${heroBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         <div className="absolute inset-0 bg-primary/80" />
