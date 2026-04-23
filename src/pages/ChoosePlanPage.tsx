@@ -389,10 +389,10 @@ const ChoosePlanPage: React.FC = () => {
                     >
                       {i + 1}
                     </span>
-                    <h3 className="mt-5 md:mt-6 font-heading text-lg md:text-xl font-semibold text-foreground tracking-tight">
+                    <h3 className="mt-5 md:mt-6 font-heading text-[1.25rem] md:text-xl font-semibold text-foreground tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="mt-2.5 md:mt-3 text-[14px] md:text-[15px] leading-[1.65] text-muted-foreground max-w-[20rem] md:max-w-none">
+                    <p className="mt-2.5 md:mt-3 text-[15px] md:text-[15px] leading-[1.65] text-foreground/70 max-w-[20rem] md:max-w-none">
                       {step.desc}
                     </p>
                   </div>
