@@ -412,9 +412,9 @@ const ChoosePlanPage: React.FC = () => {
             ].map(({ icon: Icon, label }, i) => (
               <li
                 key={i}
-                className="flex items-center justify-center gap-2.5 rounded-full border border-border/40 bg-card/30 px-4 py-3 text-[13px] md:text-sm font-medium text-foreground/75"
+                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/50 px-4 py-3 text-[14px] md:text-sm font-medium text-foreground/85"
               >
-                <Icon className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
+                <Icon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                 <span>{label}</span>
               </li>
             ))}
