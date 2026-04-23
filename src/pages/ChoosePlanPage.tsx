@@ -244,9 +244,9 @@ const ChoosePlanPage: React.FC = () => {
             className="absolute -top-32 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 md:h-[420px] md:w-[420px] rounded-full bg-accent/10 blur-3xl"
           />
 
-          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-16 pb-10 md:pb-14 text-center">
+          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-20 pb-12 md:pb-16 text-center">
             {/* Back link */}
-            <div className="mb-7 md:mb-9 flex justify-center">
+            <div className="mb-8 md:mb-10 flex justify-center">
               <Link
                 to="/"
                 className="inline-flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -257,20 +257,20 @@ const ChoosePlanPage: React.FC = () => {
             </div>
 
             {/* Step indicator */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3.5 py-1.5 text-[11px] md:text-xs font-medium text-muted-foreground tracking-wide">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/60 px-3.5 py-1.5 text-[11px] md:text-xs font-medium text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
               {c.step}
             </div>
 
-            <h1 className="mt-7 md:mt-8 font-heading text-[1.75rem] leading-[1.18] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-8 md:mt-10 font-heading text-[1.75rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-5 md:mt-6 text-[15px] md:text-lg leading-relaxed text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-6 md:mt-7 text-[15px] md:text-lg leading-[1.7] text-muted-foreground max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-6 md:mt-7 text-[11px] md:text-xs uppercase tracking-[0.18em] text-muted-foreground/60 font-normal">
+            <p className="mt-8 md:mt-9 text-[13px] md:text-sm leading-relaxed text-muted-foreground/80 italic max-w-md mx-auto">
               {c.reassurance}
             </p>
           </div>
