@@ -64,7 +64,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       },
       legacy: {
         name: 'Héritage',
-        fit: 'Pour une protection plus complète',
+        fit: 'Pour une protection plus complète, incluant un volet notarial.',
         benefits: [
           'Volontés, documents et souvenirs enrichis',
           'Protection plus complète',
