@@ -198,7 +198,7 @@ const ChoosePlanPage: React.FC = () => {
   const c = COPY[lang];
 
   const handleChoose = (plan: PlanKey) => {
-    navigate(`/setup?plan=${plan}`);
+    navigate(`/selected-plan?plan=${plan}`);
   };
 
   return (
