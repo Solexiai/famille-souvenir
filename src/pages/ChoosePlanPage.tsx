@@ -262,15 +262,15 @@ const ChoosePlanPage: React.FC = () => {
               {c.step}
             </div>
 
-            <h1 className="mt-8 md:mt-10 font-heading text-[1.75rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-7 md:mt-10 font-heading text-[1.875rem] leading-[1.2] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-6 md:mt-7 text-[15px] md:text-lg leading-[1.7] text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-5 md:mt-7 text-[16px] md:text-lg leading-[1.65] text-foreground/75 max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-8 md:mt-9 text-[13px] md:text-sm leading-relaxed text-muted-foreground/80 italic max-w-md mx-auto">
+            <p className="mt-7 md:mt-9 text-[14px] md:text-sm leading-relaxed text-foreground/60 italic max-w-md mx-auto">
               {c.reassurance}
             </p>
           </div>
@@ -304,10 +304,10 @@ const ChoosePlanPage: React.FC = () => {
 
                   <div className="px-6 py-7 md:px-7 md:py-8 flex flex-col flex-1">
                     <header className="text-center md:text-left">
-                      <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
+                      <h2 className="font-heading text-[1.625rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight leading-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-2 text-[13.5px] md:text-sm text-muted-foreground leading-relaxed">
+                      <p className="mt-2 text-[14.5px] md:text-sm text-foreground/70 leading-relaxed">
                         {plan.fit}
                       </p>
                     </header>
@@ -317,13 +317,13 @@ const ChoosePlanPage: React.FC = () => {
                       aria-hidden="true"
                     />
 
-                    <ul className="space-y-3 md:space-y-3.5 flex-1">
+                    <ul className="space-y-3.5 md:space-y-3.5 flex-1">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-3 text-[14px] md:text-[15px] leading-[1.55] text-foreground/85">
+                        <li key={i} className="flex items-start gap-3 text-[15px] md:text-[15px] leading-[1.55] text-foreground/90">
                           <span
                             className={[
                               'mt-[3px] inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full',
-                              isRecommended ? 'bg-accent/15 text-accent' : 'bg-muted text-foreground/65',
+                              isRecommended ? 'bg-accent/15 text-accent' : 'bg-muted text-foreground/70',
                             ].join(' ')}
                             aria-hidden="true"
                           >
@@ -335,7 +335,7 @@ const ChoosePlanPage: React.FC = () => {
                     </ul>
 
                     {isRecommended && plan.microReassurance && (
-                      <p className="mt-5 md:mt-6 text-center md:text-left text-[12.5px] md:text-xs text-accent/90 italic leading-relaxed">
+                      <p className="mt-5 md:mt-6 text-center md:text-left text-[13.5px] md:text-xs text-accent italic leading-relaxed">
                         {plan.microReassurance}
                       </p>
                     )}
@@ -364,7 +364,7 @@ const ChoosePlanPage: React.FC = () => {
           <div className="mt-10 md:mt-12 text-center">
             <Link
               to="/pricing"
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-5 py-2.5 text-[13.5px] md:text-sm font-medium text-foreground/80 hover:text-accent hover:border-accent/40 hover:bg-card transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/40 px-5 py-2.5 text-[14px] md:text-sm font-medium text-foreground/85 hover:text-accent hover:border-accent/40 hover:bg-card transition-colors"
             >
               {c.compareLink}
               <ArrowRight className="h-3.5 w-3.5" />
@@ -389,10 +389,10 @@ const ChoosePlanPage: React.FC = () => {
                     >
                       {i + 1}
                     </span>
-                    <h3 className="mt-5 md:mt-6 font-heading text-lg md:text-xl font-semibold text-foreground tracking-tight">
+                    <h3 className="mt-5 md:mt-6 font-heading text-[1.25rem] md:text-xl font-semibold text-foreground tracking-tight">
                       {step.title}
                     </h3>
-                    <p className="mt-2.5 md:mt-3 text-[14px] md:text-[15px] leading-[1.65] text-muted-foreground max-w-[20rem] md:max-w-none">
+                    <p className="mt-2.5 md:mt-3 text-[15px] md:text-[15px] leading-[1.65] text-foreground/70 max-w-[20rem] md:max-w-none">
                       {step.desc}
                     </p>
                   </div>
@@ -412,9 +412,9 @@ const ChoosePlanPage: React.FC = () => {
             ].map(({ icon: Icon, label }, i) => (
               <li
                 key={i}
-                className="flex items-center justify-center gap-2.5 rounded-full border border-border/40 bg-card/30 px-4 py-3 text-[13px] md:text-sm font-medium text-foreground/75"
+                className="flex items-center justify-center gap-2.5 rounded-full border border-border/50 bg-card/50 px-4 py-3 text-[14px] md:text-sm font-medium text-foreground/85"
               >
-                <Icon className="h-3.5 w-3.5 text-accent shrink-0" aria-hidden="true" />
+                <Icon className="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
                 <span>{label}</span>
               </li>
             ))}
@@ -423,7 +423,7 @@ const ChoosePlanPage: React.FC = () => {
 
         {/* ─── Final reassurance ─── */}
         <section className="container max-w-2xl px-6 md:px-6 pb-16 md:pb-24 text-center">
-          <p className="text-[14px] md:text-base text-foreground/65 leading-[1.7]">
+          <p className="text-[15px] md:text-base text-foreground/75 leading-[1.7]">
             {c.finalReassurance}
           </p>
         </section>
