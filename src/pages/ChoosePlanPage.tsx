@@ -42,7 +42,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
     plans: {
       essential: {
         name: 'Essentiel',
-        fit: 'Pour commencer simplement',
+        fit: 'Pour commencer simplement, seul ou à deux',
         benefits: [
           'Volontés et documents essentiels',
           'Espace sécurisé personnel',
