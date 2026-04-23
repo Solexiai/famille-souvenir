@@ -27,7 +27,7 @@ const en: Translations = {
   success_generic: 'Operation successful.',
 
   landing_hero_title: 'Protect the people you love',
-  landing_hero_subtitle: 'Your essential wishes, documents, and memories in a secure space designed to last up to 100 years.',
+  landing_hero_subtitle: 'Your essential wishes, documents, and memories in a secure space crafted to last up to 100 years.',
   landing_cta_start: 'Get started',
   landing_cta_microcopy: 'Start simply and choose the protection that fits you.',
   landing_cta_login: 'I already have an account',
