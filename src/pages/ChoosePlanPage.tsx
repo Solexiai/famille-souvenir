@@ -184,7 +184,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
       { title: 'Añada lo esencial', desc: 'Reúna sus voluntades, documentos y recuerdos importantes.' },
       { title: 'Proteja a sus seres queridos', desc: 'Ofrézcales puntos de referencia claros cuando más lo necesiten.' },
     ],
-    trust: ['Espacio seguro', 'Pensado para sus seres queridos', 'Conservación hasta 100 años'],
+    trust: ['Espacio seguro', 'Pensado para sus seres queridos', 'Hasta 100 años de conservación'],
     finalReassurance:
       'Elija su protección con toda tranquilidad. Después podrá completar su espacio a su propio ritmo.',
   },
