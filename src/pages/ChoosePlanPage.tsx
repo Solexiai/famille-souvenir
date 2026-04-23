@@ -372,36 +372,6 @@ const ChoosePlanPage: React.FC = () => {
           </div>
         </section>
 
-        {/* ─── How it works ─── */}
-        <section className="border-y border-border/40 bg-muted/20">
-          <div className="container max-w-5xl px-5 md:px-6 py-16 md:py-20">
-            <h2 className="text-center font-heading text-[1.625rem] md:text-3xl font-semibold text-foreground tracking-tight">
-              {c.howTitle}
-            </h2>
-
-            <ol className="mt-12 md:mt-14 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-10">
-              {c.steps.map((step, i) => (
-                <li key={i} className="text-center md:text-left">
-                  <div className="flex md:block flex-col items-center md:items-start">
-                    <span
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-accent/25 bg-background text-base font-heading font-semibold text-accent shadow-[0_4px_14px_-4px_hsl(var(--accent)/0.25)]"
-                      aria-hidden="true"
-                    >
-                      {i + 1}
-                    </span>
-                    <h3 className="mt-5 md:mt-6 font-heading text-[1.25rem] md:text-xl font-semibold text-foreground tracking-tight">
-                      {step.title}
-                    </h3>
-                    <p className="mt-2.5 md:mt-3 text-[15px] md:text-[15px] leading-[1.65] text-foreground/70 max-w-[20rem] md:max-w-none">
-                      {step.desc}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
         {/* ─── Trust strip ─── */}
         <section className="container max-w-4xl px-5 md:px-6 py-14 md:py-16">
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
