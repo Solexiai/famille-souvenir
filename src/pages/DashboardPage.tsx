@@ -290,13 +290,13 @@ const DashboardPage: React.FC = () => {
                   {(govSummary.blocked > 0 || govSummary.needsAttention > 0) && (
                     <div className="flex flex-wrap gap-2">
                       {govSummary.blocked > 0 && (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1 text-xs py-0.5">
+                        <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 gap-1 text-xs py-0.5">
                           <AlertTriangle className="h-3 w-3" />
                           {t.dash_blocked.replace('{count}', String(govSummary.blocked))}
                         </Badge>
                       )}
                       {govSummary.needsAttention > 0 && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 gap-1 text-xs py-0.5">
+                        <Badge variant="outline" className="bg-warning/10 text-warning-foreground border-warning/40 gap-1 text-xs py-0.5">
                           <AlertTriangle className="h-3 w-3" />
                           {t.dash_attention_required.replace('{count}', String(govSummary.needsAttention))}
                         </Badge>
@@ -346,22 +346,25 @@ const DashboardPage: React.FC = () => {
               </Card>
             )}
 
-            {/* Quick actions — 3 cols on mobile, clean icons */}
-            <div>
-              <h3 className="font-heading text-sm font-semibold text-foreground mb-3">Accès rapide</h3>
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-3">
+            {/* Sanctuary pillars */}
+            <div className="pt-2">
+              <div className="flex items-baseline justify-between mb-4">
+                <h3 className="font-heading text-xl sm:text-2xl font-semibold text-primary">{t.dash_quick_access ?? 'Accès rapide'}</h3>
+                <span className="hidden sm:block h-px flex-1 mx-4 bg-gradient-to-r from-accent/40 to-transparent" aria-hidden="true" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                 {visibleActions.map((action) => {
                   const Icon = action.icon;
                   return (
                     <button
                       key={action.label}
                       onClick={action.action}
-                      className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 sm:p-4 hover:border-accent/40 hover:shadow-card transition-all duration-200"
+                      className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-border/70 bg-card p-5 hover:border-accent/50 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200"
                     >
-                      <div className="h-10 w-10 rounded-xl bg-secondary/80 group-hover:bg-accent/10 flex items-center justify-center transition-colors">
-                        <Icon className={`h-5 w-5 ${action.color}`} />
+                      <div className="h-12 w-12 rounded-2xl bg-secondary group-hover:bg-accent/15 flex items-center justify-center transition-colors">
+                        <Icon className="h-5 w-5 text-primary group-hover:text-accent transition-colors" />
                       </div>
-                      <span className="text-[11px] sm:text-xs font-medium text-foreground text-center leading-tight">{action.label}</span>
+                      <span className="font-heading text-xs sm:text-sm font-medium text-primary text-center leading-tight">{action.label}</span>
                     </button>
                   );
                 })}
