@@ -244,9 +244,9 @@ const ChoosePlanPage: React.FC = () => {
             className="absolute -top-32 left-1/2 -translate-x-1/2 -z-10 h-72 w-72 md:h-[420px] md:w-[420px] rounded-full bg-accent/10 blur-3xl"
           />
 
-          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-16 pb-8 md:pb-12 text-center">
+          <div className="container max-w-3xl px-5 md:px-6 pt-10 md:pt-16 pb-10 md:pb-14 text-center">
             {/* Back link */}
-            <div className="mb-6 md:mb-8 flex justify-center">
+            <div className="mb-7 md:mb-9 flex justify-center">
               <Link
                 to="/"
                 className="inline-flex items-center gap-1.5 text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -262,23 +262,23 @@ const ChoosePlanPage: React.FC = () => {
               {c.step}
             </div>
 
-            <h1 className="mt-5 md:mt-7 font-heading text-[1.75rem] leading-[1.15] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
+            <h1 className="mt-7 md:mt-8 font-heading text-[1.75rem] leading-[1.18] md:text-5xl md:leading-[1.1] font-semibold text-foreground tracking-tight">
               {c.headline}
             </h1>
 
-            <p className="mt-4 md:mt-5 text-[15px] md:text-lg leading-relaxed text-muted-foreground max-w-xl mx-auto">
+            <p className="mt-5 md:mt-6 text-[15px] md:text-lg leading-relaxed text-muted-foreground max-w-xl mx-auto">
               {c.supporting}
             </p>
 
-            <p className="mt-4 md:mt-5 text-xs md:text-sm text-muted-foreground/80 italic">
+            <p className="mt-6 md:mt-7 text-[11px] md:text-xs uppercase tracking-[0.18em] text-muted-foreground/60 font-normal">
               {c.reassurance}
             </p>
           </div>
         </section>
 
         {/* ─── Plan cards ─── */}
-        <section className="container max-w-6xl px-4 md:px-6 pb-10 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-7">
+        <section className="container max-w-6xl px-4 md:px-6 pb-8 md:pb-14">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 lg:gap-7">
             {PLAN_ORDER.map((key) => {
               const plan = c.plans[key];
               const isRecommended = key === 'family';
@@ -290,7 +290,7 @@ const ChoosePlanPage: React.FC = () => {
                     'relative flex flex-col rounded-2xl bg-card transition-all duration-300',
                     isRecommended
                       ? 'border-2 border-accent shadow-elevated md:-translate-y-1.5 md:scale-[1.015]'
-                      : 'border border-border/70 shadow-card hover:shadow-elevated hover:-translate-y-0.5',
+                      : 'border border-border/60 shadow-soft hover:shadow-card hover:-translate-y-0.5',
                   ].join(' ')}
                 >
                   {isRecommended && plan.recommendedBadge && (
@@ -302,24 +302,24 @@ const ChoosePlanPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="p-6 md:p-7 lg:p-8 flex flex-col flex-1">
+                  <div className="px-6 py-7 md:px-7 md:py-8 lg:px-8 lg:py-9 flex flex-col flex-1">
                     <header className="text-center md:text-left">
-                      <h2 className="font-heading text-2xl md:text-[1.625rem] font-semibold text-foreground tracking-tight">
+                      <h2 className="font-heading text-[1.5rem] md:text-[1.625rem] font-semibold text-foreground tracking-tight">
                         {plan.name}
                       </h2>
-                      <p className="mt-1.5 text-sm text-muted-foreground">
+                      <p className="mt-2 text-sm text-muted-foreground">
                         {plan.fit}
                       </p>
                     </header>
 
                     <div
-                      className="my-5 md:my-6 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent"
+                      className="my-6 md:my-7 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent"
                       aria-hidden="true"
                     />
 
-                    <ul className="space-y-3 md:space-y-3.5 flex-1">
+                    <ul className="space-y-3.5 md:space-y-4 flex-1">
                       {plan.benefits.map((benefit, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm md:text-[15px] leading-relaxed text-foreground/85">
+                        <li key={i} className="flex items-start gap-3 text-sm md:text-[15px] leading-relaxed text-foreground/85">
                           <span
                             className={[
                               'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
@@ -333,6 +333,12 @@ const ChoosePlanPage: React.FC = () => {
                         </li>
                       ))}
                     </ul>
+
+                    {isRecommended && plan.microReassurance && (
+                      <p className="mt-5 md:mt-6 text-center md:text-left text-[12.5px] md:text-xs text-accent/90 italic leading-relaxed">
+                        {plan.microReassurance}
+                      </p>
+                    )}
 
                     <Button
                       onClick={() => handleChoose(key)}
@@ -355,12 +361,13 @@ const ChoosePlanPage: React.FC = () => {
           </div>
 
           {/* Compare link */}
-          <div className="mt-7 md:mt-9 text-center">
+          <div className="mt-8 md:mt-10 text-center">
             <Link
               to="/pricing"
-              className="text-xs md:text-sm text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-foreground/70 hover:text-accent underline-offset-[6px] underline decoration-border hover:decoration-accent/60 transition-colors"
             >
               {c.compareLink}
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </section>
