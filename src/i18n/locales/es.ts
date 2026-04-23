@@ -28,7 +28,7 @@ const es: Translations = {
 
   landing_hero_title: 'Proteja a quienes ama',
   landing_hero_subtitle: 'Tus deseos, documentos y recuerdos esenciales en un espacio seguro diseñado para durar hasta 100 años.',
-  landing_cta_start: 'Comenzar',
+  landing_cta_start: 'Proteger a mis seres queridos',
   landing_cta_login: 'Ya tengo una cuenta',
   landing_why_title: 'Lo que Solexi.ai le ayuda a hacer',
   landing_why_subtitle: 'Organice su expediente familiar paso a paso. La preparación reduce la confusión y el riesgo.',
