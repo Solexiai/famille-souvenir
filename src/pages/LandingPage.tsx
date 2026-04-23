@@ -313,8 +313,8 @@ const LandingPage: React.FC = () => {
             {t.landing_hero_subtitle}
           </p>
           <div className="mt-10 flex items-center justify-center">
-            <Link to="/setup">
-              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2 border-2 border-white">
+            <Link to="/setup" className="relative inline-block rounded-md p-[2px] bg-[linear-gradient(110deg,rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2),rgba(255,255,255,1),rgba(255,255,255,0.2))] bg-[length:200%_100%] animate-shimmer-border shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 py-6 gap-2 border-0 rounded-[calc(var(--radius)-2px)]">
                 {t.landing_cta_start}
                 <ArrowRight className="h-4 w-4" />
               </Button>
