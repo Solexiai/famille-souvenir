@@ -250,8 +250,8 @@ const ChoosePlanPage: React.FC = () => {
   const c = COPY[lang];
 
   const handleChoose = (plan: PlanKey) => {
-    // Direct to signup/checkout — no intermediate steps
-    navigate(`/signup?plan=${plan}`);
+    // Direct to checkout — no intermediate steps
+    navigate(`/checkout?plan=${plan}`);
   };
 
   return (
