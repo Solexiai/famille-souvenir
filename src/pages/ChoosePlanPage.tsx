@@ -37,7 +37,7 @@ const COPY: Record<SupportedLanguage, PageCopy> = {
     back: 'Retour',
     headline: 'Choisissez la protection qui vous convient',
     supporting:
-      'Que vous commenciez pour vous-même ou pour votre famille, Solexi vous aide à protéger l’essentiel avec clarté, simplicité et sérénité.',
+      'Que vous commenciez seul, à deux ou pour votre famille, Solexi vous aide à protéger l’essentiel avec clarté, simplicité et sérénité.',
     reassurance: 'Un parcours simple pour avancer à votre rythme.',
     plans: {
       essential: {
