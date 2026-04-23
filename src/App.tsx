@@ -28,7 +28,6 @@ import SettingsPage from "./pages/SettingsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import ChoosePlanPage from "./pages/ChoosePlanPage";
-import SelectedPlanPage from "./pages/SelectedPlanPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import NotFound from "./pages/NotFound";
@@ -55,7 +54,6 @@ const App = () => (
               <Route path="/terms" element={<TermsPage />} />
               
               <Route path="/choose-plan" element={<ChoosePlanPage />} />
-              <Route path="/selected-plan" element={<SelectedPlanPage />} />
               <Route path="/invitation/accept" element={<AcceptInvitationPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/auth/callback" element={<AuthCallbackPage />} />
