@@ -349,7 +349,7 @@ const DashboardPage: React.FC = () => {
             {/* Sanctuary pillars */}
             <div className="pt-2">
               <div className="flex items-baseline justify-between mb-4">
-                <h3 className="font-heading text-xl sm:text-2xl font-semibold text-primary">{t.dash_quick_access ?? 'Accès rapide'}</h3>
+                <h3 className="font-heading text-xl sm:text-2xl font-semibold text-primary">Accès rapide</h3>
                 <span className="hidden sm:block h-px flex-1 mx-4 bg-gradient-to-r from-accent/40 to-transparent" aria-hidden="true" />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
