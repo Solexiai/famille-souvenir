@@ -67,7 +67,7 @@ export const LimitWarning: React.FC<{ current: number; max: number; label: strin
     <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-md px-3 py-2 mt-2">
       <span>{label}: {current}/{max}</span>
       {pct >= 100 && (
-        <Button size="sm" variant="link" className="text-xs h-auto p-0 text-accent" onClick={() => navigate('/pricing')}>
+        <Button size="sm" variant="link" className="text-xs h-auto p-0 text-accent" onClick={() => navigate('/choose-plan')}>
           {t.upgrade}
         </Button>
       )}
