@@ -335,7 +335,7 @@ const ChoosePlanPage: React.FC = () => {
                     </ul>
 
                     {isRecommended && plan.microReassurance && (
-                      <p className="mt-5 md:mt-6 text-center md:text-left text-[12.5px] md:text-xs text-accent/90 italic leading-relaxed">
+                      <p className="mt-5 md:mt-6 text-center md:text-left text-[13.5px] md:text-xs text-accent italic leading-relaxed">
                         {plan.microReassurance}
                       </p>
                     )}
