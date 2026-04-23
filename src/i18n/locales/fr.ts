@@ -28,7 +28,7 @@ const fr: Translations = {
 
   // Landing
   landing_hero_title: 'Protégez ceux que vous aimez',
-  landing_hero_subtitle: 'Votre espace sécurisé pour organiser vos volontés et votre patrimoine familial, afin de protéger vos proches, étape par étape.',
+  landing_hero_subtitle: 'Réunissez vos volontés, documents et repères essentiels dans un espace sécurisé pour guider vos proches au bon moment.',
   landing_cta_start: 'Protéger mes proches',
   landing_cta_login: 'J\'ai déjà un compte',
   landing_why_title: 'Ce que Solexi.ai vous aide à faire',
