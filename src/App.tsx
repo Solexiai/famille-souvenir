@@ -28,6 +28,7 @@ import SettingsPage from "./pages/SettingsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import PricingPage from "./pages/PricingPage";
+import ChoosePlanPage from "./pages/ChoosePlanPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import NotFound from "./pages/NotFound";
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/pricing" element={<PricingPage />} />
+              <Route path="/choose-plan" element={<ChoosePlanPage />} />
               <Route path="/invitation/accept" element={<AcceptInvitationPage />} />
               <Route path="/unsubscribe" element={<UnsubscribePage />} />
               <Route path="/auth/callback" element={<AuthCallbackPage />} />

@@ -338,7 +338,7 @@ const LandingPage: React.FC = () => {
           {/* Primary CTA — single dominant action */}
           <div className="mt-9 md:mt-12 flex flex-col items-center">
             <Link
-              to="/setup"
+              to="/choose-plan"
               className="relative inline-block rounded-full p-[1.5px] bg-[linear-gradient(110deg,rgba(255,255,255,0.15),rgba(255,255,255,0.95),rgba(255,255,255,0.15),rgba(255,255,255,0.95),rgba(255,255,255,0.15))] bg-[length:200%_100%] animate-shimmer-border shadow-[0_10px_40px_-10px_hsl(var(--accent)/0.55)] focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 focus-within:ring-offset-primary"
             >
               <Button
@@ -484,7 +484,7 @@ const LandingPage: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <Link to="/setup" className="mt-10 inline-block">
+            <Link to="/choose-plan" className="mt-10 inline-block">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 gap-2 px-8">
                 {t.landing_cta_start}
                 <ArrowRight className="h-4 w-4" />
