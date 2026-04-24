@@ -332,7 +332,38 @@ const LandingPage: React.FC = () => {
 
           {/* Supporting text — refined, breathable */}
           <p className="mt-6 md:mt-8 text-[15px] leading-[1.7] sm:text-lg md:text-xl text-primary-foreground/75 max-w-md sm:max-w-xl md:max-w-2xl mx-auto">
-            {t.landing_hero_subtitle}
+            {(() => {
+              const subtitle = t.landing_hero_subtitle;
+              const match = subtitle.match(/(100\s+(?:ans|years|años))/i);
+              if (!match) return subtitle;
+              const idx = match.index ?? 0;
+              const before = subtitle.slice(0, idx);
+              const target = match[0];
+              const after = subtitle.slice(idx + target.length);
+              return (
+                <>
+                  {before}
+                  <span className="relative inline-block text-accent font-medium">
+                    {target}
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 120 10"
+                      preserveAspectRatio="none"
+                      className="absolute left-0 -bottom-1.5 w-full h-2 text-accent/80"
+                    >
+                      <path
+                        d="M2 6 Q 30 2, 60 5 T 118 4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                  {after}
+                </>
+              );
+            })()}
           </p>
 
           {/* Primary CTA — single dominant action */}
