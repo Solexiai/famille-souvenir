@@ -134,6 +134,8 @@ export interface Document {
   created_at: string;
   updated_at: string;
 }
+
+export interface ChecklistItem {
   id: string;
   circle_id: string;
   category: ChecklistCategory;
