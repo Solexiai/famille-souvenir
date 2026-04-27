@@ -547,10 +547,19 @@ const ChecklistPage: React.FC = () => {
 
                           {/* Tags */}
                           <div className="flex items-center gap-2 flex-wrap">
+                            {item.source === 'ai' && (
+                              <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 gap-1 text-[10px]">
+                                <Sparkles className="h-3 w-3" />
+                                {lang === 'fr' ? 'Suggestion IA Solexi' : lang === 'es' ? 'Sugerencia IA Solexi' : 'Solexi AI suggestion'}
+                              </Badge>
+                            )}
                             {item.requires_professional_review && (
-                              <span className="inline-flex items-center gap-1 text-xs text-amber-600">
-                                <AlertTriangle className="h-3 w-3" /> Pro
-                              </span>
+                              <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px]">
+                                <AlertTriangle className="h-3 w-3" />
+                                {lang === 'fr' ? 'À vérifier avec un professionnel qualifié'
+                                  : lang === 'es' ? 'Requiere verificación profesional local'
+                                  : 'Requires local professional verification'}
+                              </Badge>
                             )}
                             {item.linked_document_id && (
                               <span className="inline-flex items-center gap-1 text-xs text-primary">
