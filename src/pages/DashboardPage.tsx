@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles } from 'lucide-react';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles, Camera } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 
@@ -237,6 +237,23 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <Button onClick={() => navigate('/assistant')} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full">
                   <Sparkles className="h-4 w-4 mr-2" />{aiT.nav_assistant}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Mobile scan next-step card */}
+            <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+              <CardContent className="p-5 flex items-center gap-4 flex-wrap">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <Camera className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] uppercase tracking-wider text-primary font-medium">{aiT.next_step_title}</p>
+                  <p className="font-heading text-base text-primary mt-0.5">{aiT.scan_dashboard_title}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{aiT.scan_dashboard_desc}</p>
+                </div>
+                <Button onClick={() => navigate('/documents?scan=1')} variant="outline" className="rounded-full border-primary/30 text-primary hover:bg-primary/10">
+                  <Camera className="h-4 w-4 mr-2" />{aiT.scan_dashboard_cta}
                 </Button>
               </CardContent>
             </Card>

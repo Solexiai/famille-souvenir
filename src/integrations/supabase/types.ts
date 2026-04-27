@@ -296,6 +296,7 @@ export type Database = {
       }
       documents: {
         Row: {
+          ai_classification_status: string
           category: string
           circle_id: string
           created_at: string
@@ -304,15 +305,20 @@ export type Database = {
           file_size: number | null
           id: string
           linked_responsible_member: string | null
+          original_file_type: string | null
+          professional_review_recommended: boolean
           review_note: string | null
+          reviewed_by_user: boolean
           storage_path: string
           title: string
           updated_at: string
+          upload_source: string
           uploaded_by: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           visibility: Database["public"]["Enums"]["document_visibility"]
         }
         Insert: {
+          ai_classification_status?: string
           category?: string
           circle_id: string
           created_at?: string
@@ -321,15 +327,20 @@ export type Database = {
           file_size?: number | null
           id?: string
           linked_responsible_member?: string | null
+          original_file_type?: string | null
+          professional_review_recommended?: boolean
           review_note?: string | null
+          reviewed_by_user?: boolean
           storage_path: string
           title: string
           updated_at?: string
+          upload_source?: string
           uploaded_by: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           visibility?: Database["public"]["Enums"]["document_visibility"]
         }
         Update: {
+          ai_classification_status?: string
           category?: string
           circle_id?: string
           created_at?: string
@@ -338,10 +349,14 @@ export type Database = {
           file_size?: number | null
           id?: string
           linked_responsible_member?: string | null
+          original_file_type?: string | null
+          professional_review_recommended?: boolean
           review_note?: string | null
+          reviewed_by_user?: boolean
           storage_path?: string
           title?: string
           updated_at?: string
+          upload_source?: string
           uploaded_by?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           visibility?: Database["public"]["Enums"]["document_visibility"]

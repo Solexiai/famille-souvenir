@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X } from 'lucide-react';
+import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X, Camera } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload } from '@/lib/image-preparation';
@@ -20,7 +20,8 @@ import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { MobileScanCapture } from '@/components/MobileScanCapture';
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
@@ -68,6 +69,8 @@ const DocumentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -141,6 +144,15 @@ const DocumentsPage: React.FC = () => {
   };
 
   useEffect(() => { loadData(); }, [user]);
+
+  // Auto-open scan dialog when arriving with ?scan=1 (from Dashboard CTA)
+  useEffect(() => {
+    if (searchParams.get('scan') === '1' && circle) {
+      setScanOpen(true);
+      searchParams.delete('scan');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [circle, searchParams, setSearchParams]);
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,13 +229,18 @@ const DocumentsPage: React.FC = () => {
                 {t.docs_subtitle}
               </p>
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5 shrink-0 text-xs sm:text-sm">
-                  <Plus className="h-4 w-4" />
-                  {t.docs_add}
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs sm:text-sm" onClick={() => setScanOpen(true)}>
+                <Camera className="h-4 w-4" />
+                {aiT.scan_btn}
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 text-xs sm:text-sm">
+                    <Plus className="h-4 w-4" />
+                    {t.docs_add}
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-lg mx-3">
                 <DialogHeader>
                   <DialogTitle className="font-heading">{t.docs_add_title}</DialogTitle>
@@ -268,7 +285,8 @@ const DocumentsPage: React.FC = () => {
                   </Button>
                 </form>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            </div>
           </div>
           <LimitWarning current={documents.length} max={FREE_LIMITS.maxDocuments} label={t.plan_gate_document_limit} />
         </div>
@@ -320,6 +338,12 @@ const DocumentsPage: React.FC = () => {
                         <Badge className={`text-[10px] sm:text-xs px-1.5 py-0.5 ${verificationColors[doc.verification_status]}`}>
                           {verificationLabels[doc.verification_status]}
                         </Badge>
+                        {(doc as DocType & { upload_source?: string }).upload_source === 'mobile_scan' && (
+                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0.5 gap-1 bg-accent/10 text-accent border-accent/30">
+                            <Camera className="h-3 w-3" />
+                            {aiT.scan_source_badge}
+                          </Badge>
+                        )}
                         <span className="text-[10px] sm:text-xs text-muted-foreground ml-auto">
                           {new Date(doc.created_at).toLocaleDateString('fr-FR')}
                         </span>
@@ -391,6 +415,14 @@ const DocumentsPage: React.FC = () => {
           </div>
         )}
       </div>
+      {circle && (
+        <MobileScanCapture
+          open={scanOpen}
+          onOpenChange={setScanOpen}
+          circleId={circle.id}
+          onUploaded={loadData}
+        />
+      )}
     </AppLayout>
   );
 };

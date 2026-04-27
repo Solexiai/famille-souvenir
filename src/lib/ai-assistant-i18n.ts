@@ -73,6 +73,25 @@ export const AI_COPY: Record<AILang, {
   requires_local_verification: string;
   jurisdiction_warning: string;
   nav_assistant: string;
+  // Mobile scan
+  scan_btn: string;
+  scan_dialog_title: string;
+  scan_use_camera: string;
+  scan_choose_file: string;
+  scan_camera_hint: string;
+  scan_preview_title: string;
+  scan_retake: string;
+  scan_use_this: string;
+  scan_name_label: string;
+  scan_name_placeholder: string;
+  scan_category: string;
+  scan_save: string;
+  scan_uploading: string;
+  scan_success: string;
+  scan_source_badge: string;
+  scan_dashboard_title: string;
+  scan_dashboard_desc: string;
+  scan_dashboard_cta: string;
 }> = {
   fr: {
     page_title: 'Assistant IA Solexi',
@@ -144,6 +163,24 @@ export const AI_COPY: Record<AILang, {
     requires_local_verification: 'Nécessite une vérification par un professionnel local',
     jurisdiction_warning: "Solexi AI adapte ses suggestions selon votre localisation, mais ne fournit pas de conseils juridiques. Les règles successorales, fiscales, de probate et de directives médicales varient selon la juridiction. Veuillez consulter un professionnel qualifié de votre région.",
     nav_assistant: 'Assistant IA',
+    scan_btn: 'Scanner un document',
+    scan_dialog_title: 'Scanner un document',
+    scan_use_camera: "Utiliser l'appareil photo",
+    scan_choose_file: 'Choisir un fichier',
+    scan_camera_hint: "Sur mobile, votre appareil photo s'ouvrira automatiquement.",
+    scan_preview_title: 'Aperçu',
+    scan_retake: 'Reprendre',
+    scan_use_this: 'Utiliser ce scan',
+    scan_name_label: 'Nommer ce document',
+    scan_name_placeholder: 'Ex. Testament, Carte d\'identité, Police d\'assurance…',
+    scan_category: 'Catégorie',
+    scan_save: 'Enregistrer dans mes documents',
+    scan_uploading: 'Envoi en cours…',
+    scan_success: 'Document scanné enregistré',
+    scan_source_badge: 'Importé depuis le scan mobile',
+    scan_dashboard_title: 'Scannez votre premier document important',
+    scan_dashboard_desc: 'Utilisez votre appareil photo pour ajouter rapidement un testament, une assurance, une pièce d\'identité ou un souvenir familial à votre coffre Solexi.',
+    scan_dashboard_cta: 'Scanner maintenant',
   },
   en: {
     page_title: 'Solexi AI Assistant',
@@ -215,6 +252,24 @@ export const AI_COPY: Record<AILang, {
     requires_local_verification: 'Requires local professional verification',
     jurisdiction_warning: 'Solexi AI adapts suggestions based on your selected location, but it does not provide legal advice. Estate, inheritance, probate, tax, and healthcare directive rules vary by jurisdiction. Please consult a qualified local professional.',
     nav_assistant: 'AI Assistant',
+    scan_btn: 'Scan a document',
+    scan_dialog_title: 'Scan a document',
+    scan_use_camera: 'Use phone camera',
+    scan_choose_file: 'Choose a file',
+    scan_camera_hint: 'On mobile, your camera will open automatically.',
+    scan_preview_title: 'Preview',
+    scan_retake: 'Retake',
+    scan_use_this: 'Use this scan',
+    scan_name_label: 'Name this document',
+    scan_name_placeholder: 'e.g. Will, ID card, Insurance policy…',
+    scan_category: 'Category',
+    scan_save: 'Save to my documents',
+    scan_uploading: 'Uploading…',
+    scan_success: 'Scanned document saved',
+    scan_source_badge: 'Uploaded from mobile scan',
+    scan_dashboard_title: 'Scan your first important document',
+    scan_dashboard_desc: 'Use your phone camera to quickly add a will, insurance document, identity document, or family memory to your Solexi vault.',
+    scan_dashboard_cta: 'Scan now',
   },
   es: {
     page_title: 'Asistente IA Solexi',
@@ -286,6 +341,24 @@ export const AI_COPY: Record<AILang, {
     requires_local_verification: 'Requiere verificación por un profesional local',
     jurisdiction_warning: 'Solexi AI adapta las sugerencias según su ubicación seleccionada, pero no proporciona asesoramiento legal. Las normas sucesorias, fiscales, de probate y de directivas médicas varían según la jurisdicción. Consulte a un profesional cualificado de su región.',
     nav_assistant: 'Asistente IA',
+    scan_btn: 'Escanear un documento',
+    scan_dialog_title: 'Escanear un documento',
+    scan_use_camera: 'Usar la cámara del teléfono',
+    scan_choose_file: 'Elegir un archivo',
+    scan_camera_hint: 'En móvil, la cámara se abrirá automáticamente.',
+    scan_preview_title: 'Vista previa',
+    scan_retake: 'Repetir',
+    scan_use_this: 'Usar este escaneo',
+    scan_name_label: 'Nombrar este documento',
+    scan_name_placeholder: 'Ej. Testamento, Documento de identidad, Póliza de seguro…',
+    scan_category: 'Categoría',
+    scan_save: 'Guardar en mis documentos',
+    scan_uploading: 'Subiendo…',
+    scan_success: 'Documento escaneado guardado',
+    scan_source_badge: 'Subido desde escaneo móvil',
+    scan_dashboard_title: 'Escanea tu primer documento importante',
+    scan_dashboard_desc: 'Usa la cámara de tu teléfono para añadir rápidamente un testamento, un seguro, un documento de identidad o un recuerdo familiar a tu caja fuerte Solexi.',
+    scan_dashboard_cta: 'Escanear ahora',
   },
 };
 
