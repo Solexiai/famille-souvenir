@@ -78,6 +78,14 @@ const AssistantPage: React.FC = () => {
   const [checklist, setChecklist] = useState<ChecklistPayload | null>(null);
   const [generating, setGenerating] = useState(false);
   const [savedIdx, setSavedIdx] = useState<Set<number>>(new Set());
+  const [expandedIdx, setExpandedIdx] = useState<Set<number>>(new Set());
+  const toggleExpanded = (i: number) => {
+    setExpandedIdx(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, sending]);
