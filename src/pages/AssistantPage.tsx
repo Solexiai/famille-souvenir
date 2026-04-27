@@ -98,7 +98,8 @@ const AssistantPage: React.FC = () => {
 
   const [checklist, setChecklist] = useState<ChecklistPayload | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [savedIdx, setSavedIdx] = useState<Set<number>>(new Set());
+  const [savedTitles, setSavedTitles] = useState<Set<string>>(new Set());
+  const [circleId, setCircleId] = useState<string | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<Set<number>>(new Set());
   const toggleExpanded = (i: number) => {
     setExpandedIdx(prev => {
