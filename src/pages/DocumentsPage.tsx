@@ -324,6 +324,65 @@ const DocumentsPage: React.FC = () => {
                           {new Date(doc.created_at).toLocaleDateString('fr-FR')}
                         </span>
                       </div>
+
+                      {/* AI Classify */}
+                      <div className="pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-[11px] h-7 gap-1"
+                          onClick={() => handleClassify(doc)}
+                          disabled={classifyingId === doc.id}
+                        >
+                          {classifyingId === doc.id
+                            ? <><Loader2 className="h-3 w-3 animate-spin" />{aiT.classify_running}</>
+                            : <><Sparkles className="h-3 w-3 text-accent" />{aiT.classify_btn}</>}
+                        </Button>
+                      </div>
+
+                      {classifyResults[doc.id] && (
+                        <div className="mt-2 rounded-lg border border-accent/30 bg-accent/5 p-3 space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-[10px]">
+                              {aiT.ai_badge}
+                            </Badge>
+                            <button
+                              onClick={() => setClassifyResults((prev) => { const { [doc.id]: _, ...rest } = prev; return rest; })}
+                              className="text-muted-foreground hover:text-foreground"
+                              aria-label="dismiss"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">{aiT.classify_disclaimer}</p>
+                          <div className="text-xs space-y-1">
+                            <p><span className="font-medium">{aiT.classify_result_title}: </span>
+                              {categories.find(c => c.value === classifyResults[doc.id].suggested_category)?.label || classifyResults[doc.id].suggested_category}
+                              <span className="text-muted-foreground"> · {aiT.classify_confidence} {Math.round(classifyResults[doc.id].confidence * 100)}%</span>
+                            </p>
+                            <p className="text-foreground/80"><span className="font-medium">{aiT.classify_reason}: </span>{classifyResults[doc.id].reason}</p>
+                            {classifyResults[doc.id].recommended_next_steps?.length > 0 && (
+                              <div>
+                                <p className="font-medium">{aiT.classify_next_steps}:</p>
+                                <ul className="list-disc list-inside text-foreground/80">
+                                  {classifyResults[doc.id].recommended_next_steps.map((s, i) => <li key={i}>{s}</li>)}
+                                </ul>
+                              </div>
+                            )}
+                            {classifyResults[doc.id].professional_review_recommended && (
+                              <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px] mt-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                {aiT.pro_review_badge}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <Button size="sm" className="text-[11px] h-7 gap-1 bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => applyClassification(doc)}>
+                              <Check className="h-3 w-3" />{aiT.classify_apply}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
