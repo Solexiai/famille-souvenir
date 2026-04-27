@@ -112,15 +112,15 @@ const AssistantPage: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, sending]);
 
-  // Load existing context
+  // Load existing context, circle, and previously saved AI suggestions
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
-        .from('ai_user_context')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const [{ data }, { data: circles }, { data: priorSaved }] = await Promise.all([
+        supabase.from('ai_user_context').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('family_circles').select('id').limit(1),
+        supabase.from('ai_saved_suggestions').select('title').eq('user_id', user.id).eq('suggestion_type', 'checklist_item'),
+      ]);
       if (data) {
         const loaded: AIContext = {
           id: data.id,
@@ -131,11 +131,12 @@ const AssistantPage: React.FC = () => {
           ai_disclaimer_accepted: !!data.ai_disclaimer_accepted,
         };
         setCtx(loaded);
-        // Only treat as "saved/unlocked" if the persisted row is fully complete.
         const regionRequired = !!REGIONS_BY_COUNTRY[loaded.country];
         const complete = !!loaded.country && !!loaded.language && !!loaded.preparing_for && (!regionRequired || !!loaded.region);
         if (complete) setSavedCtx(loaded);
       }
+      if (circles && circles.length > 0) setCircleId(circles[0].id);
+      if (priorSaved) setSavedTitles(new Set(priorSaved.map(r => (r.title || '').trim()).filter(Boolean)));
       setLoading(false);
     })();
   }, [user, aiLang]);
