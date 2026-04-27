@@ -75,6 +75,55 @@ const DocumentsPage: React.FC = () => {
   const [visibility, setVisibility] = useState<DocumentVisibility>('private_owner');
   const [file, setFile] = useState<File | null>(null);
 
+  // AI classification state
+  const [classifyingId, setClassifyingId] = useState<string | null>(null);
+  const [classifyResults, setClassifyResults] = useState<Record<string, {
+    suggested_category: string;
+    confidence: number;
+    reason: string;
+    recommended_next_steps: string[];
+    professional_review_recommended: boolean;
+  }>>({});
+
+  const handleClassify = async (doc: DocType) => {
+    setClassifyingId(doc.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-preparation-assistant', {
+        body: {
+          action: 'classify_document',
+          language: aiLang,
+          document_metadata: {
+            file_name: doc.file_name,
+            mime_type: (doc.file_name.split('.').pop() || '').toLowerCase(),
+            file_size: doc.file_size,
+            existing_category: doc.category,
+            upload_date: doc.created_at,
+          },
+        },
+      });
+      if (error || !data?.ok) {
+        const msg = (error as any)?.context?.error || data?.error || '';
+        if (/rate/i.test(msg)) toast.error(aiT.error_rate);
+        else if (/credits|payment/i.test(msg)) toast.error(aiT.error_credits);
+        else toast.error(aiT.error_generic);
+        return;
+      }
+      setClassifyResults((prev) => ({ ...prev, [doc.id]: data.data }));
+    } finally {
+      setClassifyingId(null);
+    }
+  };
+
+  const applyClassification = async (doc: DocType) => {
+    const r = classifyResults[doc.id];
+    if (!r) return;
+    const { error } = await supabase.from('documents').update({ category: r.suggested_category }).eq('id', doc.id);
+    if (error) { toast.error(t.docs_save_error); return; }
+    toast.success('✓');
+    setClassifyResults((prev) => { const { [doc.id]: _, ...rest } = prev; return rest; });
+    loadData();
+  };
+
   const loadData = async () => {
     if (!user) return;
     const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
