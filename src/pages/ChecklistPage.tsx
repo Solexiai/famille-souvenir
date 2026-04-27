@@ -77,7 +77,8 @@ type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
+  const navigate = useNavigate();
   const categoryLabelsT = t.checklist_categories as Record<ChecklistCategory, string>;
   const statusLabelsT = t.checklist_statuses as Record<ChecklistStatus, string>;
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
