@@ -119,11 +119,21 @@ export interface Document {
   verification_status: VerificationStatus;
   review_note: string;
   linked_responsible_member: string | null;
+  upload_source?: string | null;
+  original_file_type?: string | null;
+  stored_file_type?: string | null;
+  converted_to_pdf?: boolean | null;
+  ai_classification_status?: string | null;
+  reviewed_by_user?: boolean | null;
+  professional_review_recommended?: boolean | null;
+  assigned_reviewer_user_id?: string | null;
+  assigned_reviewer_name?: string | null;
+  assigned_reviewer_role?: string | null;
+  reviewer_due_date?: string | null;
+  governance_review_id?: string | null;
   created_at: string;
   updated_at: string;
 }
-
-export interface ChecklistItem {
   id: string;
   circle_id: string;
   category: ChecklistCategory;
