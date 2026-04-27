@@ -338,9 +338,12 @@ const DocumentsPage: React.FC = () => {
                         <Badge className={`text-[10px] sm:text-xs px-1.5 py-0.5 ${verificationColors[doc.verification_status]}`}>
                           {verificationLabels[doc.verification_status]}
                         </Badge>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-auto">
-                          {new Date(doc.created_at).toLocaleDateString('fr-FR')}
-                        </span>
+                        {(doc as DocType & { upload_source?: string }).upload_source === 'mobile_scan' && (
+                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 py-0.5 gap-1 bg-accent/10 text-accent border-accent/30">
+                            <Camera className="h-3 w-3" />
+                            {aiT.scan_source_badge}
+                          </Badge>
+                        )}
                       </div>
 
                       {/* AI Classify */}
