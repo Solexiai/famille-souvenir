@@ -547,7 +547,7 @@ const ChecklistPage: React.FC = () => {
 
                           {/* Tags */}
                           <div className="flex items-center gap-2 flex-wrap">
-                            {item.source === 'ai' && (
+                            {(item.source === 'ai' || item.source === 'ai_document_classification') && (
                               <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 gap-1 text-[10px]">
                                 <Sparkles className="h-3 w-3" />
                                 {lang === 'fr' ? 'Suggestion IA Solexi' : lang === 'es' ? 'Sugerencia IA Solexi' : 'Solexi AI suggestion'}

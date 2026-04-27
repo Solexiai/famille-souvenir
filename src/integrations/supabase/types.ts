@@ -297,19 +297,26 @@ export type Database = {
       documents: {
         Row: {
           ai_classification_status: string
+          assigned_reviewer_name: string | null
+          assigned_reviewer_role: string | null
+          assigned_reviewer_user_id: string | null
           category: string
           circle_id: string
+          converted_to_pdf: boolean
           created_at: string
           description: string | null
           file_name: string
           file_size: number | null
+          governance_review_id: string | null
           id: string
           linked_responsible_member: string | null
           original_file_type: string | null
           professional_review_recommended: boolean
           review_note: string | null
           reviewed_by_user: boolean
+          reviewer_due_date: string | null
           storage_path: string
+          stored_file_type: string | null
           title: string
           updated_at: string
           upload_source: string
@@ -319,19 +326,26 @@ export type Database = {
         }
         Insert: {
           ai_classification_status?: string
+          assigned_reviewer_name?: string | null
+          assigned_reviewer_role?: string | null
+          assigned_reviewer_user_id?: string | null
           category?: string
           circle_id: string
+          converted_to_pdf?: boolean
           created_at?: string
           description?: string | null
           file_name: string
           file_size?: number | null
+          governance_review_id?: string | null
           id?: string
           linked_responsible_member?: string | null
           original_file_type?: string | null
           professional_review_recommended?: boolean
           review_note?: string | null
           reviewed_by_user?: boolean
+          reviewer_due_date?: string | null
           storage_path: string
+          stored_file_type?: string | null
           title: string
           updated_at?: string
           upload_source?: string
@@ -341,19 +355,26 @@ export type Database = {
         }
         Update: {
           ai_classification_status?: string
+          assigned_reviewer_name?: string | null
+          assigned_reviewer_role?: string | null
+          assigned_reviewer_user_id?: string | null
           category?: string
           circle_id?: string
+          converted_to_pdf?: boolean
           created_at?: string
           description?: string | null
           file_name?: string
           file_size?: number | null
+          governance_review_id?: string | null
           id?: string
           linked_responsible_member?: string | null
           original_file_type?: string | null
           professional_review_recommended?: boolean
           review_note?: string | null
           reviewed_by_user?: boolean
+          reviewer_due_date?: string | null
           storage_path?: string
+          stored_file_type?: string | null
           title?: string
           updated_at?: string
           upload_source?: string

@@ -92,6 +92,40 @@ export const AI_COPY: Record<AILang, {
   scan_dashboard_title: string;
   scan_dashboard_desc: string;
   scan_dashboard_cta: string;
+  scan_pdf_hint: string;
+  scan_source_badge_short: string;
+  scan_source_badge_tooltip: string;
+  // Documents helper
+  documents_vault_helper: string;
+  // Post-classification actions
+  classify_action_apply: string;
+  classify_action_add_checklist: string;
+  classify_action_assign_reviewer: string;
+  classify_action_send_governance: string;
+  classify_added_to_checklist: string;
+  classify_sent_to_governance: string;
+  classify_already_in_checklist: string;
+  classify_already_in_governance: string;
+  // Reviewer dialog
+  reviewer_dialog_title: string;
+  reviewer_choose: string;
+  reviewer_self: string;
+  reviewer_circle_member: string;
+  reviewer_external: string;
+  reviewer_name_label: string;
+  reviewer_name_placeholder: string;
+  reviewer_role_label: string;
+  reviewer_due_date_label: string;
+  reviewer_save: string;
+  reviewer_saved: string;
+  reviewer_role_family: string;
+  reviewer_role_executor: string;
+  reviewer_role_notary: string;
+  reviewer_role_advisor: string;
+  reviewer_role_other: string;
+  reviewer_assigned_badge: string;
+  // Checklist task title prefix
+  classify_checklist_task_prefix: string;
 }> = {
   fr: {
     page_title: 'Assistant IA Solexi',
@@ -181,6 +215,36 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_title: 'Scannez votre premier document important',
     scan_dashboard_desc: 'Utilisez votre appareil photo pour ajouter rapidement un testament, une assurance, une pièce d\'identité ou un souvenir familial à votre coffre Solexi.',
     scan_dashboard_cta: 'Scanner maintenant',
+    scan_pdf_hint: 'Votre scan sera enregistré en PDF lorsque possible.',
+    scan_source_badge_short: 'Scan mobile',
+    scan_source_badge_tooltip: 'Document importé depuis le scan mobile Solexi',
+    documents_vault_helper: 'Vos documents restent dans votre coffre sécurisé. Après classification, vous pouvez les ajouter à votre Checklist ou les envoyer en Gouvernance pour révision.',
+    classify_action_apply: 'Appliquer cette catégorie',
+    classify_action_add_checklist: 'Ajouter à la Checklist',
+    classify_action_assign_reviewer: 'Attribuer un responsable',
+    classify_action_send_governance: 'Envoyer à la Gouvernance',
+    classify_added_to_checklist: 'Tâche ajoutée à votre Checklist',
+    classify_sent_to_governance: 'Document envoyé en Gouvernance',
+    classify_already_in_checklist: 'Déjà dans la Checklist',
+    classify_already_in_governance: 'Déjà en Gouvernance',
+    reviewer_dialog_title: 'Attribuer un responsable',
+    reviewer_choose: 'Choisir le type de responsable',
+    reviewer_self: 'Moi-même',
+    reviewer_circle_member: 'Un membre du cercle familial',
+    reviewer_external: 'Un professionnel externe',
+    reviewer_name_label: 'Nom du responsable',
+    reviewer_name_placeholder: 'Ex. Marie Tremblay',
+    reviewer_role_label: 'Rôle du responsable',
+    reviewer_due_date_label: 'Date limite (optionnelle)',
+    reviewer_save: 'Enregistrer',
+    reviewer_saved: 'Responsable assigné',
+    reviewer_role_family: 'Responsable familial',
+    reviewer_role_executor: 'Exécuteur / liquidateur',
+    reviewer_role_notary: 'Notaire / avocat',
+    reviewer_role_advisor: 'Conseiller financier',
+    reviewer_role_other: 'Autre',
+    reviewer_assigned_badge: 'Responsable',
+    classify_checklist_task_prefix: 'Réviser le document :',
   },
   en: {
     page_title: 'Solexi AI Assistant',
@@ -270,6 +334,36 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_title: 'Scan your first important document',
     scan_dashboard_desc: 'Use your phone camera to quickly add a will, insurance document, identity document, or family memory to your Solexi vault.',
     scan_dashboard_cta: 'Scan now',
+    scan_pdf_hint: 'Your scan will be saved as a PDF when possible.',
+    scan_source_badge_short: 'Mobile scan',
+    scan_source_badge_tooltip: 'Document uploaded from Solexi mobile scan',
+    documents_vault_helper: 'Your documents remain in your secure vault. After classification, you can add them to your Checklist or send them to Governance for review.',
+    classify_action_apply: 'Apply category',
+    classify_action_add_checklist: 'Add to Checklist',
+    classify_action_assign_reviewer: 'Assign reviewer',
+    classify_action_send_governance: 'Send to Governance',
+    classify_added_to_checklist: 'Task added to your Checklist',
+    classify_sent_to_governance: 'Document sent to Governance',
+    classify_already_in_checklist: 'Already in Checklist',
+    classify_already_in_governance: 'Already in Governance',
+    reviewer_dialog_title: 'Assign reviewer',
+    reviewer_choose: 'Choose reviewer type',
+    reviewer_self: 'Myself',
+    reviewer_circle_member: 'A family circle member',
+    reviewer_external: 'An external professional',
+    reviewer_name_label: 'Reviewer name',
+    reviewer_name_placeholder: 'e.g. Marie Tremblay',
+    reviewer_role_label: 'Reviewer role',
+    reviewer_due_date_label: 'Due date (optional)',
+    reviewer_save: 'Save',
+    reviewer_saved: 'Reviewer assigned',
+    reviewer_role_family: 'Family responsible person',
+    reviewer_role_executor: 'Executor',
+    reviewer_role_notary: 'Notary / attorney',
+    reviewer_role_advisor: 'Financial advisor',
+    reviewer_role_other: 'Other',
+    reviewer_assigned_badge: 'Reviewer',
+    classify_checklist_task_prefix: 'Review document:',
   },
   es: {
     page_title: 'Asistente IA Solexi',
@@ -359,6 +453,36 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_title: 'Escanea tu primer documento importante',
     scan_dashboard_desc: 'Usa la cámara de tu teléfono para añadir rápidamente un testamento, un seguro, un documento de identidad o un recuerdo familiar a tu caja fuerte Solexi.',
     scan_dashboard_cta: 'Escanear ahora',
+    scan_pdf_hint: 'Su escaneo se guardará como PDF cuando sea posible.',
+    scan_source_badge_short: 'Escaneo móvil',
+    scan_source_badge_tooltip: 'Documento subido desde escaneo móvil Solexi',
+    documents_vault_helper: 'Sus documentos permanecen en su bóveda segura. Después de la clasificación, puede añadirlos a su Checklist o enviarlos a Gobernanza para revisión.',
+    classify_action_apply: 'Aplicar esta categoría',
+    classify_action_add_checklist: 'Añadir a la Checklist',
+    classify_action_assign_reviewer: 'Asignar revisor',
+    classify_action_send_governance: 'Enviar a Gobernanza',
+    classify_added_to_checklist: 'Tarea añadida a su Checklist',
+    classify_sent_to_governance: 'Documento enviado a Gobernanza',
+    classify_already_in_checklist: 'Ya está en la Checklist',
+    classify_already_in_governance: 'Ya está en Gobernanza',
+    reviewer_dialog_title: 'Asignar revisor',
+    reviewer_choose: 'Elegir tipo de revisor',
+    reviewer_self: 'Mí mismo',
+    reviewer_circle_member: 'Un miembro del círculo familiar',
+    reviewer_external: 'Un profesional externo',
+    reviewer_name_label: 'Nombre del revisor',
+    reviewer_name_placeholder: 'Ej. Marie Tremblay',
+    reviewer_role_label: 'Rol del revisor',
+    reviewer_due_date_label: 'Fecha límite (opcional)',
+    reviewer_save: 'Guardar',
+    reviewer_saved: 'Revisor asignado',
+    reviewer_role_family: 'Responsable familiar',
+    reviewer_role_executor: 'Ejecutor',
+    reviewer_role_notary: 'Notario / abogado',
+    reviewer_role_advisor: 'Asesor financiero',
+    reviewer_role_other: 'Otro',
+    reviewer_assigned_badge: 'Revisor',
+    classify_checklist_task_prefix: 'Revisar el documento:',
   },
 };
 
