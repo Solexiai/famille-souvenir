@@ -87,6 +87,27 @@ export const DocumentClassificationActions: React.FC<Props> = ({
   const [done, setDone] = useState<{ category?: boolean; checklist?: boolean; reviewer?: boolean; governance?: boolean }>({});
   const [reviewerOpen, setReviewerOpen] = useState(false);
 
+  // Hydrate "already added" state from DB so repeated "Classify with AI" clicks
+  // never produce duplicate checklist tasks or governance entries.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [{ data: cl }, { data: gov }] = await Promise.all([
+        supabase.from('checklist_items').select('id').eq('circle_id', circleId).eq('linked_document_id', doc.id).limit(1),
+        supabase.from('governance_responsibilities').select('id').eq('circle_id', circleId).eq('linked_document', doc.id).limit(1),
+      ]);
+      if (cancelled) return;
+      setDone((d) => ({
+        ...d,
+        category: d.category || doc.ai_classification_status === 'classified',
+        checklist: d.checklist || (cl?.length ?? 0) > 0,
+        governance: d.governance || (gov?.length ?? 0) > 0,
+        reviewer: d.reviewer || !!doc.assigned_reviewer_role,
+      }));
+    })();
+    return () => { cancelled = true; };
+  }, [circleId, doc.id, doc.ai_classification_status, doc.assigned_reviewer_role]);
+
   const apply = async () => {
     setBusy('apply');
     try {
