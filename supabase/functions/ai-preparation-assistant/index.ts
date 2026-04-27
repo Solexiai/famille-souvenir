@@ -89,7 +89,21 @@ async function callProvider(req: ProviderRequest): Promise<{
 }
 
 // ─── System prompt ───────────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are Solexi AI Preparation Assistant. You help users organize memories, documents, and estate-preparation information. You provide educational and organizational guidance only. You do not provide legal, tax, financial, medical, or professional advice. You must always recommend consulting a qualified professional when the question involves legal validity, taxation, inheritance rights, medical decisions, notarization, or financial planning. Tailor general guidance to the user's country and state/province, but do not claim certainty unless the information is verified. If unsure, say that the user should verify with a qualified local professional. Always answer in the user's preferred language.`;
+const SYSTEM_PROMPT = `You are Solexi AI Preparation Assistant. You help users organize memories, documents, and estate-preparation information.
+
+CORE RULES — never break these:
+1. You provide educational and organizational guidance only. You are NOT a lawyer, notary, tax professional, financial advisor, or doctor.
+2. You must NEVER claim that information is legally complete, legally verified, or constitutes definitive legal/tax/medical/financial requirements. Solexi has no connected official legal database.
+3. For ANY topic involving legal validity, estate, inheritance, probate, taxes, notarization, healthcare directives/surrogates, powers of attorney, or financial planning, you MUST explicitly tell the user to verify with a qualified professional in their state/province/country.
+4. Use phrases like "common documents to consider preparing", "items to review with a qualified local professional", "this may vary depending on your situation and jurisdiction". Avoid phrases like "you must", "the law requires", "this is legally sufficient".
+5. Adapt suggestions to the user's selected country and state/province as CONTEXT for practical preparation only — never as a legal statement. Reference the jurisdiction by name in your guidance (e.g., "in Florida, United States, common documents people prepare include…").
+6. Always reply in the user's preferred language: 'fr' → French, 'en' → English, 'es' → Spanish. Never mix languages.`;
+
+function languageName(code?: string): string {
+  if (code === "fr") return "French";
+  if (code === "es") return "Spanish";
+  return "English";
+}
 
 function contextBlock(ctx: {
   country?: string;
@@ -97,7 +111,8 @@ function contextBlock(ctx: {
   language?: string;
   preparing_for?: string;
 }): string {
-  return `User context — country: ${ctx.country || "unspecified"}, region/province: ${ctx.region || "unspecified"}, language: ${ctx.language || "fr"}, preparing for: ${ctx.preparing_for || "myself"}.`;
+  const lang = ctx.language || "fr";
+  return `User context — country: ${ctx.country || "unspecified"}, state/province: ${ctx.region || "unspecified"}, preferred language: ${lang} (you MUST reply in ${languageName(lang)}), preparing for: ${ctx.preparing_for || "myself"}. Tailor practical guidance to this jurisdiction context, but do not claim legal completeness.`;
 }
 
 // ─── Action handlers ─────────────────────────────────────────────────────
@@ -158,10 +173,18 @@ Return a structured classification.`;
 }
 
 async function generateChecklist(payload: any) {
-  const userPrompt = `Generate a personalized estate & family preparation checklist.
+  const country = payload.country || "unspecified";
+  const region = payload.region || "unspecified";
+  const userPrompt = `Generate a personalized, jurisdiction-aware preparation checklist.
 ${contextBlock(payload)}
 
-Return 8-15 practical checklist items grouped into the standard sections.`;
+Requirements:
+- Return 10-16 practical items.
+- The "intro" must be 2-3 reassuring sentences that explicitly mention the user's location (${region}, ${country}) and remind that this is educational organizational guidance, not legal advice.
+- Include AT LEAST 3 items in the "state_province_specific" section that reference ${region}, ${country} by name (e.g., "Items to verify in ${region}: …"). These items MUST set professional_review_recommended=true and their description must say to verify with a qualified local professional in ${region}.
+- For any item touching wills, estate, probate, powers of attorney, healthcare directives/surrogates, beneficiary designations, taxes, or real estate transfers, set professional_review_recommended=true and use wording like "Common documents to consider preparing" / "Review with a qualified local professional".
+- Never claim items are a complete legal requirement. Use cautious wording.
+- Reply in the user's preferred language only.`;
 
   const tool: ProviderTool = {
     type: "function",
@@ -181,7 +204,7 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
                 description: { type: "string" },
                 section: {
                   type: "string",
-                  description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review",
+                  description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review, state_province_specific",
                 },
                 professional_review_recommended: { type: "boolean" },
               },
