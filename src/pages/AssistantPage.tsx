@@ -31,9 +31,22 @@ interface ChatMessage {
 
 interface ChecklistItem {
   title: string;
-  description: string;
+  /** Legacy field — kept for backward compatibility with older payloads. */
+  description?: string;
+  /** New short, app-friendly fields. */
+  category?: string;
+  short_explanation?: string;
+  recommended_action?: string;
+  details?: string;
   section: string;
   professional_review_recommended: boolean;
+}
+
+interface ChecklistPayload {
+  intro: string;
+  closing?: string;
+  jurisdiction_section_title?: string;
+  items: ChecklistItem[];
 }
 
 const REGIONS_BY_COUNTRY: Record<string, string[]> = {
