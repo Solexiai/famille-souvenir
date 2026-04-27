@@ -133,6 +133,8 @@ export const AI_COPY: Record<AILang, {
   scan_step_filter_hint: string;
   scan_crop_use_full: string;
   scan_crop_reset: string;
+  scan_crop_auto_detect: string;
+  scan_crop_zoom: string;
   scan_crop_confirm: string;
   scan_crop_auto_suggested: string;
   scan_filter_original: string;
@@ -266,7 +268,9 @@ export const AI_COPY: Record<AILang, {
     scan_step_filter_title: 'Améliorer la lisibilité',
     scan_step_filter_hint: 'Appliquer un filtre pour améliorer la lisibilité.',
     scan_crop_use_full: 'Utiliser l\'image complète',
-    scan_crop_reset: 'Recadrage par défaut',
+    scan_crop_reset: 'Réinitialiser',
+    scan_crop_auto_detect: 'Détection auto',
+    scan_crop_zoom: 'Zoom',
     scan_crop_confirm: 'Confirmer le cadrage',
     scan_crop_auto_suggested: 'Suggestion automatique appliquée — ajustez si besoin.',
     scan_filter_original: 'Original',
@@ -400,7 +404,9 @@ export const AI_COPY: Record<AILang, {
     scan_step_filter_title: 'Improve readability',
     scan_step_filter_hint: 'Apply a filter to improve readability.',
     scan_crop_use_full: 'Use full image',
-    scan_crop_reset: 'Default crop',
+    scan_crop_reset: 'Reset crop',
+    scan_crop_auto_detect: 'Auto-detect',
+    scan_crop_zoom: 'Zoom',
     scan_crop_confirm: 'Confirm crop',
     scan_crop_auto_suggested: 'Auto-suggested crop applied — adjust if needed.',
     scan_filter_original: 'Original',
@@ -534,7 +540,9 @@ export const AI_COPY: Record<AILang, {
     scan_step_filter_title: 'Mejorar la legibilidad',
     scan_step_filter_hint: 'Aplique un filtro para mejorar la legibilidad.',
     scan_crop_use_full: 'Usar imagen completa',
-    scan_crop_reset: 'Recorte por defecto',
+    scan_crop_reset: 'Reiniciar',
+    scan_crop_auto_detect: 'Detección auto',
+    scan_crop_zoom: 'Zoom',
     scan_crop_confirm: 'Confirmar recorte',
     scan_crop_auto_suggested: 'Recorte sugerido aplicado — ajuste si es necesario.',
     scan_filter_original: 'Original',
