@@ -602,6 +602,9 @@ const AssistantPage: React.FC = () => {
                     {generating ? t.generating_checklist : t.generate_checklist}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground bg-secondary/40 rounded-md p-2.5 border border-border/50">
+                  💡 {navHelperText}
+                </p>
                 {!checklist && !generating && (
                   <p className="text-sm text-muted-foreground">{t.checklist_empty}</p>
                 )}
