@@ -140,7 +140,7 @@ Return a structured classification.`;
           "recommended_next_steps", "sensitive_data_warning",
           "professional_review_recommended",
         ],
-        additionalProperties: false,
+      },
       },
     },
   };
