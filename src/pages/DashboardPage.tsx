@@ -8,12 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot } from 'lucide-react';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
+import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { t, terms } = useLocale();
+  const { t, terms, lang } = useLocale();
+  const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
+  const aiT = AI_COPY[aiLang];
   const navigate = useNavigate();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memberCount, setMemberCount] = useState(0);
@@ -220,6 +223,23 @@ const DashboardPage: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Next recommended step — AI Assistant */}
+            <Card className="shadow-card border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+              <CardContent className="p-5 flex items-center gap-4 flex-wrap">
+                <div className="h-12 w-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
+                  <Sparkles className="h-5 w-5 text-accent" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] uppercase tracking-wider text-accent font-medium">{aiT.next_step_title}</p>
+                  <p className="font-heading text-base text-primary mt-0.5">{aiT.next_step_open_assistant}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{aiT.empty_assistant}</p>
+                </div>
+                <Button onClick={() => navigate('/assistant')} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full">
+                  <Sparkles className="h-4 w-4 mr-2" />{aiT.nav_assistant}
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Alerts row */}
             {(checklistSummary.needsReview > 0 || checklistSummary.blocked > 0 || checklistSummary.proReview > 0) && (

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
+import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload } from '@/lib/image-preparation';
@@ -19,11 +19,16 @@ import { logAuditEvent } from '@/lib/audit';
 import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
+import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
+import { useNavigate } from 'react-router-dom';
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
   const { plan } = usePlan();
   const { t, lang } = useLocale();
+  const navigate = useNavigate();
+  const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
+  const aiT = AI_COPY[aiLang];
 
   const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' };
 
@@ -69,6 +74,55 @@ const DocumentsPage: React.FC = () => {
   const [category, setCategory] = useState('other');
   const [visibility, setVisibility] = useState<DocumentVisibility>('private_owner');
   const [file, setFile] = useState<File | null>(null);
+
+  // AI classification state
+  const [classifyingId, setClassifyingId] = useState<string | null>(null);
+  const [classifyResults, setClassifyResults] = useState<Record<string, {
+    suggested_category: string;
+    confidence: number;
+    reason: string;
+    recommended_next_steps: string[];
+    professional_review_recommended: boolean;
+  }>>({});
+
+  const handleClassify = async (doc: DocType) => {
+    setClassifyingId(doc.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-preparation-assistant', {
+        body: {
+          action: 'classify_document',
+          language: aiLang,
+          document_metadata: {
+            file_name: doc.file_name,
+            mime_type: (doc.file_name.split('.').pop() || '').toLowerCase(),
+            file_size: doc.file_size,
+            existing_category: doc.category,
+            upload_date: doc.created_at,
+          },
+        },
+      });
+      if (error || !data?.ok) {
+        const msg = (error as any)?.context?.error || data?.error || '';
+        if (/rate/i.test(msg)) toast.error(aiT.error_rate);
+        else if (/credits|payment/i.test(msg)) toast.error(aiT.error_credits);
+        else toast.error(aiT.error_generic);
+        return;
+      }
+      setClassifyResults((prev) => ({ ...prev, [doc.id]: data.data }));
+    } finally {
+      setClassifyingId(null);
+    }
+  };
+
+  const applyClassification = async (doc: DocType) => {
+    const r = classifyResults[doc.id];
+    if (!r) return;
+    const { error } = await supabase.from('documents').update({ category: r.suggested_category }).eq('id', doc.id);
+    if (error) { toast.error(t.docs_save_error); return; }
+    toast.success('✓');
+    setClassifyResults((prev) => { const { [doc.id]: _, ...rest } = prev; return rest; });
+    loadData();
+  };
 
   const loadData = async () => {
     if (!user) return;
@@ -270,6 +324,65 @@ const DocumentsPage: React.FC = () => {
                           {new Date(doc.created_at).toLocaleDateString('fr-FR')}
                         </span>
                       </div>
+
+                      {/* AI Classify */}
+                      <div className="pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-[11px] h-7 gap-1"
+                          onClick={() => handleClassify(doc)}
+                          disabled={classifyingId === doc.id}
+                        >
+                          {classifyingId === doc.id
+                            ? <><Loader2 className="h-3 w-3 animate-spin" />{aiT.classify_running}</>
+                            : <><Sparkles className="h-3 w-3 text-accent" />{aiT.classify_btn}</>}
+                        </Button>
+                      </div>
+
+                      {classifyResults[doc.id] && (
+                        <div className="mt-2 rounded-lg border border-accent/30 bg-accent/5 p-3 space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-[10px]">
+                              {aiT.ai_badge}
+                            </Badge>
+                            <button
+                              onClick={() => setClassifyResults((prev) => { const { [doc.id]: _, ...rest } = prev; return rest; })}
+                              className="text-muted-foreground hover:text-foreground"
+                              aria-label="dismiss"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">{aiT.classify_disclaimer}</p>
+                          <div className="text-xs space-y-1">
+                            <p><span className="font-medium">{aiT.classify_result_title}: </span>
+                              {categories.find(c => c.value === classifyResults[doc.id].suggested_category)?.label || classifyResults[doc.id].suggested_category}
+                              <span className="text-muted-foreground"> · {aiT.classify_confidence} {Math.round(classifyResults[doc.id].confidence * 100)}%</span>
+                            </p>
+                            <p className="text-foreground/80"><span className="font-medium">{aiT.classify_reason}: </span>{classifyResults[doc.id].reason}</p>
+                            {classifyResults[doc.id].recommended_next_steps?.length > 0 && (
+                              <div>
+                                <p className="font-medium">{aiT.classify_next_steps}:</p>
+                                <ul className="list-disc list-inside text-foreground/80">
+                                  {classifyResults[doc.id].recommended_next_steps.map((s, i) => <li key={i}>{s}</li>)}
+                                </ul>
+                              </div>
+                            )}
+                            {classifyResults[doc.id].professional_review_recommended && (
+                              <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px] mt-1">
+                                <AlertTriangle className="h-3 w-3" />
+                                {aiT.pro_review_badge}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <Button size="sm" className="text-[11px] h-7 gap-1 bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => applyClassification(doc)}>
+                              <Check className="h-3 w-3" />{aiT.classify_apply}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>

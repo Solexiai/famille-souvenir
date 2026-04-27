@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_interactions_log: {
+        Row: {
+          action_type: string
+          created_at: string
+          error_message: string | null
+          id: string
+          request_summary: string | null
+          response_summary: string | null
+          success: boolean
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_summary?: string | null
+          response_summary?: string | null
+          success?: boolean
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_summary?: string | null
+          response_summary?: string | null
+          success?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_saved_suggestions: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metadata: Json
+          professional_review_recommended: boolean
+          status: string
+          suggestion_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          professional_review_recommended?: boolean
+          status?: string
+          suggestion_type: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          professional_review_recommended?: boolean
+          status?: string
+          suggestion_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_user_context: {
+        Row: {
+          ai_disclaimer_accepted: boolean
+          ai_disclaimer_accepted_at: string | null
+          country: string | null
+          created_at: string
+          id: string
+          language: string
+          preparing_for: string
+          region: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_disclaimer_accepted?: boolean
+          ai_disclaimer_accepted_at?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          language?: string
+          preparing_for?: string
+          region?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_disclaimer_accepted?: boolean
+          ai_disclaimer_accepted_at?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          language?: string
+          preparing_for?: string
+          region?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
