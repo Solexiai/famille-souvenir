@@ -52,7 +52,10 @@ const AssistantPage: React.FC = () => {
   const [ctx, setCtx] = useState<AIContext>({
     country: '', region: '', language: aiLang, preparing_for: 'myself', ai_disclaimer_accepted: false,
   });
+  // Snapshot of the last successfully saved context — drives the unlock gate.
+  const [savedCtx, setSavedCtx] = useState<AIContext | null>(null);
   const [savingCtx, setSavingCtx] = useState(false);
+  const [showRegionError, setShowRegionError] = useState(false);
   const [tab, setTab] = useState('chat');
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -76,14 +79,19 @@ const AssistantPage: React.FC = () => {
         .eq('user_id', user.id)
         .maybeSingle();
       if (data) {
-        setCtx({
+        const loaded: AIContext = {
           id: data.id,
           country: data.country || '',
           region: data.region || '',
           language: (data.language as AILang) || aiLang,
           preparing_for: (data.preparing_for as 'myself' | 'family_member') || 'myself',
           ai_disclaimer_accepted: !!data.ai_disclaimer_accepted,
-        });
+        };
+        setCtx(loaded);
+        // Only treat as "saved/unlocked" if the persisted row is fully complete.
+        const regionRequired = !!REGIONS_BY_COUNTRY[loaded.country];
+        const complete = !!loaded.country && !!loaded.language && !!loaded.preparing_for && (!regionRequired || !!loaded.region);
+        if (complete) setSavedCtx(loaded);
       }
       setLoading(false);
     })();
@@ -112,11 +120,17 @@ const AssistantPage: React.FC = () => {
       toast.error(t.error_generic);
       return;
     }
-    setCtx({ ...next, id: data.id });
+    const saved = { ...next, id: data.id };
+    setCtx(saved);
+    // Mark as unlocked only if all required fields are present in the saved row.
+    const regionRequired = !!REGIONS_BY_COUNTRY[saved.country];
+    const complete = !!saved.country && !!saved.language && !!saved.preparing_for && (!regionRequired || !!saved.region);
+    if (complete) setSavedCtx(saved);
     return data;
   };
 
   const acceptDisclaimer = async () => {
+    // Persist the disclaimer flag without unlocking the assistant — context still required.
     await saveContext({ ai_disclaimer_accepted: true });
   };
 
@@ -244,8 +258,33 @@ const AssistantPage: React.FC = () => {
     );
   }
 
-  // Context required
-  const contextReady = !!ctx.country && !!ctx.language;
+  // The assistant is unlocked ONLY when a complete context has been saved.
+  const contextReady = !!savedCtx;
+
+  // Validation for the form (live, but doesn't unlock until Save).
+  const regionRequired = !!REGIONS_BY_COUNTRY[ctx.country];
+  const formComplete =
+    !!ctx.country &&
+    !!ctx.language &&
+    !!ctx.preparing_for &&
+    (!regionRequired || !!ctx.region);
+
+  const regionErrorMsg =
+    aiLang === 'fr'
+      ? 'Veuillez sélectionner votre province ou état avant de continuer.'
+      : aiLang === 'es'
+        ? 'Seleccione su provincia o estado antes de continuar.'
+        : 'Please select your province or state before continuing.';
+
+  const handleSaveClick = async () => {
+    if (regionRequired && !ctx.region) {
+      setShowRegionError(true);
+      return;
+    }
+    setShowRegionError(false);
+    const result = await saveContext();
+    if (result) toast.success('✓');
+  };
 
   const SettingsForm = (
     <Card className="shadow-card">
@@ -257,7 +296,14 @@ const AssistantPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">{t.context_country}</Label>
-            <Select value={ctx.country} onValueChange={(v) => setCtx({ ...ctx, country: v, region: '' })}>
+            <Select
+              value={ctx.country}
+              onValueChange={(v) => {
+                // Update form state only — never auto-save or unlock on country change.
+                setCtx({ ...ctx, country: v, region: '' });
+                setShowRegionError(false);
+              }}
+            >
               <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
               <SelectContent>
                 {COUNTRIES.map(c => (
@@ -269,9 +315,14 @@ const AssistantPage: React.FC = () => {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">{t.context_region}</Label>
+            <Label className="text-xs">
+              {t.context_region}{regionRequired && <span className="text-destructive"> *</span>}
+            </Label>
             {REGIONS_BY_COUNTRY[ctx.country] ? (
-              <Select value={ctx.region} onValueChange={(v) => setCtx({ ...ctx, region: v })}>
+              <Select
+                value={ctx.region}
+                onValueChange={(v) => { setCtx({ ...ctx, region: v }); setShowRegionError(false); }}
+              >
                 <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                 <SelectContent>
                   {REGIONS_BY_COUNTRY[ctx.country].map(r => (
@@ -281,6 +332,9 @@ const AssistantPage: React.FC = () => {
               </Select>
             ) : (
               <Input value={ctx.region} onChange={(e) => setCtx({ ...ctx, region: e.target.value })} placeholder="—" />
+            )}
+            {showRegionError && regionRequired && !ctx.region && (
+              <p className="text-xs text-destructive">{regionErrorMsg}</p>
             )}
           </div>
           <div className="space-y-1.5">
@@ -305,7 +359,7 @@ const AssistantPage: React.FC = () => {
             </Select>
           </div>
         </div>
-        <Button onClick={() => saveContext().then(() => toast.success('✓'))} disabled={savingCtx}>
+        <Button onClick={handleSaveClick} disabled={savingCtx || !formComplete}>
           {savingCtx && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
           {t.context_save}
         </Button>
