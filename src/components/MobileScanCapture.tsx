@@ -147,6 +147,7 @@ export const MobileScanCapture: React.FC<Props> = ({ open, onOpenChange, circleI
         {step === 'capture' && (
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">{aiT.scan_camera_hint}</p>
+            <p className="text-xs text-muted-foreground/80 italic">{aiT.scan_pdf_hint}</p>
             <div className="grid gap-2">
               <Button
                 size="lg"
