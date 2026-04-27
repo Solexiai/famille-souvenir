@@ -92,6 +92,40 @@ export const AI_COPY: Record<AILang, {
   scan_dashboard_title: string;
   scan_dashboard_desc: string;
   scan_dashboard_cta: string;
+  scan_pdf_hint: string;
+  scan_source_badge_short: string;
+  scan_source_badge_tooltip: string;
+  // Documents helper
+  documents_vault_helper: string;
+  // Post-classification actions
+  classify_action_apply: string;
+  classify_action_add_checklist: string;
+  classify_action_assign_reviewer: string;
+  classify_action_send_governance: string;
+  classify_added_to_checklist: string;
+  classify_sent_to_governance: string;
+  classify_already_in_checklist: string;
+  classify_already_in_governance: string;
+  // Reviewer dialog
+  reviewer_dialog_title: string;
+  reviewer_choose: string;
+  reviewer_self: string;
+  reviewer_circle_member: string;
+  reviewer_external: string;
+  reviewer_name_label: string;
+  reviewer_name_placeholder: string;
+  reviewer_role_label: string;
+  reviewer_due_date_label: string;
+  reviewer_save: string;
+  reviewer_saved: string;
+  reviewer_role_family: string;
+  reviewer_role_executor: string;
+  reviewer_role_notary: string;
+  reviewer_role_advisor: string;
+  reviewer_role_other: string;
+  reviewer_assigned_badge: string;
+  // Checklist task title prefix
+  classify_checklist_task_prefix: string;
 }> = {
   fr: {
     page_title: 'Assistant IA Solexi',
