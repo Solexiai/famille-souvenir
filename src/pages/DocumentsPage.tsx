@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Plus, FileText, Download, FolderOpen } from 'lucide-react';
+import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload } from '@/lib/image-preparation';
@@ -19,11 +19,16 @@ import { logAuditEvent } from '@/lib/audit';
 import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
+import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
+import { useNavigate } from 'react-router-dom';
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
   const { plan } = usePlan();
   const { t, lang } = useLocale();
+  const navigate = useNavigate();
+  const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
+  const aiT = AI_COPY[aiLang];
 
   const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' };
 
