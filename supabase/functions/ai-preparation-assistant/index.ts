@@ -92,17 +92,49 @@ async function callProvider(req: ProviderRequest): Promise<{
 const SYSTEM_PROMPT = `You are Solexi AI Preparation Assistant. You help users organize memories, documents, and estate-preparation information.
 
 CORE RULES — never break these:
-1. You provide educational and organizational guidance only. You are NOT a lawyer, notary, tax professional, financial advisor, or doctor.
-2. You must NEVER claim that information is legally complete, legally verified, or constitutes definitive legal/tax/medical/financial requirements. Solexi has no connected official legal database.
-3. For ANY topic involving legal validity, estate, inheritance, probate, taxes, notarization, healthcare directives/surrogates, powers of attorney, or financial planning, you MUST explicitly tell the user to verify with a qualified professional in their state/province/country.
-4. Use phrases like "common documents to consider preparing", "items to review with a qualified local professional", "this may vary depending on your situation and jurisdiction". Avoid phrases like "you must", "the law requires", "this is legally sufficient".
-5. Adapt suggestions to the user's selected country and state/province as CONTEXT for practical preparation only — never as a legal statement. Reference the jurisdiction by name in your guidance (e.g., "in Florida, United States, common documents people prepare include…").
-6. Always reply in the user's preferred language: 'fr' → French, 'en' → English, 'es' → Spanish. Never mix languages.`;
+1. Educational and organizational guidance only. You are NOT a lawyer, notary, tax professional, financial advisor, or doctor.
+2. NEVER claim information is legally complete, legally valid, legally verified, or constitutes definitive legal/tax/medical/financial requirements.
+3. For ANY topic involving wills, estate, inheritance, probate, taxes, notarization, healthcare directives/surrogates, powers of attorney, beneficiaries, real estate transfers, or financial planning, explicitly tell the user to verify with a qualified professional in their state/province/country.
+4. Use safe wording: "commonly reviewed", "often considered", "may be relevant depending on the situation", "should be verified with a qualified local professional", "common documents people consider preparing". AVOID definitive wording: "this is a crucial document", "you need this", "you must", "this ensures legal validity", "the law requires".
+5. Adapt suggestions to the user's selected country and state/province as practical CONTEXT only — never as a legal statement. Reference the jurisdiction by name.
+6. Be SHORT and APP-FRIENDLY. Prefer structured lists / short cards over long paragraphs or articles. No multi-paragraph essays.
+7. Always reply in the user's preferred language: 'fr' → French, 'en' → English, 'es' → Spanish. Never mix languages.`;
 
 function languageName(code?: string): string {
   if (code === "fr") return "French";
   if (code === "es") return "Spanish";
   return "English";
+}
+
+function jurisdictionSectionTitle(lang: string, region: string): string {
+  const r = region && region !== "unspecified" ? region : "";
+  if (lang === "fr") {
+    return r
+      ? `Éléments propres à ${r} à vérifier avec un professionnel qualifié`
+      : "Éléments propres à la province ou à l'État à vérifier avec un professionnel qualifié";
+  }
+  if (lang === "es") {
+    return r
+      ? `Elementos específicos de ${r} que debe verificar con un profesional calificado`
+      : "Elementos específicos del estado o provincia que debe verificar con un profesional calificado";
+  }
+  return r
+    ? `${r}-specific items to verify with a qualified professional`
+    : "State/province-specific items to verify with a qualified professional";
+}
+
+function openingLine(lang: string, country: string, region: string): string {
+  const loc = `${country}${region && region !== "unspecified" ? ` — ${region}` : ""}`;
+  if (lang === "fr") return `Selon votre localisation : ${loc}. Ceci est une orientation éducative et organisationnelle, pas un conseil juridique, fiscal, financier, médical ou professionnel.`;
+  if (lang === "es") return `Según su ubicación: ${loc}. Esta es una orientación educativa y organizativa, no un asesoramiento legal, fiscal, financiero, médico ni profesional.`;
+  return `Based on your selected location: ${loc}. This is educational and organizational guidance only, not legal, tax, financial, medical, or professional advice.`;
+}
+
+function closingLine(lang: string, region: string): string {
+  const r = region && region !== "unspecified" ? region : (lang === "fr" ? "votre juridiction" : lang === "es" ? "su jurisdicción" : "your jurisdiction");
+  if (lang === "fr") return `Avant toute décision, veuillez revoir ces éléments avec un professionnel qualifié à ${r}.`;
+  if (lang === "es") return `Antes de tomar decisiones, revise estos elementos con un profesional calificado en ${r}.`;
+  return `Before making decisions, please review these items with a qualified professional in ${r}.`;
 }
 
 function contextBlock(ctx: {
@@ -112,7 +144,7 @@ function contextBlock(ctx: {
   preparing_for?: string;
 }): string {
   const lang = ctx.language || "fr";
-  return `User context — country: ${ctx.country || "unspecified"}, state/province: ${ctx.region || "unspecified"}, preferred language: ${lang} (you MUST reply in ${languageName(lang)}), preparing for: ${ctx.preparing_for || "myself"}. Tailor practical guidance to this jurisdiction context, but do not claim legal completeness.`;
+  return `User context — country: ${ctx.country || "unspecified"}, state/province: ${ctx.region || "unspecified"}, preferred language: ${lang} (you MUST reply in ${languageName(lang)}), preparing for: ${ctx.preparing_for || "myself"}. Tailor practical guidance to this jurisdiction context, but do not claim legal completeness. Keep responses short and app-friendly.`;
 }
 
 // ─── Action handlers ─────────────────────────────────────────────────────
@@ -173,46 +205,59 @@ Return a structured classification.`;
 }
 
 async function generateChecklist(payload: any) {
+  const lang = payload.language || "fr";
   const country = payload.country || "unspecified";
   const region = payload.region || "unspecified";
-  const userPrompt = `Generate a personalized, jurisdiction-aware preparation checklist.
+  const sectionTitle = jurisdictionSectionTitle(lang, region);
+  const opening = openingLine(lang, country, region);
+  const closing = closingLine(lang, region);
+
+  const userPrompt = `Generate a SHORT, app-friendly, jurisdiction-aware preparation checklist.
 ${contextBlock(payload)}
 
-Requirements:
-- Return 10-16 practical items.
-- The "intro" must be 2-3 reassuring sentences that explicitly mention the user's location (${region}, ${country}) and remind that this is educational organizational guidance, not legal advice.
-- Include AT LEAST 3 items in the "state_province_specific" section that reference ${region}, ${country} by name (e.g., "Items to verify in ${region}: …"). These items MUST set professional_review_recommended=true and their description must say to verify with a qualified local professional in ${region}.
-- For any item touching wills, estate, probate, powers of attorney, healthcare directives/surrogates, beneficiary designations, taxes, or real estate transfers, set professional_review_recommended=true and use wording like "Common documents to consider preparing" / "Review with a qualified local professional".
-- Never claim items are a complete legal requirement. Use cautious wording.
-- Reply in the user's preferred language only.`;
+STRICT requirements:
+- Return 8 to 12 items total. No more.
+- "intro" must be exactly this opening line, verbatim: "${opening}"
+- "closing" must be exactly this closing line, verbatim: "${closing}"
+- "jurisdiction_section_title" must be exactly: "${sectionTitle}"
+- Include 4 to 6 items in the "state_province_specific" section. Each must be relevant to ${region}, ${country} when known (e.g., for Florida, USA: Designation of Health Care Surrogate, Living Will, Durable Power of Attorney, Last Will and Testament, Trust documents if applicable, Beneficiary designations, Homestead/real estate documents if applicable, Probate-related documents). All "state_province_specific" items MUST set professional_review_recommended=true.
+- Each item must include: title (short), category (one short word/phrase like "Legal", "Healthcare", "Financial", "Identity", "Digital", "Memories"), short_explanation (max 2 sentences, cautious wording), recommended_action (1 short imperative sentence), professional_review_recommended (boolean). Optional "details" field for a slightly longer expansion (max 3 sentences) used for "Show more details".
+- For wills, estate, probate, powers of attorney, healthcare directives/surrogates, beneficiary designations, taxes, real estate: professional_review_recommended=true.
+- Use safe wording everywhere ("commonly reviewed", "often considered", "may be relevant", "should be verified with a qualified local professional"). Never say "this is crucial", "you need", "legally valid", "the law requires".
+- Reply in ${languageName(lang)} only.`;
 
   const tool: ProviderTool = {
     type: "function",
     function: {
       name: "generate_checklist",
-      description: "Return a structured preparation checklist.",
+      description: "Return a short, structured, jurisdiction-aware preparation checklist.",
       parameters: {
         type: "object",
         properties: {
-          intro: { type: "string", description: "Short reassuring intro (2-3 sentences)." },
+          intro: { type: "string", description: "Exact opening line provided in the prompt." },
+          closing: { type: "string", description: "Exact closing line provided in the prompt." },
+          jurisdiction_section_title: { type: "string", description: "Exact jurisdiction section title provided in the prompt." },
           items: {
             type: "array",
             items: {
               type: "object",
               properties: {
                 title: { type: "string" },
-                description: { type: "string" },
+                category: { type: "string", description: "Short category label like Legal, Healthcare, Financial, Identity, Digital, Memories." },
+                short_explanation: { type: "string", description: "Max 2 sentences. Cautious wording." },
+                recommended_action: { type: "string", description: "1 short imperative sentence." },
+                details: { type: "string", description: "Optional, max 3 sentences, for Show more details." },
                 section: {
                   type: "string",
                   description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review, state_province_specific",
                 },
                 professional_review_recommended: { type: "boolean" },
               },
-              required: ["title", "description", "section", "professional_review_recommended"],
+              required: ["title", "category", "short_explanation", "recommended_action", "section", "professional_review_recommended"],
             },
           },
         },
-        required: ["intro", "items"],
+        required: ["intro", "closing", "jurisdiction_section_title", "items"],
       },
     },
   };
@@ -231,12 +276,27 @@ Requirements:
 }
 
 async function chatGuidance(payload: any) {
+  const lang = payload.language || "fr";
+  const country = payload.country || "unspecified";
+  const region = payload.region || "unspecified";
+  const opening = openingLine(lang, country, region);
+  const closing = closingLine(lang, region);
+  const sectionTitle = jurisdictionSectionTitle(lang, region);
+
+  const formatRules = `Reply in ${languageName(lang)} only. Format the answer for an app UI, NOT as a long article:
+- Start with this exact opening line on its own line: "${opening}"
+- Then a very short intro (max 2 sentences).
+- Then short structured sections using markdown headings (## ) and bullet lists. Each bullet ≤ 2 sentences. Use cautious wording.
+- If the user's question touches estate/legal/healthcare/tax/probate/beneficiary/real-estate topics, include a section titled exactly: "## ${sectionTitle}" with 4–8 bullets relevant to ${region}, ${country}. Each bullet must end with " — verify with a qualified local professional."
+- End with this exact closing line on its own line: "${closing}"
+- Total length target: under ~250 words. No multi-paragraph essays. Never claim legal validity or completeness.`;
+
   const messages: ProviderMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
     { role: "system", content: contextBlock(payload) },
+    { role: "system", content: formatRules },
   ];
 
-  // Optional prior conversation turns
   if (Array.isArray(payload.history)) {
     for (const m of payload.history.slice(-10)) {
       if (m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string") {
