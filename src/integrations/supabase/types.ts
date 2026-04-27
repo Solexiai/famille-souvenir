@@ -162,6 +162,7 @@ export type Database = {
       }
       checklist_items: {
         Row: {
+          ai_suggestion_id: string | null
           assigned_to: string | null
           blocked_reason: string | null
           category: Database["public"]["Enums"]["checklist_category"]
@@ -173,11 +174,13 @@ export type Database = {
           id: string
           linked_document_id: string | null
           requires_professional_review: boolean
+          source: string
           status: Database["public"]["Enums"]["checklist_status"]
           title: string
           updated_at: string
         }
         Insert: {
+          ai_suggestion_id?: string | null
           assigned_to?: string | null
           blocked_reason?: string | null
           category?: Database["public"]["Enums"]["checklist_category"]
@@ -189,11 +192,13 @@ export type Database = {
           id?: string
           linked_document_id?: string | null
           requires_professional_review?: boolean
+          source?: string
           status?: Database["public"]["Enums"]["checklist_status"]
           title: string
           updated_at?: string
         }
         Update: {
+          ai_suggestion_id?: string | null
           assigned_to?: string | null
           blocked_reason?: string | null
           category?: Database["public"]["Enums"]["checklist_category"]
@@ -205,6 +210,7 @@ export type Database = {
           id?: string
           linked_document_id?: string | null
           requires_professional_review?: boolean
+          source?: string
           status?: Database["public"]["Enums"]["checklist_status"]
           title?: string
           updated_at?: string

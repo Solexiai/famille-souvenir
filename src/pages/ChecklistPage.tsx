@@ -19,8 +19,9 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
   Loader2, Plus, CheckSquare, AlertTriangle, FileText, Ban, CalendarIcon,
-  User, Filter, ChevronDown, ChevronRight
+  User, Filter, ChevronDown, ChevronRight, Sparkles
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type {
   FamilyCircle, ChecklistItem, ChecklistCategory, ChecklistStatus,
   CircleMember, AppRole, Document as DocType
@@ -76,7 +77,8 @@ type AuditLogInsert = Database['public']['Tables']['audit_logs']['Insert'];
 
 const ChecklistPage: React.FC = () => {
   const { user } = useAuth();
-  const { t } = useLocale();
+  const { t, lang } = useLocale();
+  const navigate = useNavigate();
   const categoryLabelsT = t.checklist_categories as Record<ChecklistCategory, string>;
   const statusLabelsT = t.checklist_statuses as Record<ChecklistStatus, string>;
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
@@ -484,12 +486,31 @@ const ChecklistPage: React.FC = () => {
         {/* Checklist items grouped by category */}
         {filteredItems.length === 0 ? (
           <Card className="shadow-soft">
-            <CardContent className="py-12 text-center">
-              <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <CardContent className="py-12 text-center space-y-4">
+              <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto" />
               <p className="text-muted-foreground">
-                {items.length === 0 ? t.checklist_empty : t.checklist_no_filter_match}
+                {items.length === 0
+                  ? (lang === 'fr'
+                      ? 'Votre Checklist est vide. Vous pouvez ajouter des tâches manuellement ou générer une liste de préparation avec l’Assistant IA Solexi.'
+                      : lang === 'es'
+                        ? 'Su Checklist está vacía. Puede añadir tareas manualmente o generar una lista de preparación con el Asistente IA Solexi.'
+                        : 'Your Checklist is empty. You can add tasks manually or generate a preparation list with the Solexi AI Assistant.')
+                  : t.checklist_no_filter_match}
               </p>
-              {items.length === 0 && <p className="text-sm text-muted-foreground mt-1">{t.checklist_empty_desc}</p>}
+              {items.length === 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {canEdit && (
+                    <Button onClick={() => setDialogOpen(true)} variant="outline" className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      {lang === 'fr' ? 'Ajouter une tâche' : lang === 'es' ? 'Añadir una tarea' : 'Add a task'}
+                    </Button>
+                  )}
+                  <Button onClick={() => navigate('/assistant')} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                    <Sparkles className="h-4 w-4" />
+                    {lang === 'fr' ? "Ouvrir l’Assistant IA" : lang === 'es' ? 'Abrir el Asistente IA' : 'Open AI Assistant'}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : (
@@ -526,10 +547,19 @@ const ChecklistPage: React.FC = () => {
 
                           {/* Tags */}
                           <div className="flex items-center gap-2 flex-wrap">
+                            {item.source === 'ai' && (
+                              <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 gap-1 text-[10px]">
+                                <Sparkles className="h-3 w-3" />
+                                {lang === 'fr' ? 'Suggestion IA Solexi' : lang === 'es' ? 'Sugerencia IA Solexi' : 'Solexi AI suggestion'}
+                              </Badge>
+                            )}
                             {item.requires_professional_review && (
-                              <span className="inline-flex items-center gap-1 text-xs text-amber-600">
-                                <AlertTriangle className="h-3 w-3" /> Pro
-                              </span>
+                              <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px]">
+                                <AlertTriangle className="h-3 w-3" />
+                                {lang === 'fr' ? 'À vérifier avec un professionnel qualifié'
+                                  : lang === 'es' ? 'Requiere verificación profesional local'
+                                  : 'Requires local professional verification'}
+                              </Badge>
                             )}
                             {item.linked_document_id && (
                               <span className="inline-flex items-center gap-1 text-xs text-primary">

@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { supabase } from '@/integrations/supabase/client';
+import type { ChecklistCategory } from '@/types/database';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -55,9 +57,28 @@ const REGIONS_BY_COUNTRY: Record<string, string[]> = {
   FR: ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Provence-Alpes-Côte d’Azur', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Bretagne', 'Normandie', 'Pays de la Loire', 'Centre-Val de Loire', 'Bourgogne-Franche-Comté', 'Corse', 'Outre-mer'],
 };
 
+const AI_CATEGORY_MAP: Record<string, ChecklistCategory> = {
+  identity: 'identity', identity_civil: 'identity',
+  legal: 'legal', legal_estate: 'legal', testament: 'legal', mandate: 'legal',
+  financial: 'financial', financial_insurance: 'financial',
+  insurance: 'insurance',
+  property: 'property', real_estate: 'property',
+  digital: 'digital_estate', digital_legacy: 'digital_estate', digital_estate: 'digital_estate',
+  final_wishes: 'final_wishes', memories: 'final_wishes', memories_messages: 'final_wishes',
+  contacts: 'contacts', people_to_contact: 'contacts',
+  executor: 'executor_readiness', executor_readiness: 'executor_readiness',
+};
+
+function mapToChecklistCategory(raw?: string | null): ChecklistCategory {
+  if (!raw) return 'legal';
+  const k = raw.toLowerCase().trim().replace(/\s+/g, '_');
+  return AI_CATEGORY_MAP[k] || 'legal';
+}
+
 const AssistantPage: React.FC = () => {
   const { user } = useAuth();
   const { lang } = useLocale();
+  const navigate = useNavigate();
   const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
   const t = AI_COPY[aiLang];
 
@@ -77,7 +98,8 @@ const AssistantPage: React.FC = () => {
 
   const [checklist, setChecklist] = useState<ChecklistPayload | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [savedIdx, setSavedIdx] = useState<Set<number>>(new Set());
+  const [savedTitles, setSavedTitles] = useState<Set<string>>(new Set());
+  const [circleId, setCircleId] = useState<string | null>(null);
   const [expandedIdx, setExpandedIdx] = useState<Set<number>>(new Set());
   const toggleExpanded = (i: number) => {
     setExpandedIdx(prev => {
@@ -90,15 +112,15 @@ const AssistantPage: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, sending]);
 
-  // Load existing context
+  // Load existing context, circle, and previously saved AI suggestions
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
-        .from('ai_user_context')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const [{ data }, { data: circles }, { data: priorSaved }] = await Promise.all([
+        supabase.from('ai_user_context').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('family_circles').select('id').limit(1),
+        supabase.from('ai_saved_suggestions').select('title').eq('user_id', user.id).eq('suggestion_type', 'checklist_item'),
+      ]);
       if (data) {
         const loaded: AIContext = {
           id: data.id,
@@ -109,11 +131,12 @@ const AssistantPage: React.FC = () => {
           ai_disclaimer_accepted: !!data.ai_disclaimer_accepted,
         };
         setCtx(loaded);
-        // Only treat as "saved/unlocked" if the persisted row is fully complete.
         const regionRequired = !!REGIONS_BY_COUNTRY[loaded.country];
         const complete = !!loaded.country && !!loaded.language && !!loaded.preparing_for && (!regionRequired || !!loaded.region);
         if (complete) setSavedCtx(loaded);
       }
+      if (circles && circles.length > 0) setCircleId(circles[0].id);
+      if (priorSaved) setSavedTitles(new Set(priorSaved.map(r => (r.title || '').trim()).filter(Boolean)));
       setLoading(false);
     })();
   }, [user, aiLang]);
@@ -202,7 +225,6 @@ const AssistantPage: React.FC = () => {
 
   const generateChecklist = async () => {
     setGenerating(true);
-    setSavedIdx(new Set());
     try {
       const result = await callAI('generate_checklist');
       setChecklist(result);
@@ -213,19 +235,86 @@ const AssistantPage: React.FC = () => {
     }
   };
 
+  // Localized strings for the save flow
+  const navHelperText =
+    aiLang === 'fr' ? 'Les éléments enregistrés seront ajoutés à votre Checklist afin que vous puissiez les suivre étape par étape.'
+    : aiLang === 'es' ? 'Los elementos guardados se añadirán a su Checklist para que pueda seguirlos paso a paso.'
+    : 'Saved preparation items will be added to your Checklist so you can follow them step by step.';
+  const savedToCkText =
+    aiLang === 'fr' ? 'Élément ajouté à votre Checklist. Vous pouvez le retrouver dans la page Checklist.'
+    : aiLang === 'es' ? 'Elemento añadido a su Checklist. Puede encontrarlo en la página Checklist.'
+    : 'Item added to your Checklist. You can find it in the Checklist page.';
+  const viewInCkText =
+    aiLang === 'fr' ? 'Voir dans ma Checklist'
+    : aiLang === 'es' ? 'Ver en mi Checklist'
+    : 'View in my Checklist';
+  const alreadyInCkText =
+    aiLang === 'fr' ? 'Cet élément est déjà dans votre Checklist.'
+    : aiLang === 'es' ? 'Este elemento ya está en su Checklist.'
+    : 'This item is already in your Checklist.';
+
   const saveSuggestion = async (item: ChecklistItem, idx: number) => {
     if (!user) return;
-    const { error } = await supabase.from('ai_saved_suggestions').insert({
-      user_id: user.id,
-      suggestion_type: 'checklist_item',
-      title: item.title,
-      content: [item.short_explanation, item.recommended_action, item.details].filter(Boolean).join('\n\n') || item.description || '',
-      professional_review_recommended: item.professional_review_recommended,
-      metadata: { section: item.section, category: item.category || null },
-    });
-    if (error) { toast.error(t.error_generic); return; }
-    setSavedIdx(new Set([...savedIdx, idx]));
-    toast.success(t.saved_toast);
+    const titleKey = item.title.trim();
+
+    // 1) Insert into ai_saved_suggestions (existing behaviour)
+    const { data: savedRow, error: savedErr } = await supabase
+      .from('ai_saved_suggestions')
+      .insert({
+        user_id: user.id,
+        suggestion_type: 'checklist_item',
+        title: item.title,
+        content: [item.short_explanation, item.recommended_action, item.details].filter(Boolean).join('\n\n') || item.description || '',
+        professional_review_recommended: item.professional_review_recommended,
+        metadata: { section: item.section, category: item.category || null, source: 'solexi_ai' },
+      })
+      .select('id')
+      .single();
+    if (savedErr) { toast.error(t.error_generic); return; }
+
+    // 2) Mirror into the main checklist if a circle exists
+    if (circleId) {
+      // Duplicate guard: check by ai_suggestion_id linkage on existing items with same title.
+      const { data: existing } = await supabase
+        .from('checklist_items')
+        .select('id')
+        .eq('circle_id', circleId)
+        .eq('source', 'ai')
+        .eq('title', item.title)
+        .limit(1);
+      if (existing && existing.length > 0) {
+        setSavedTitles(prev => new Set(prev).add(titleKey));
+        toast.message(alreadyInCkText);
+        return;
+      }
+
+      const description = [item.short_explanation, item.recommended_action, item.details]
+        .filter(Boolean).join('\n\n') || item.description || '';
+
+      const { error: ckErr } = await supabase.from('checklist_items').insert({
+        circle_id: circleId,
+        category: mapToChecklistCategory(item.category || item.section),
+        title: item.title,
+        description,
+        status: 'not_started',
+        requires_professional_review: !!item.professional_review_recommended,
+        source: 'ai',
+        ai_suggestion_id: savedRow?.id ?? null,
+      } as never);
+      if (ckErr) {
+        // Item still saved in suggestions; surface a soft error.
+        toast.error(t.error_generic);
+      } else {
+        toast.success(savedToCkText, {
+          action: { label: viewInCkText, onClick: () => navigate('/checklist') },
+          duration: 6000,
+        });
+      }
+    } else {
+      toast.success(t.saved_toast);
+    }
+
+    setSavedTitles(prev => new Set(prev).add(titleKey));
   };
 
   const sectionLabel = (s: string) => (t as any)[`section_${s}`] || s;
@@ -513,6 +602,9 @@ const AssistantPage: React.FC = () => {
                     {generating ? t.generating_checklist : t.generate_checklist}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground bg-secondary/40 rounded-md p-2.5 border border-border/50">
+                  💡 {navHelperText}
+                </p>
                 {!checklist && !generating && (
                   <p className="text-sm text-muted-foreground">{t.checklist_empty}</p>
                 )}
@@ -535,15 +627,20 @@ const AssistantPage: React.FC = () => {
                             <span className="text-[10px] text-muted-foreground">{sectionLabel(item.section)}</span>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant={savedIdx.has(idx) ? 'secondary' : 'outline'}
-                          onClick={() => saveSuggestion(item, idx)}
-                          disabled={savedIdx.has(idx)}
-                          className="shrink-0 text-xs"
-                        >
-                          {savedIdx.has(idx) ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
-                        </Button>
+                        {(() => {
+                          const isSaved = savedTitles.has(item.title.trim());
+                          return (
+                            <Button
+                              size="sm"
+                              variant={isSaved ? 'secondary' : 'outline'}
+                              onClick={() => saveSuggestion(item, idx)}
+                              disabled={isSaved}
+                              className="shrink-0 text-xs"
+                            >
+                              {isSaved ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
+                            </Button>
+                          );
+                        })()}
                       </div>
                       {(item.short_explanation || item.description) && (
                         <p className="text-sm text-foreground/80">{item.short_explanation || item.description}</p>

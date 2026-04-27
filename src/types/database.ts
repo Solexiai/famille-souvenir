@@ -136,6 +136,8 @@ export interface ChecklistItem {
   evidence_note: string;
   requires_professional_review: boolean;
   blocked_reason: string;
+  source?: string | null;
+  ai_suggestion_id?: string | null;
   created_at: string;
   updated_at: string;
 }
