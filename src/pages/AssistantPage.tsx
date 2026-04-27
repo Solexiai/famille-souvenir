@@ -57,9 +57,28 @@ const REGIONS_BY_COUNTRY: Record<string, string[]> = {
   FR: ['Île-de-France', 'Auvergne-Rhône-Alpes', 'Provence-Alpes-Côte d’Azur', 'Nouvelle-Aquitaine', 'Occitanie', 'Hauts-de-France', 'Grand Est', 'Bretagne', 'Normandie', 'Pays de la Loire', 'Centre-Val de Loire', 'Bourgogne-Franche-Comté', 'Corse', 'Outre-mer'],
 };
 
+const AI_CATEGORY_MAP: Record<string, ChecklistCategory> = {
+  identity: 'identity', identity_civil: 'identity',
+  legal: 'legal', legal_estate: 'legal', testament: 'legal', mandate: 'legal',
+  financial: 'financial', financial_insurance: 'financial',
+  insurance: 'insurance',
+  property: 'property', real_estate: 'property',
+  digital: 'digital_estate', digital_legacy: 'digital_estate', digital_estate: 'digital_estate',
+  final_wishes: 'final_wishes', memories: 'final_wishes', memories_messages: 'final_wishes',
+  contacts: 'contacts', people_to_contact: 'contacts',
+  executor: 'executor_readiness', executor_readiness: 'executor_readiness',
+};
+
+function mapToChecklistCategory(raw?: string | null): ChecklistCategory {
+  if (!raw) return 'legal';
+  const k = raw.toLowerCase().trim().replace(/\s+/g, '_');
+  return AI_CATEGORY_MAP[k] || 'legal';
+}
+
 const AssistantPage: React.FC = () => {
   const { user } = useAuth();
   const { lang } = useLocale();
+  const navigate = useNavigate();
   const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
   const t = AI_COPY[aiLang];
 
