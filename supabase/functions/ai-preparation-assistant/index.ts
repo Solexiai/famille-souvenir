@@ -175,8 +175,6 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
           intro: { type: "string", description: "Short reassuring intro (2-3 sentences)." },
           items: {
             type: "array",
-            minItems: 6,
-            maxItems: 20,
             items: {
               type: "object",
               properties: {
@@ -184,20 +182,11 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
                 description: { type: "string" },
                 section: {
                   type: "string",
-                  enum: [
-                    "identity_civil",
-                    "legal_estate",
-                    "financial_insurance",
-                    "digital_legacy",
-                    "memories_messages",
-                    "people_to_contact",
-                    "professional_review",
-                  ],
+                  description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review",
                 },
                 professional_review_recommended: { type: "boolean" },
               },
               required: ["title", "description", "section", "professional_review_recommended"],
-              additionalProperties: false,
             },
           },
         },
