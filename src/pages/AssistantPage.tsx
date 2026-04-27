@@ -120,11 +120,17 @@ const AssistantPage: React.FC = () => {
       toast.error(t.error_generic);
       return;
     }
-    setCtx({ ...next, id: data.id });
+    const saved = { ...next, id: data.id };
+    setCtx(saved);
+    // Mark as unlocked only if all required fields are present in the saved row.
+    const regionRequired = !!REGIONS_BY_COUNTRY[saved.country];
+    const complete = !!saved.country && !!saved.language && !!saved.preparing_for && (!regionRequired || !!saved.region);
+    if (complete) setSavedCtx(saved);
     return data;
   };
 
   const acceptDisclaimer = async () => {
+    // Persist the disclaimer flag without unlocking the assistant — context still required.
     await saveContext({ ai_disclaimer_accepted: true });
   };
 
