@@ -285,7 +285,8 @@ const DocumentsPage: React.FC = () => {
                   </Button>
                 </form>
               </DialogContent>
-            </Dialog>
+              </Dialog>
+            </div>
           </div>
           <LimitWarning current={documents.length} max={FREE_LIMITS.maxDocuments} label={t.plan_gate_document_limit} />
         </div>
