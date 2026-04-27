@@ -344,6 +344,9 @@ const DocumentsPage: React.FC = () => {
                             {aiT.scan_source_badge}
                           </Badge>
                         )}
+                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-auto">
+                          {new Date(doc.created_at).toLocaleDateString('fr-FR')}
+                        </span>
                       </div>
 
                       {/* AI Classify */}
@@ -412,6 +415,14 @@ const DocumentsPage: React.FC = () => {
           </div>
         )}
       </div>
+      {circle && (
+        <MobileScanCapture
+          open={scanOpen}
+          onOpenChange={setScanOpen}
+          circleId={circle.id}
+          onUploaded={loadData}
+        />
+      )}
     </AppLayout>
   );
 };
