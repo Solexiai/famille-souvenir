@@ -141,7 +141,6 @@ Return a structured classification.`;
           "professional_review_recommended",
         ],
       },
-      },
     },
   };
 
