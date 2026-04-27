@@ -92,17 +92,49 @@ async function callProvider(req: ProviderRequest): Promise<{
 const SYSTEM_PROMPT = `You are Solexi AI Preparation Assistant. You help users organize memories, documents, and estate-preparation information.
 
 CORE RULES — never break these:
-1. You provide educational and organizational guidance only. You are NOT a lawyer, notary, tax professional, financial advisor, or doctor.
-2. You must NEVER claim that information is legally complete, legally verified, or constitutes definitive legal/tax/medical/financial requirements. Solexi has no connected official legal database.
-3. For ANY topic involving legal validity, estate, inheritance, probate, taxes, notarization, healthcare directives/surrogates, powers of attorney, or financial planning, you MUST explicitly tell the user to verify with a qualified professional in their state/province/country.
-4. Use phrases like "common documents to consider preparing", "items to review with a qualified local professional", "this may vary depending on your situation and jurisdiction". Avoid phrases like "you must", "the law requires", "this is legally sufficient".
-5. Adapt suggestions to the user's selected country and state/province as CONTEXT for practical preparation only — never as a legal statement. Reference the jurisdiction by name in your guidance (e.g., "in Florida, United States, common documents people prepare include…").
-6. Always reply in the user's preferred language: 'fr' → French, 'en' → English, 'es' → Spanish. Never mix languages.`;
+1. Educational and organizational guidance only. You are NOT a lawyer, notary, tax professional, financial advisor, or doctor.
+2. NEVER claim information is legally complete, legally valid, legally verified, or constitutes definitive legal/tax/medical/financial requirements.
+3. For ANY topic involving wills, estate, inheritance, probate, taxes, notarization, healthcare directives/surrogates, powers of attorney, beneficiaries, real estate transfers, or financial planning, explicitly tell the user to verify with a qualified professional in their state/province/country.
+4. Use safe wording: "commonly reviewed", "often considered", "may be relevant depending on the situation", "should be verified with a qualified local professional", "common documents people consider preparing". AVOID definitive wording: "this is a crucial document", "you need this", "you must", "this ensures legal validity", "the law requires".
+5. Adapt suggestions to the user's selected country and state/province as practical CONTEXT only — never as a legal statement. Reference the jurisdiction by name.
+6. Be SHORT and APP-FRIENDLY. Prefer structured lists / short cards over long paragraphs or articles. No multi-paragraph essays.
+7. Always reply in the user's preferred language: 'fr' → French, 'en' → English, 'es' → Spanish. Never mix languages.`;
 
 function languageName(code?: string): string {
   if (code === "fr") return "French";
   if (code === "es") return "Spanish";
   return "English";
+}
+
+function jurisdictionSectionTitle(lang: string, region: string): string {
+  const r = region && region !== "unspecified" ? region : "";
+  if (lang === "fr") {
+    return r
+      ? `Éléments propres à ${r} à vérifier avec un professionnel qualifié`
+      : "Éléments propres à la province ou à l'État à vérifier avec un professionnel qualifié";
+  }
+  if (lang === "es") {
+    return r
+      ? `Elementos específicos de ${r} que debe verificar con un profesional calificado`
+      : "Elementos específicos del estado o provincia que debe verificar con un profesional calificado";
+  }
+  return r
+    ? `${r}-specific items to verify with a qualified professional`
+    : "State/province-specific items to verify with a qualified professional";
+}
+
+function openingLine(lang: string, country: string, region: string): string {
+  const loc = `${country}${region && region !== "unspecified" ? ` — ${region}` : ""}`;
+  if (lang === "fr") return `Selon votre localisation : ${loc}. Ceci est une orientation éducative et organisationnelle, pas un conseil juridique, fiscal, financier, médical ou professionnel.`;
+  if (lang === "es") return `Según su ubicación: ${loc}. Esta es una orientación educativa y organizativa, no un asesoramiento legal, fiscal, financiero, médico ni profesional.`;
+  return `Based on your selected location: ${loc}. This is educational and organizational guidance only, not legal, tax, financial, medical, or professional advice.`;
+}
+
+function closingLine(lang: string, region: string): string {
+  const r = region && region !== "unspecified" ? region : (lang === "fr" ? "votre juridiction" : lang === "es" ? "su jurisdicción" : "your jurisdiction");
+  if (lang === "fr") return `Avant toute décision, veuillez revoir ces éléments avec un professionnel qualifié à ${r}.`;
+  if (lang === "es") return `Antes de tomar decisiones, revise estos elementos con un profesional calificado en ${r}.`;
+  return `Before making decisions, please review these items with a qualified professional in ${r}.`;
 }
 
 function contextBlock(ctx: {
@@ -112,7 +144,7 @@ function contextBlock(ctx: {
   preparing_for?: string;
 }): string {
   const lang = ctx.language || "fr";
-  return `User context — country: ${ctx.country || "unspecified"}, state/province: ${ctx.region || "unspecified"}, preferred language: ${lang} (you MUST reply in ${languageName(lang)}), preparing for: ${ctx.preparing_for || "myself"}. Tailor practical guidance to this jurisdiction context, but do not claim legal completeness.`;
+  return `User context — country: ${ctx.country || "unspecified"}, state/province: ${ctx.region || "unspecified"}, preferred language: ${lang} (you MUST reply in ${languageName(lang)}), preparing for: ${ctx.preparing_for || "myself"}. Tailor practical guidance to this jurisdiction context, but do not claim legal completeness. Keep responses short and app-friendly.`;
 }
 
 // ─── Action handlers ─────────────────────────────────────────────────────
