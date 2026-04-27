@@ -126,6 +126,22 @@ export const AI_COPY: Record<AILang, {
   reviewer_assigned_badge: string;
   // Checklist task title prefix
   classify_checklist_task_prefix: string;
+  // Scan crop & filter (Phase 1.5)
+  scan_step_crop_title: string;
+  scan_step_crop_hint: string;
+  scan_step_filter_title: string;
+  scan_step_filter_hint: string;
+  scan_crop_use_full: string;
+  scan_crop_reset: string;
+  scan_crop_confirm: string;
+  scan_crop_auto_suggested: string;
+  scan_filter_original: string;
+  scan_filter_bw: string;
+  scan_filter_grayscale: string;
+  scan_filter_enhanced: string;
+  scan_processing: string;
+  scan_back: string;
+  scan_continue: string;
 }> = {
   fr: {
     page_title: 'Assistant IA Solexi',
@@ -245,6 +261,21 @@ export const AI_COPY: Record<AILang, {
     reviewer_role_other: 'Autre',
     reviewer_assigned_badge: 'Responsable',
     classify_checklist_task_prefix: 'Réviser le document :',
+    scan_step_crop_title: 'Ajustez le cadrage',
+    scan_step_crop_hint: 'Ajustez le cadrage pour isoler votre document.',
+    scan_step_filter_title: 'Améliorer la lisibilité',
+    scan_step_filter_hint: 'Appliquer un filtre pour améliorer la lisibilité.',
+    scan_crop_use_full: 'Utiliser l\'image complète',
+    scan_crop_reset: 'Recadrage par défaut',
+    scan_crop_confirm: 'Confirmer le cadrage',
+    scan_crop_auto_suggested: 'Suggestion automatique appliquée — ajustez si besoin.',
+    scan_filter_original: 'Original',
+    scan_filter_bw: 'Noir et blanc',
+    scan_filter_grayscale: 'Niveaux de gris',
+    scan_filter_enhanced: 'Contraste amélioré',
+    scan_processing: 'Traitement…',
+    scan_back: 'Retour',
+    scan_continue: 'Continuer',
   },
   en: {
     page_title: 'Solexi AI Assistant',
@@ -364,6 +395,21 @@ export const AI_COPY: Record<AILang, {
     reviewer_role_other: 'Other',
     reviewer_assigned_badge: 'Reviewer',
     classify_checklist_task_prefix: 'Review document:',
+    scan_step_crop_title: 'Adjust the crop',
+    scan_step_crop_hint: 'Adjust the crop to isolate your document.',
+    scan_step_filter_title: 'Improve readability',
+    scan_step_filter_hint: 'Apply a filter to improve readability.',
+    scan_crop_use_full: 'Use full image',
+    scan_crop_reset: 'Default crop',
+    scan_crop_confirm: 'Confirm crop',
+    scan_crop_auto_suggested: 'Auto-suggested crop applied — adjust if needed.',
+    scan_filter_original: 'Original',
+    scan_filter_bw: 'Black & white',
+    scan_filter_grayscale: 'Grayscale',
+    scan_filter_enhanced: 'Enhanced contrast',
+    scan_processing: 'Processing…',
+    scan_back: 'Back',
+    scan_continue: 'Continue',
   },
   es: {
     page_title: 'Asistente IA Solexi',
@@ -483,6 +529,21 @@ export const AI_COPY: Record<AILang, {
     reviewer_role_other: 'Otro',
     reviewer_assigned_badge: 'Revisor',
     classify_checklist_task_prefix: 'Revisar el documento:',
+    scan_step_crop_title: 'Ajustar el recorte',
+    scan_step_crop_hint: 'Ajuste el recorte para aislar su documento.',
+    scan_step_filter_title: 'Mejorar la legibilidad',
+    scan_step_filter_hint: 'Aplique un filtro para mejorar la legibilidad.',
+    scan_crop_use_full: 'Usar imagen completa',
+    scan_crop_reset: 'Recorte por defecto',
+    scan_crop_confirm: 'Confirmar recorte',
+    scan_crop_auto_suggested: 'Recorte sugerido aplicado — ajuste si es necesario.',
+    scan_filter_original: 'Original',
+    scan_filter_bw: 'Blanco y negro',
+    scan_filter_grayscale: 'Escala de grises',
+    scan_filter_enhanced: 'Contraste mejorado',
+    scan_processing: 'Procesando…',
+    scan_back: 'Atrás',
+    scan_continue: 'Continuar',
   },
 };
 
