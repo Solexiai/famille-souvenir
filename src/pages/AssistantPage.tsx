@@ -52,7 +52,10 @@ const AssistantPage: React.FC = () => {
   const [ctx, setCtx] = useState<AIContext>({
     country: '', region: '', language: aiLang, preparing_for: 'myself', ai_disclaimer_accepted: false,
   });
+  // Snapshot of the last successfully saved context — drives the unlock gate.
+  const [savedCtx, setSavedCtx] = useState<AIContext | null>(null);
   const [savingCtx, setSavingCtx] = useState(false);
+  const [showRegionError, setShowRegionError] = useState(false);
   const [tab, setTab] = useState('chat');
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
