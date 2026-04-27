@@ -624,15 +624,20 @@ const AssistantPage: React.FC = () => {
                             <span className="text-[10px] text-muted-foreground">{sectionLabel(item.section)}</span>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          variant={savedIdx.has(idx) ? 'secondary' : 'outline'}
-                          onClick={() => saveSuggestion(item, idx)}
-                          disabled={savedIdx.has(idx)}
-                          className="shrink-0 text-xs"
-                        >
-                          {savedIdx.has(idx) ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
-                        </Button>
+                        {(() => {
+                          const isSaved = savedTitles.has(item.title.trim());
+                          return (
+                            <Button
+                              size="sm"
+                              variant={isSaved ? 'secondary' : 'outline'}
+                              onClick={() => saveSuggestion(item, idx)}
+                              disabled={isSaved}
+                              className="shrink-0 text-xs"
+                            >
+                              {isSaved ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
+                            </Button>
+                          );
+                        })()}
                       </div>
                       {(item.short_explanation || item.description) && (
                         <p className="text-sm text-foreground/80">{item.short_explanation || item.description}</p>
