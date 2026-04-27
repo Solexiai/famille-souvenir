@@ -245,6 +245,7 @@ export const AI_COPY: Record<AILang, {
     reviewer_role_other: 'Autre',
     reviewer_assigned_badge: 'Responsable',
     classify_checklist_task_prefix: 'Réviser le document :',
+  },
   en: {
     page_title: 'Solexi AI Assistant',
     page_subtitle: 'A calm guide to help you organize documents, memories, and your family circle.',
