@@ -93,6 +93,8 @@ export const AI_COPY: Record<AILang, {
   scan_dashboard_desc: string;
   scan_dashboard_cta: string;
   scan_pdf_hint: string;
+  scan_future_hint: string;
+  scan_vault_toast: string;
   scan_source_badge_short: string;
   scan_source_badge_tooltip: string;
   // Documents helper
@@ -234,6 +236,8 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_desc: 'Utilisez votre appareil photo pour ajouter rapidement un testament, une assurance, une pièce d\'identité ou un souvenir familial à votre coffre Solexi.',
     scan_dashboard_cta: 'Scanner maintenant',
     scan_pdf_hint: 'Votre scan sera enregistré en PDF lorsque possible.',
+    scan_future_hint: 'Votre document sera enregistré. Vous pourrez l\'améliorer plus tard avec les futures fonctions de scan intelligent.',
+    scan_vault_toast: 'Document ajouté à votre coffre sécurisé.',
     scan_source_badge_short: 'Scan mobile',
     scan_source_badge_tooltip: 'Document importé depuis le scan mobile Solexi',
     documents_vault_helper: 'Vos documents restent dans votre coffre sécurisé. Après classification, vous pouvez les ajouter à votre Checklist ou les envoyer en Gouvernance pour révision.',
@@ -370,6 +374,8 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_desc: 'Use your phone camera to quickly add a will, insurance document, identity document, or family memory to your Solexi vault.',
     scan_dashboard_cta: 'Scan now',
     scan_pdf_hint: 'Your scan will be saved as a PDF when possible.',
+    scan_future_hint: 'Your document will be saved. Future smart scan tools may improve cropping and readability.',
+    scan_vault_toast: 'Document added to your secure vault.',
     scan_source_badge_short: 'Mobile scan',
     scan_source_badge_tooltip: 'Document uploaded from Solexi mobile scan',
     documents_vault_helper: 'Your documents remain in your secure vault. After classification, you can add them to your Checklist or send them to Governance for review.',
@@ -506,6 +512,8 @@ export const AI_COPY: Record<AILang, {
     scan_dashboard_desc: 'Usa la cámara de tu teléfono para añadir rápidamente un testamento, un seguro, un documento de identidad o un recuerdo familiar a tu caja fuerte Solexi.',
     scan_dashboard_cta: 'Escanear ahora',
     scan_pdf_hint: 'Su escaneo se guardará como PDF cuando sea posible.',
+    scan_future_hint: 'Su documento se guardará. Las futuras herramientas de escaneo inteligente podrán mejorar el recorte y la legibilidad.',
+    scan_vault_toast: 'Documento añadido a su bóveda segura.',
     scan_source_badge_short: 'Escaneo móvil',
     scan_source_badge_tooltip: 'Documento subido desde escaneo móvil Solexi',
     documents_vault_helper: 'Sus documentos permanecen en su bóveda segura. Después de la clasificación, puede añadirlos a su Checklist o enviarlos a Gobernanza para revisión.',
