@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X } from 'lucide-react';
+import { Loader2, Plus, FileText, Download, FolderOpen, Sparkles, AlertTriangle, Check, X, Camera } from 'lucide-react';
 import type { FamilyCircle, Document as DocType, DocumentVisibility, VerificationStatus } from '@/types/database';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload } from '@/lib/image-preparation';
@@ -20,7 +20,8 @@ import { LimitWarning } from '@/components/PlanGate';
 import { usePlan, FREE_LIMITS } from '@/hooks/usePlan';
 import { useLocale } from '@/contexts/LocaleContext';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { MobileScanCapture } from '@/components/MobileScanCapture';
 
 const DocumentsPage: React.FC = () => {
   const { user } = useAuth();
@@ -68,6 +69,8 @@ const DocumentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
