@@ -145,6 +145,15 @@ const DocumentsPage: React.FC = () => {
 
   useEffect(() => { loadData(); }, [user]);
 
+  // Auto-open scan dialog when arriving with ?scan=1 (from Dashboard CTA)
+  useEffect(() => {
+    if (searchParams.get('scan') === '1' && circle) {
+      setScanOpen(true);
+      searchParams.delete('scan');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [circle, searchParams, setSearchParams]);
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !circle || !user || !title.trim()) return;
@@ -220,13 +229,18 @@ const DocumentsPage: React.FC = () => {
                 {t.docs_subtitle}
               </p>
             </div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="gap-1.5 shrink-0 text-xs sm:text-sm">
-                  <Plus className="h-4 w-4" />
-                  {t.docs_add}
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs sm:text-sm" onClick={() => setScanOpen(true)}>
+                <Camera className="h-4 w-4" />
+                {aiT.scan_btn}
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1.5 text-xs sm:text-sm">
+                    <Plus className="h-4 w-4" />
+                    {t.docs_add}
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-lg mx-3">
                 <DialogHeader>
                   <DialogTitle className="font-heading">{t.docs_add_title}</DialogTitle>
