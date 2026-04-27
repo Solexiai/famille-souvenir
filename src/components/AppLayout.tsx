@@ -13,12 +13,14 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import {
-  Home, Shield, FolderOpen, CheckSquare, Image, Briefcase, Settings, LogOut, Menu,
+  Home, Shield, FolderOpen, CheckSquare, Image, Briefcase, Settings, LogOut, Menu, Sparkles,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 
 const navKeys = [
   { href: '/dashboard', labelKey: 'home', icon: Home },
+  { href: '/assistant', labelKey: 'assistant', icon: Sparkles },
   { href: '/governance', labelKey: 'governance', icon: Shield },
   { href: '/documents', labelKey: 'documents', icon: FolderOpen },
   { href: '/checklist', labelKey: 'checklist', icon: CheckSquare },
