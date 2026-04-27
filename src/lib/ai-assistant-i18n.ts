@@ -126,6 +126,22 @@ export const AI_COPY: Record<AILang, {
   reviewer_assigned_badge: string;
   // Checklist task title prefix
   classify_checklist_task_prefix: string;
+  // Scan crop & filter (Phase 1.5)
+  scan_step_crop_title: string;
+  scan_step_crop_hint: string;
+  scan_step_filter_title: string;
+  scan_step_filter_hint: string;
+  scan_crop_use_full: string;
+  scan_crop_reset: string;
+  scan_crop_confirm: string;
+  scan_crop_auto_suggested: string;
+  scan_filter_original: string;
+  scan_filter_bw: string;
+  scan_filter_grayscale: string;
+  scan_filter_enhanced: string;
+  scan_processing: string;
+  scan_back: string;
+  scan_continue: string;
 }> = {
   fr: {
     page_title: 'Assistant IA Solexi',
