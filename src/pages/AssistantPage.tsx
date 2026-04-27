@@ -79,14 +79,19 @@ const AssistantPage: React.FC = () => {
         .eq('user_id', user.id)
         .maybeSingle();
       if (data) {
-        setCtx({
+        const loaded: AIContext = {
           id: data.id,
           country: data.country || '',
           region: data.region || '',
           language: (data.language as AILang) || aiLang,
           preparing_for: (data.preparing_for as 'myself' | 'family_member') || 'myself',
           ai_disclaimer_accepted: !!data.ai_disclaimer_accepted,
-        });
+        };
+        setCtx(loaded);
+        // Only treat as "saved/unlocked" if the persisted row is fully complete.
+        const regionRequired = !!REGIONS_BY_COUNTRY[loaded.country];
+        const complete = !!loaded.country && !!loaded.language && !!loaded.preparing_for && (!regionRequired || !!loaded.region);
+        if (complete) setSavedCtx(loaded);
       }
       setLoading(false);
     })();
