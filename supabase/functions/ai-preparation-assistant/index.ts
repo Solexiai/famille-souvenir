@@ -190,7 +190,6 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
           },
         },
         required: ["intro", "items"],
-        additionalProperties: false,
       },
     },
   };
