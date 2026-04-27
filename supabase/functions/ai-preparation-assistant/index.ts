@@ -124,19 +124,13 @@ Return a structured classification.`;
         properties: {
           suggested_category: {
             type: "string",
-            enum: [
-              "identity", "testament", "mandate", "insurance", "banking",
-              "investments", "property", "vehicles", "debts", "taxes",
-              "medical", "wishes", "contracts", "subscriptions",
-              "digital_assets", "funeral", "other",
-            ],
+            description: "One of: identity, testament, mandate, insurance, banking, investments, property, vehicles, debts, taxes, medical, wishes, contracts, subscriptions, digital_assets, funeral, other",
           },
-          confidence: { type: "number", minimum: 0, maximum: 1 },
+          confidence: { type: "number", description: "Confidence score between 0 and 1" },
           reason: { type: "string" },
           recommended_next_steps: {
             type: "array",
             items: { type: "string" },
-            maxItems: 5,
           },
           sensitive_data_warning: { type: "boolean" },
           professional_review_recommended: { type: "boolean" },
