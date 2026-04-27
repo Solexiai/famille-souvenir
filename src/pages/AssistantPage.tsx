@@ -224,7 +224,6 @@ const AssistantPage: React.FC = () => {
 
   const generateChecklist = async () => {
     setGenerating(true);
-    setSavedIdx(new Set());
     try {
       const result = await callAI('generate_checklist');
       setChecklist(result);
@@ -235,19 +234,86 @@ const AssistantPage: React.FC = () => {
     }
   };
 
+  // Localized strings for the save flow
+  const navHelperText =
+    aiLang === 'fr' ? 'Les éléments enregistrés seront ajoutés à votre Checklist afin que vous puissiez les suivre étape par étape.'
+    : aiLang === 'es' ? 'Los elementos guardados se añadirán a su Checklist para que pueda seguirlos paso a paso.'
+    : 'Saved preparation items will be added to your Checklist so you can follow them step by step.';
+  const savedToCkText =
+    aiLang === 'fr' ? 'Élément ajouté à votre Checklist. Vous pouvez le retrouver dans la page Checklist.'
+    : aiLang === 'es' ? 'Elemento añadido a su Checklist. Puede encontrarlo en la página Checklist.'
+    : 'Item added to your Checklist. You can find it in the Checklist page.';
+  const viewInCkText =
+    aiLang === 'fr' ? 'Voir dans ma Checklist'
+    : aiLang === 'es' ? 'Ver en mi Checklist'
+    : 'View in my Checklist';
+  const alreadyInCkText =
+    aiLang === 'fr' ? 'Cet élément est déjà dans votre Checklist.'
+    : aiLang === 'es' ? 'Este elemento ya está en su Checklist.'
+    : 'This item is already in your Checklist.';
+
   const saveSuggestion = async (item: ChecklistItem, idx: number) => {
     if (!user) return;
-    const { error } = await supabase.from('ai_saved_suggestions').insert({
-      user_id: user.id,
-      suggestion_type: 'checklist_item',
-      title: item.title,
-      content: [item.short_explanation, item.recommended_action, item.details].filter(Boolean).join('\n\n') || item.description || '',
-      professional_review_recommended: item.professional_review_recommended,
-      metadata: { section: item.section, category: item.category || null },
-    });
-    if (error) { toast.error(t.error_generic); return; }
-    setSavedIdx(new Set([...savedIdx, idx]));
-    toast.success(t.saved_toast);
+    const titleKey = item.title.trim();
+
+    // 1) Insert into ai_saved_suggestions (existing behaviour)
+    const { data: savedRow, error: savedErr } = await supabase
+      .from('ai_saved_suggestions')
+      .insert({
+        user_id: user.id,
+        suggestion_type: 'checklist_item',
+        title: item.title,
+        content: [item.short_explanation, item.recommended_action, item.details].filter(Boolean).join('\n\n') || item.description || '',
+        professional_review_recommended: item.professional_review_recommended,
+        metadata: { section: item.section, category: item.category || null, source: 'solexi_ai' },
+      })
+      .select('id')
+      .single();
+    if (savedErr) { toast.error(t.error_generic); return; }
+
+    // 2) Mirror into the main checklist if a circle exists
+    if (circleId) {
+      // Duplicate guard: check by ai_suggestion_id linkage on existing items with same title.
+      const { data: existing } = await supabase
+        .from('checklist_items')
+        .select('id')
+        .eq('circle_id', circleId)
+        .eq('source', 'ai')
+        .eq('title', item.title)
+        .limit(1);
+      if (existing && existing.length > 0) {
+        setSavedTitles(prev => new Set(prev).add(titleKey));
+        toast.message(alreadyInCkText);
+        return;
+      }
+
+      const description = [item.short_explanation, item.recommended_action, item.details]
+        .filter(Boolean).join('\n\n') || item.description || '';
+
+      const { error: ckErr } = await supabase.from('checklist_items').insert({
+        circle_id: circleId,
+        category: mapToChecklistCategory(item.category || item.section),
+        title: item.title,
+        description,
+        status: 'not_started',
+        requires_professional_review: !!item.professional_review_recommended,
+        source: 'ai',
+        ai_suggestion_id: savedRow?.id ?? null,
+      } as never);
+      if (ckErr) {
+        // Item still saved in suggestions; surface a soft error.
+        toast.error(t.error_generic);
+      } else {
+        toast.success(savedToCkText, {
+          action: { label: viewInCkText, onClick: () => navigate('/checklist') },
+          duration: 6000,
+        });
+      }
+    } else {
+      toast.success(t.saved_toast);
+    }
+
+    setSavedTitles(prev => new Set(prev).add(titleKey));
   };
 
   const sectionLabel = (s: string) => (t as any)[`section_${s}`] || s;
