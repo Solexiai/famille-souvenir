@@ -13,6 +13,7 @@ import { prepareImageForUpload } from '@/lib/image-preparation';
 import { logAuditEvent } from '@/lib/audit';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 import { useLocale } from '@/contexts/LocaleContext';
+import { convertScanImageToPdf } from '@/lib/scan-to-pdf';
 
 interface Props {
   open: boolean;
@@ -80,15 +81,22 @@ export const MobileScanCapture: React.FC<Props> = ({ open, onOpenChange, circleI
     if (!file || !user || !title.trim()) return;
     setUploading(true);
     try {
+      // Strip EXIF/resize first
       const processed = await prepareImageForUpload(file);
-      const validation = await validateUpload(processed, 'document', circleId);
+
+      // Try converting to a single-page PDF (fallback to image on failure)
+      const conversion = await convertScanImageToPdf(processed, title.trim());
+      const finalFile = conversion.file;
+
+      const validation = await validateUpload(finalFile, 'document', circleId);
       if (!validation.allowed) {
         toast.error(validation.error || t.docs_upload_error);
         return;
       }
-      const ext = processed.name.split('.').pop() || 'jpg';
+
+      const ext = finalFile.name.split('.').pop() || (conversion.converted ? 'pdf' : 'jpg');
       const storagePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from('vault-private').upload(storagePath, processed);
+      const { error: upErr } = await supabase.storage.from('vault-private').upload(storagePath, finalFile);
       if (upErr) {
         toast.error(t.docs_upload_error);
         return;
@@ -101,10 +109,12 @@ export const MobileScanCapture: React.FC<Props> = ({ open, onOpenChange, circleI
         category,
         visibility: 'private_owner',
         storage_path: storagePath,
-        file_name: file.name || `scan-${Date.now()}.jpg`,
-        file_size: processed.size,
+        file_name: finalFile.name,
+        file_size: finalFile.size,
         upload_source: 'mobile_scan',
-        original_file_type: file.type || 'image/jpeg',
+        original_file_type: conversion.originalFileType,
+        stored_file_type: conversion.storedFileType,
+        converted_to_pdf: conversion.converted,
         ai_classification_status: 'not_classified',
         reviewed_by_user: false,
       } as never);
@@ -114,6 +124,7 @@ export const MobileScanCapture: React.FC<Props> = ({ open, onOpenChange, circleI
       }
       await logAuditEvent('document_scanned', circleId, {
         title: title.trim(), category, source: 'mobile_scan',
+        converted_to_pdf: conversion.converted,
       });
       toast.success(aiT.scan_success);
       onUploaded?.();
