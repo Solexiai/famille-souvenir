@@ -68,6 +68,10 @@ export const AI_COPY: Record<AILang, {
   section_memories_messages: string;
   section_people_to_contact: string;
   section_professional_review: string;
+  section_state_province_specific: string;
+  jurisdiction_aware_label: string;
+  requires_local_verification: string;
+  jurisdiction_warning: string;
   nav_assistant: string;
 }> = {
   fr: {
@@ -135,6 +139,10 @@ export const AI_COPY: Record<AILang, {
     section_memories_messages: 'Souvenirs et messages familiaux',
     section_people_to_contact: 'Personnes à contacter',
     section_professional_review: 'Vérification professionnelle requise',
+    section_state_province_specific: 'Éléments spécifiques à votre État/province à vérifier',
+    jurisdiction_aware_label: 'Conseils adaptés à votre juridiction',
+    requires_local_verification: 'Nécessite une vérification par un professionnel local',
+    jurisdiction_warning: "Solexi AI adapte ses suggestions selon votre localisation, mais ne fournit pas de conseils juridiques. Les règles successorales, fiscales, de probate et de directives médicales varient selon la juridiction. Veuillez consulter un professionnel qualifié de votre région.",
     nav_assistant: 'Assistant IA',
   },
   en: {
@@ -202,6 +210,10 @@ export const AI_COPY: Record<AILang, {
     section_memories_messages: 'Family memories and messages',
     section_people_to_contact: 'People to contact',
     section_professional_review: 'Professional review needed',
+    section_state_province_specific: 'State/province-specific items to verify',
+    jurisdiction_aware_label: 'Jurisdiction-aware guidance',
+    requires_local_verification: 'Requires local professional verification',
+    jurisdiction_warning: 'Solexi AI adapts suggestions based on your selected location, but it does not provide legal advice. Estate, inheritance, probate, tax, and healthcare directive rules vary by jurisdiction. Please consult a qualified local professional.',
     nav_assistant: 'AI Assistant',
   },
   es: {
@@ -269,6 +281,10 @@ export const AI_COPY: Record<AILang, {
     section_memories_messages: 'Recuerdos y mensajes familiares',
     section_people_to_contact: 'Personas a contactar',
     section_professional_review: 'Requiere revisión profesional',
+    section_state_province_specific: 'Elementos específicos de su estado/provincia a verificar',
+    jurisdiction_aware_label: 'Orientación adaptada a su jurisdicción',
+    requires_local_verification: 'Requiere verificación por un profesional local',
+    jurisdiction_warning: 'Solexi AI adapta las sugerencias según su ubicación seleccionada, pero no proporciona asesoramiento legal. Las normas sucesorias, fiscales, de probate y de directivas médicas varían según la jurisdicción. Consulte a un profesional cualificado de su región.',
     nav_assistant: 'Asistente IA',
   },
 };

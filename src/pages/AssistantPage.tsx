@@ -400,8 +400,20 @@ const AssistantPage: React.FC = () => {
             <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-[10px]">
               {t.educational_badge}
             </Badge>
+            {savedCtx?.country && (
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 text-[10px]">
+                {t.jurisdiction_aware_label}
+              </Badge>
+            )}
           </div>
         </div>
+
+        {savedCtx?.country && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 sm:p-4 flex items-start gap-2.5">
+            <AlertTriangle className="h-4 w-4 text-amber-700 mt-0.5 shrink-0" />
+            <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">{t.jurisdiction_warning}</p>
+          </div>
+        )}
 
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="grid grid-cols-3 w-full">
@@ -511,7 +523,7 @@ const AssistantPage: React.FC = () => {
                           {item.professional_review_recommended && (
                             <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px]">
                               <AlertTriangle className="h-3 w-3" />
-                              {t.pro_review_badge}
+                              {t.requires_local_verification}
                             </Badge>
                           )}
                         </div>
