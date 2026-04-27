@@ -41,9 +41,12 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
+
   const getLabel = (key: string): string => {
     switch (key) {
       case 'home': return t.nav_home;
+      case 'assistant': return AI_COPY[aiLang].nav_assistant;
       case 'governance': return t.dash_governance;
       case 'documents': return t.dash_documents;
       case 'checklist': return t.dash_checklist;
