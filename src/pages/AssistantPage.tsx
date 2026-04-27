@@ -75,7 +75,7 @@ const AssistantPage: React.FC = () => {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
 
-  const [checklist, setChecklist] = useState<{ intro: string; items: ChecklistItem[] } | null>(null);
+  const [checklist, setChecklist] = useState<ChecklistPayload | null>(null);
   const [generating, setGenerating] = useState(false);
   const [savedIdx, setSavedIdx] = useState<Set<number>>(new Set());
 
