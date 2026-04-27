@@ -516,42 +516,96 @@ const AssistantPage: React.FC = () => {
                 {!checklist && !generating && (
                   <p className="text-sm text-muted-foreground">{t.checklist_empty}</p>
                 )}
-                {checklist && (
-                  <>
-                    <p className="text-sm text-foreground/80">{checklist.intro}</p>
-                    <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-[10px]">
-                      {t.ai_badge}
-                    </Badge>
-                    <div className="space-y-3">
-                      {checklist.items.map((item, idx) => (
-                        <div key={idx} className="rounded-lg border border-border/60 p-4 space-y-2 hover:shadow-soft transition-shadow">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="font-medium text-sm">{item.title}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{sectionLabel(item.section)}</p>
-                            </div>
-                            <Button
-                              size="sm"
-                              variant={savedIdx.has(idx) ? 'secondary' : 'outline'}
-                              onClick={() => saveSuggestion(item, idx)}
-                              disabled={savedIdx.has(idx)}
-                              className="shrink-0 text-xs"
-                            >
-                              {savedIdx.has(idx) ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
-                            </Button>
+                {checklist && (() => {
+                  const jurisdictionItems = checklist.items.filter(i => i.section === 'state_province_specific');
+                  const otherItems = checklist.items.filter(i => i.section !== 'state_province_specific');
+                  const showMoreLabel = aiLang === 'fr' ? 'Afficher plus de détails' : aiLang === 'es' ? 'Mostrar más detalles' : 'Show more details';
+                  const showLessLabel = aiLang === 'fr' ? 'Masquer les détails' : aiLang === 'es' ? 'Ocultar detalles' : 'Hide details';
+                  const actionLabel = aiLang === 'fr' ? 'Action recommandée' : aiLang === 'es' ? 'Acción recomendada' : 'Recommended action';
+
+                  const renderItem = (item: ChecklistItem, idx: number) => (
+                    <div key={idx} className="rounded-lg border border-border/60 p-4 space-y-2 hover:shadow-soft transition-shadow">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm">{item.title}</p>
+                          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                            {item.category && (
+                              <Badge variant="outline" className="text-[10px]">{item.category}</Badge>
+                            )}
+                            <span className="text-[10px] text-muted-foreground">{sectionLabel(item.section)}</span>
                           </div>
-                          <p className="text-sm text-foreground/80">{item.description}</p>
-                          {item.professional_review_recommended && (
-                            <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px]">
-                              <AlertTriangle className="h-3 w-3" />
-                              {t.requires_local_verification}
-                            </Badge>
-                          )}
                         </div>
-                      ))}
+                        <Button
+                          size="sm"
+                          variant={savedIdx.has(idx) ? 'secondary' : 'outline'}
+                          onClick={() => saveSuggestion(item, idx)}
+                          disabled={savedIdx.has(idx)}
+                          className="shrink-0 text-xs"
+                        >
+                          {savedIdx.has(idx) ? <><Check className="h-3 w-3 mr-1" />{t.saved}</> : <><Bookmark className="h-3 w-3 mr-1" />{t.save_suggestion}</>}
+                        </Button>
+                      </div>
+                      {(item.short_explanation || item.description) && (
+                        <p className="text-sm text-foreground/80">{item.short_explanation || item.description}</p>
+                      )}
+                      {item.recommended_action && (
+                        <p className="text-xs text-foreground/90"><span className="font-medium">{actionLabel}: </span>{item.recommended_action}</p>
+                      )}
+                      {item.details && (
+                        <>
+                          {expandedIdx.has(idx) && (
+                            <p className="text-xs text-muted-foreground border-l-2 border-accent/30 pl-3">{item.details}</p>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => toggleExpanded(idx)}
+                            className="text-xs text-accent hover:underline inline-flex items-center gap-1"
+                          >
+                            {expandedIdx.has(idx) ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                            {expandedIdx.has(idx) ? showLessLabel : showMoreLabel}
+                          </button>
+                        </>
+                      )}
+                      {item.professional_review_recommended && (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 gap-1 text-[10px]">
+                          <AlertTriangle className="h-3 w-3" />
+                          {t.requires_local_verification}
+                        </Badge>
+                      )}
                     </div>
-                  </>
-                )}
+                  );
+
+                  return (
+                    <>
+                      <p className="text-sm text-foreground/80">{checklist.intro}</p>
+                      <Badge variant="outline" className="bg-accent/10 text-accent border-accent/30 text-[10px]">
+                        {t.ai_badge}
+                      </Badge>
+
+                      {otherItems.length > 0 && (
+                        <div className="space-y-3">
+                          {otherItems.map((item) => renderItem(item, checklist.items.indexOf(item)))}
+                        </div>
+                      )}
+
+                      {jurisdictionItems.length > 0 && (
+                        <div className="space-y-3 pt-2">
+                          <div className="flex items-center gap-2 border-t pt-4">
+                            <AlertTriangle className="h-4 w-4 text-amber-700" />
+                            <h3 className="font-heading text-base font-semibold text-primary">
+                              {checklist.jurisdiction_section_title || t.section_state_province_specific}
+                            </h3>
+                          </div>
+                          {jurisdictionItems.map((item) => renderItem(item, checklist.items.indexOf(item)))}
+                        </div>
+                      )}
+
+                      {checklist.closing && (
+                        <p className="text-sm text-foreground/80 border-t pt-3 italic">{checklist.closing}</p>
+                      )}
+                    </>
+                  );
+                })()}
               </CardContent>
             </Card>
           </TabsContent>
