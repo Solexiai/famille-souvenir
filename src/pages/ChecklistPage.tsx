@@ -486,12 +486,31 @@ const ChecklistPage: React.FC = () => {
         {/* Checklist items grouped by category */}
         {filteredItems.length === 0 ? (
           <Card className="shadow-soft">
-            <CardContent className="py-12 text-center">
-              <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <CardContent className="py-12 text-center space-y-4">
+              <CheckSquare className="h-12 w-12 text-muted-foreground mx-auto" />
               <p className="text-muted-foreground">
-                {items.length === 0 ? t.checklist_empty : t.checklist_no_filter_match}
+                {items.length === 0
+                  ? (lang === 'fr'
+                      ? 'Votre Checklist est vide. Vous pouvez ajouter des tâches manuellement ou générer une liste de préparation avec l’Assistant IA Solexi.'
+                      : lang === 'es'
+                        ? 'Su Checklist está vacía. Puede añadir tareas manualmente o generar una lista de preparación con el Asistente IA Solexi.'
+                        : 'Your Checklist is empty. You can add tasks manually or generate a preparation list with the Solexi AI Assistant.')
+                  : t.checklist_no_filter_match}
               </p>
-              {items.length === 0 && <p className="text-sm text-muted-foreground mt-1">{t.checklist_empty_desc}</p>}
+              {items.length === 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {canEdit && (
+                    <Button onClick={() => setDialogOpen(true)} variant="outline" className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      {lang === 'fr' ? 'Ajouter une tâche' : lang === 'es' ? 'Añadir una tarea' : 'Add a task'}
+                    </Button>
+                  )}
+                  <Button onClick={() => navigate('/assistant')} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                    <Sparkles className="h-4 w-4" />
+                    {lang === 'fr' ? "Ouvrir l’Assistant IA" : lang === 'es' ? 'Abrir el Asistente IA' : 'Open AI Assistant'}
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         ) : (
