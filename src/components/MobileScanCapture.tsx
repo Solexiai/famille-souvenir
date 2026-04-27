@@ -362,7 +362,17 @@ export const MobileScanCapture: React.FC<Props> = ({ open, onOpenChange, circleI
                 <p className="text-[11px] text-accent mt-1">{aiT.scan_crop_auto_suggested}</p>
               )}
             </div>
-            <ScanCropEditor image={sourceImage} initialQuad={quad} onChange={setQuad} />
+            <ScanCropEditor
+              image={sourceImage}
+              initialQuad={quad}
+              onChange={setQuad}
+              labels={{
+                autoDetect: aiT.scan_crop_auto_detect,
+                reset: aiT.scan_crop_reset,
+                full: aiT.scan_crop_use_full,
+                zoom: aiT.scan_crop_zoom,
+              }}
+            />
             <div className="grid grid-cols-2 gap-2">
               <Button variant="outline" onClick={useFullImage} disabled={processing}>
                 {aiT.scan_crop_use_full}
