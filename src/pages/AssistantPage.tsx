@@ -219,9 +219,9 @@ const AssistantPage: React.FC = () => {
       user_id: user.id,
       suggestion_type: 'checklist_item',
       title: item.title,
-      content: item.description,
+      content: [item.short_explanation, item.recommended_action, item.details].filter(Boolean).join('\n\n') || item.description || '',
       professional_review_recommended: item.professional_review_recommended,
-      metadata: { section: item.section },
+      metadata: { section: item.section, category: item.category || null },
     });
     if (error) { toast.error(t.error_generic); return; }
     setSavedIdx(new Set([...savedIdx, idx]));
