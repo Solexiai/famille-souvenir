@@ -68,6 +68,10 @@ export const AI_COPY: Record<AILang, {
   section_memories_messages: string;
   section_people_to_contact: string;
   section_professional_review: string;
+  section_state_province_specific: string;
+  jurisdiction_aware_label: string;
+  requires_local_verification: string;
+  jurisdiction_warning: string;
   nav_assistant: string;
 }> = {
   fr: {
