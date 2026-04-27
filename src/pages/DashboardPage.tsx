@@ -8,12 +8,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot } from 'lucide-react';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
+import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { t, terms } = useLocale();
+  const { t, terms, lang } = useLocale();
+  const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
+  const aiT = AI_COPY[aiLang];
   const navigate = useNavigate();
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memberCount, setMemberCount] = useState(0);
