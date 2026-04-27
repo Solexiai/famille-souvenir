@@ -205,46 +205,59 @@ Return a structured classification.`;
 }
 
 async function generateChecklist(payload: any) {
+  const lang = payload.language || "fr";
   const country = payload.country || "unspecified";
   const region = payload.region || "unspecified";
-  const userPrompt = `Generate a personalized, jurisdiction-aware preparation checklist.
+  const sectionTitle = jurisdictionSectionTitle(lang, region);
+  const opening = openingLine(lang, country, region);
+  const closing = closingLine(lang, region);
+
+  const userPrompt = `Generate a SHORT, app-friendly, jurisdiction-aware preparation checklist.
 ${contextBlock(payload)}
 
-Requirements:
-- Return 10-16 practical items.
-- The "intro" must be 2-3 reassuring sentences that explicitly mention the user's location (${region}, ${country}) and remind that this is educational organizational guidance, not legal advice.
-- Include AT LEAST 3 items in the "state_province_specific" section that reference ${region}, ${country} by name (e.g., "Items to verify in ${region}: …"). These items MUST set professional_review_recommended=true and their description must say to verify with a qualified local professional in ${region}.
-- For any item touching wills, estate, probate, powers of attorney, healthcare directives/surrogates, beneficiary designations, taxes, or real estate transfers, set professional_review_recommended=true and use wording like "Common documents to consider preparing" / "Review with a qualified local professional".
-- Never claim items are a complete legal requirement. Use cautious wording.
-- Reply in the user's preferred language only.`;
+STRICT requirements:
+- Return 8 to 12 items total. No more.
+- "intro" must be exactly this opening line, verbatim: "${opening}"
+- "closing" must be exactly this closing line, verbatim: "${closing}"
+- "jurisdiction_section_title" must be exactly: "${sectionTitle}"
+- Include 4 to 6 items in the "state_province_specific" section. Each must be relevant to ${region}, ${country} when known (e.g., for Florida, USA: Designation of Health Care Surrogate, Living Will, Durable Power of Attorney, Last Will and Testament, Trust documents if applicable, Beneficiary designations, Homestead/real estate documents if applicable, Probate-related documents). All "state_province_specific" items MUST set professional_review_recommended=true.
+- Each item must include: title (short), category (one short word/phrase like "Legal", "Healthcare", "Financial", "Identity", "Digital", "Memories"), short_explanation (max 2 sentences, cautious wording), recommended_action (1 short imperative sentence), professional_review_recommended (boolean). Optional "details" field for a slightly longer expansion (max 3 sentences) used for "Show more details".
+- For wills, estate, probate, powers of attorney, healthcare directives/surrogates, beneficiary designations, taxes, real estate: professional_review_recommended=true.
+- Use safe wording everywhere ("commonly reviewed", "often considered", "may be relevant", "should be verified with a qualified local professional"). Never say "this is crucial", "you need", "legally valid", "the law requires".
+- Reply in ${languageName(lang)} only.`;
 
   const tool: ProviderTool = {
     type: "function",
     function: {
       name: "generate_checklist",
-      description: "Return a structured preparation checklist.",
+      description: "Return a short, structured, jurisdiction-aware preparation checklist.",
       parameters: {
         type: "object",
         properties: {
-          intro: { type: "string", description: "Short reassuring intro (2-3 sentences)." },
+          intro: { type: "string", description: "Exact opening line provided in the prompt." },
+          closing: { type: "string", description: "Exact closing line provided in the prompt." },
+          jurisdiction_section_title: { type: "string", description: "Exact jurisdiction section title provided in the prompt." },
           items: {
             type: "array",
             items: {
               type: "object",
               properties: {
                 title: { type: "string" },
-                description: { type: "string" },
+                category: { type: "string", description: "Short category label like Legal, Healthcare, Financial, Identity, Digital, Memories." },
+                short_explanation: { type: "string", description: "Max 2 sentences. Cautious wording." },
+                recommended_action: { type: "string", description: "1 short imperative sentence." },
+                details: { type: "string", description: "Optional, max 3 sentences, for Show more details." },
                 section: {
                   type: "string",
                   description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review, state_province_specific",
                 },
                 professional_review_recommended: { type: "boolean" },
               },
-              required: ["title", "description", "section", "professional_review_recommended"],
+              required: ["title", "category", "short_explanation", "recommended_action", "section", "professional_review_recommended"],
             },
           },
         },
-        required: ["intro", "items"],
+        required: ["intro", "closing", "jurisdiction_section_title", "items"],
       },
     },
   };
@@ -263,12 +276,27 @@ Requirements:
 }
 
 async function chatGuidance(payload: any) {
+  const lang = payload.language || "fr";
+  const country = payload.country || "unspecified";
+  const region = payload.region || "unspecified";
+  const opening = openingLine(lang, country, region);
+  const closing = closingLine(lang, region);
+  const sectionTitle = jurisdictionSectionTitle(lang, region);
+
+  const formatRules = `Reply in ${languageName(lang)} only. Format the answer for an app UI, NOT as a long article:
+- Start with this exact opening line on its own line: "${opening}"
+- Then a very short intro (max 2 sentences).
+- Then short structured sections using markdown headings (## ) and bullet lists. Each bullet ≤ 2 sentences. Use cautious wording.
+- If the user's question touches estate/legal/healthcare/tax/probate/beneficiary/real-estate topics, include a section titled exactly: "## ${sectionTitle}" with 4–8 bullets relevant to ${region}, ${country}. Each bullet must end with " — verify with a qualified local professional."
+- End with this exact closing line on its own line: "${closing}"
+- Total length target: under ~250 words. No multi-paragraph essays. Never claim legal validity or completeness.`;
+
   const messages: ProviderMessage[] = [
     { role: "system", content: SYSTEM_PROMPT },
     { role: "system", content: contextBlock(payload) },
+    { role: "system", content: formatRules },
   ];
 
-  // Optional prior conversation turns
   if (Array.isArray(payload.history)) {
     for (const m of payload.history.slice(-10)) {
       if (m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string") {
