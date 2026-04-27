@@ -29,6 +29,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import ChoosePlanPage from "./pages/ChoosePlanPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import AssistantPage from "./pages/AssistantPage";
 import AcceptInvitationPage from "./pages/AcceptInvitationPage";
 import UnsubscribePage from "./pages/UnsubscribePage";
 import NotFound from "./pages/NotFound";
@@ -72,6 +73,7 @@ const App = () => (
               <Route path="/executor" element={<ProtectedRoute><ExecutorPage /></ProtectedRoute>} />
               <Route path="/vault" element={<ProtectedRoute><VaultPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+              <Route path="/assistant" element={<ProtectedRoute><AssistantPage /></ProtectedRoute>} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
