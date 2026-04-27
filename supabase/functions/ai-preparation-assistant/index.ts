@@ -124,19 +124,13 @@ Return a structured classification.`;
         properties: {
           suggested_category: {
             type: "string",
-            enum: [
-              "identity", "testament", "mandate", "insurance", "banking",
-              "investments", "property", "vehicles", "debts", "taxes",
-              "medical", "wishes", "contracts", "subscriptions",
-              "digital_assets", "funeral", "other",
-            ],
+            description: "One of: identity, testament, mandate, insurance, banking, investments, property, vehicles, debts, taxes, medical, wishes, contracts, subscriptions, digital_assets, funeral, other",
           },
-          confidence: { type: "number", minimum: 0, maximum: 1 },
+          confidence: { type: "number", description: "Confidence score between 0 and 1" },
           reason: { type: "string" },
           recommended_next_steps: {
             type: "array",
             items: { type: "string" },
-            maxItems: 5,
           },
           sensitive_data_warning: { type: "boolean" },
           professional_review_recommended: { type: "boolean" },
@@ -146,7 +140,6 @@ Return a structured classification.`;
           "recommended_next_steps", "sensitive_data_warning",
           "professional_review_recommended",
         ],
-        additionalProperties: false,
       },
     },
   };
@@ -181,8 +174,6 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
           intro: { type: "string", description: "Short reassuring intro (2-3 sentences)." },
           items: {
             type: "array",
-            minItems: 6,
-            maxItems: 20,
             items: {
               type: "object",
               properties: {
@@ -190,25 +181,15 @@ Return 8-15 practical checklist items grouped into the standard sections.`;
                 description: { type: "string" },
                 section: {
                   type: "string",
-                  enum: [
-                    "identity_civil",
-                    "legal_estate",
-                    "financial_insurance",
-                    "digital_legacy",
-                    "memories_messages",
-                    "people_to_contact",
-                    "professional_review",
-                  ],
+                  description: "One of: identity_civil, legal_estate, financial_insurance, digital_legacy, memories_messages, people_to_contact, professional_review",
                 },
                 professional_review_recommended: { type: "boolean" },
               },
               required: ["title", "description", "section", "professional_review_recommended"],
-              additionalProperties: false,
             },
           },
         },
         required: ["intro", "items"],
-        additionalProperties: false,
       },
     },
   };
