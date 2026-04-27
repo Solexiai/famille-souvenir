@@ -19,8 +19,9 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import {
   Loader2, Plus, CheckSquare, AlertTriangle, FileText, Ban, CalendarIcon,
-  User, Filter, ChevronDown, ChevronRight
+  User, Filter, ChevronDown, ChevronRight, Sparkles
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type {
   FamilyCircle, ChecklistItem, ChecklistCategory, ChecklistStatus,
   CircleMember, AppRole, Document as DocType
