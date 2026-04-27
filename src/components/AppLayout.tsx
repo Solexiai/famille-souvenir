@@ -31,7 +31,7 @@ const navKeys = [
 
 export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { signOut } = useAuth();
-  const { t, terms } = useLocale();
+  const { t, terms, lang } = useLocale();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
