@@ -218,6 +218,31 @@ export interface Translations {
   dash_memories: string;
   dash_executor: string;
 
+  // Dashboard — Premiers pas & Parcours
+  dash_first_steps_title: string;
+  dash_first_steps_desc: string;
+  dash_first_steps_cta_circle: string;
+  dash_first_steps_cta_invite: string;
+  dash_first_steps_cta_doc: string;
+  dash_journey_title: string;
+  dash_journey_subtitle: string;
+  dash_journey_progress: string;
+  dash_step_done: string;
+  dash_step_todo: string;
+  dash_step_open: string;
+  dash_step_circle_title: string;
+  dash_step_circle_desc: string;
+  dash_step_members_title: string;
+  dash_step_members_desc: string;
+  dash_step_roles_title: string;
+  dash_step_roles_desc: string;
+  dash_step_documents_title: string;
+  dash_step_documents_desc: string;
+  dash_step_memories_title: string;
+  dash_step_memories_desc: string;
+  dash_step_checklist_title: string;
+  dash_step_checklist_desc: string;
+
   // Documentary status labels
   doc_status_unknown: string;
   doc_status_declared: string;
