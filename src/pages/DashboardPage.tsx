@@ -147,9 +147,7 @@ const DashboardPage: React.FC = () => {
     load();
   }, [user, t.app_name, t.doc_status_confirmed]);
 
-  const executorLabel = terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1);
-
-  const checklistProgress = checklistSummary.total > 0 ? Math.round((checklistSummary.completed / checklistSummary.total) * 100) : 0;
+  // executorLabel & checklistProgress reserved for future use
 
   return (
     <AppLayout>
