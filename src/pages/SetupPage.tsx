@@ -64,7 +64,7 @@ const SetupPage: React.FC = () => {
     }
 
     setSaving(false);
-    navigate(user ? '/onboarding' : '/signup');
+    navigate(user ? '/dashboard' : '/signup');
   };
 
   return (
