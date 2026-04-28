@@ -64,7 +64,12 @@ const SetupPage: React.FC = () => {
     }
 
     setSaving(false);
-    navigate(user ? '/dashboard' : '/signup');
+    if (user) {
+      // Hard navigate so ProtectedRoute re-reads the freshly saved profile
+      window.location.assign('/dashboard');
+    } else {
+      navigate('/signup');
+    }
   };
 
   return (
