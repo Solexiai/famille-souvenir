@@ -22,6 +22,8 @@ const DashboardPage: React.FC = () => {
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memberCount, setMemberCount] = useState(0);
   const [docCount, setDocCount] = useState(0);
+  const [memoryCount, setMemoryCount] = useState(0);
+  const [invitationCount, setInvitationCount] = useState(0);
   const [checklistSummary, setChecklistSummary] = useState({ total: 0, completed: 0, needsReview: 0, blocked: 0, proReview: 0 });
   const [govSummary, setGovSummary] = useState({ total: 0, completed: 0, blocked: 0, needsAttention: 0 });
   const [executorSummary, setExecutorSummary] = useState<{ proposed: string | null; testamentNamed: string | null; verified: string | null }>({ proposed: null, testamentNamed: null, verified: null });
