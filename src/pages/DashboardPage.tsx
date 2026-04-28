@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles, Camera } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
+import { GuidedOnboarding } from '@/components/GuidedOnboarding';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -27,6 +28,7 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
+  const [showGuided, setShowGuided] = useState(false);
 
   const docStatusLabel = (s: DocumentaryStatus) => {
     const m: Record<string, string> = {
@@ -53,8 +55,9 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const { data: profile } = await supabase.from('profiles').select('full_name').eq('user_id', user.id).single();
+      const { data: profile } = await supabase.from('profiles').select('full_name, guided_onboarding_completed_at').eq('user_id', user.id).single();
       if (profile) setProfileName(profile.full_name || user.email?.split('@')[0] || '');
+      const onboardingDone = !!profile?.guided_onboarding_completed_at;
 
       const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
       if (circles && circles.length > 0) {
@@ -113,6 +116,10 @@ const DashboardPage: React.FC = () => {
           testamentNamed: testamentLabel ? getMName(testamentLabel.member_id) : null,
           verified: verifiedMember ? (profileMap.get(verifiedMember.user_id)?.full_name || t.doc_status_confirmed) : null,
         });
+      }
+      // Trigger AI-guided onboarding on first dashboard visit (owners only, once per user)
+      if (circles && circles.length > 0 && !onboardingDone && circles[0].owner_id === user.id) {
+        setShowGuided(true);
       }
       setLoading(false);
     };
@@ -410,6 +417,14 @@ const DashboardPage: React.FC = () => {
           </>
         )}
       </div>
+      {circle && (
+        <GuidedOnboarding
+          open={showGuided}
+          circleId={circle.id}
+          onClose={() => setShowGuided(false)}
+          onCompleted={() => setShowGuided(false)}
+        />
+      )}
     </AppLayout>
   );
 };
