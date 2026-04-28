@@ -81,15 +81,19 @@ const DashboardPage: React.FC = () => {
         const c = circles[0] as FamilyCircle;
         setCircle(c);
 
-        const [{ count: mc }, { count: dc }, { data: clData }, { data: memberData }, { data: govData }] = await Promise.all([
+        const [{ count: mc }, { count: dc }, { count: memC }, { count: invC }, { data: clData }, { data: memberData }, { data: govData }] = await Promise.all([
           supabase.from('circle_members').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('documents').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
+          supabase.from('memories').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
+          supabase.from('invitations').select('*', { count: 'exact', head: true }).eq('circle_id', c.id),
           supabase.from('checklist_items').select('*').eq('circle_id', c.id),
           supabase.from('circle_members').select('role').eq('circle_id', c.id).eq('user_id', user.id).limit(1),
           supabase.from('governance_responsibilities').select('*').eq('circle_id', c.id),
         ]);
         setMemberCount(mc || 0);
         setDocCount(dc || 0);
+        setMemoryCount(memC || 0);
+        setInvitationCount(invC || 0);
         if (memberData && memberData.length > 0) setUserRole(memberData[0].role as AppRole);
         const items = (clData as ChecklistItem[]) || [];
         setChecklistSummary({
