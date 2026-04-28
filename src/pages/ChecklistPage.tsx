@@ -411,10 +411,23 @@ const ChecklistPage: React.FC = () => {
                     <Switch checked={requiresPro} onCheckedChange={setRequiresPro} />
                     <Label className="text-sm">{t.checklist_pro_review}</Label>
                   </div>
-                  <Button type="submit" className="w-full" disabled={saving}>
-                    {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-                    {editItem ? t.save : t.add}
-                  </Button>
+                  <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+                    {editItem && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={handleDelete}
+                        disabled={saving}
+                        className="sm:w-auto"
+                      >
+                        Supprimer
+                      </Button>
+                    )}
+                    <Button type="submit" className="flex-1" disabled={saving}>
+                      {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                      {editItem ? t.save : t.add}
+                    </Button>
+                  </div>
                 </form>
               </DialogContent>
             </Dialog>
