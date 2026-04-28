@@ -149,17 +149,6 @@ const DashboardPage: React.FC = () => {
 
   const executorLabel = terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1);
 
-  const quickActions = [
-    { label: t.dash_documents, icon: FolderOpen, action: () => navigate('/documents'), color: 'text-blue-600' },
-    { label: t.dash_governance, icon: Shield, action: () => navigate('/governance'), color: 'text-emerald-600' },
-    { label: t.dash_checklist, icon: CheckSquare, action: () => navigate('/checklist'), color: 'text-violet-600' },
-    { label: t.dash_memories, icon: Image, action: () => navigate('/memories'), color: 'text-rose-500' },
-    
-    { label: t.members, icon: UserPlus, action: () => navigate('/circle/members'), color: 'text-cyan-600', roles: ['owner', 'family_manager'] as AppRole[] },
-  ];
-
-  const visibleActions = quickActions.filter(a => !a.roles || !userRole || a.roles.includes(userRole));
-
   const checklistProgress = checklistSummary.total > 0 ? Math.round((checklistSummary.completed / checklistSummary.total) * 100) : 0;
 
   return (
