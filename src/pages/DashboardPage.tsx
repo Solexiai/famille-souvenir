@@ -528,30 +528,6 @@ const DashboardPage: React.FC = () => {
               </Card>
             )}
 
-            {/* Sanctuary pillars */}
-            <div className="pt-2">
-              <div className="flex items-baseline justify-between mb-4">
-                <h3 className="font-heading text-xl sm:text-2xl font-semibold text-primary">Accès rapide</h3>
-                <span className="hidden sm:block h-px flex-1 mx-4 bg-gradient-to-r from-accent/40 to-transparent" aria-hidden="true" />
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                {visibleActions.map((action) => {
-                  const Icon = action.icon;
-                  return (
-                    <button
-                      key={action.label}
-                      onClick={action.action}
-                      className="group relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-border/70 bg-card p-5 hover:border-accent/50 hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200"
-                    >
-                      <div className="h-12 w-12 rounded-2xl bg-secondary group-hover:bg-accent/15 flex items-center justify-center transition-colors">
-                        <Icon className="h-5 w-5 text-primary group-hover:text-accent transition-colors" />
-                      </div>
-                      <span className="font-heading text-xs sm:text-sm font-medium text-primary text-center leading-tight">{action.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </>
         )}
       </div>
