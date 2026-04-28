@@ -117,6 +117,10 @@ const DashboardPage: React.FC = () => {
           verified: verifiedMember ? (profileMap.get(verifiedMember.user_id)?.full_name || t.doc_status_confirmed) : null,
         });
       }
+      // Trigger AI-guided onboarding on first dashboard visit (owners only, once per user)
+      if (circles && circles.length > 0 && !onboardingDone && circles[0].owner_id === user.id) {
+        setShowGuided(true);
+      }
       setLoading(false);
     };
     load();
