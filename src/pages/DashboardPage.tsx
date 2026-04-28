@@ -417,6 +417,14 @@ const DashboardPage: React.FC = () => {
           </>
         )}
       </div>
+      {circle && (
+        <GuidedOnboarding
+          open={showGuided}
+          circleId={circle.id}
+          onClose={() => setShowGuided(false)}
+          onCompleted={() => setShowGuided(false)}
+        />
+      )}
     </AppLayout>
   );
 };
