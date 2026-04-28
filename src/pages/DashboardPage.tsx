@@ -304,36 +304,69 @@ const DashboardPage: React.FC = () => {
               </div>
             )}
 
-            {/* Dossier status — full width, clean layout */}
-            <Card className="shadow-card overflow-hidden">
-              <div className="flex items-center justify-between px-4 sm:px-5 pt-4 pb-2">
-                <div className="flex items-center gap-2">
-                  <FileCheck className="h-4 w-4 text-accent" />
-                  <h3 className="font-heading text-sm font-semibold text-foreground">{t.dash_documentary_prep}</h3>
-                </div>
-                <Badge variant="outline" className="text-[11px]">{dossierLabel(circle.dossier_readiness_status)}</Badge>
-              </div>
-              <CardContent className="pt-2 pb-4 px-4 sm:px-5">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-3">
-                  {[
-                    { label: t.doc_status_testament, value: circle.testament_status },
-                    { label: t.doc_status_mandate, value: circle.mandate_status },
-                    { label: t.doc_status_notary, value: circle.notary_status },
-                    { label: t.doc_status_beneficiaries, value: circle.beneficiary_designation_status },
-                  ].map((item) => (
-                    <div key={item.label} className="flex flex-col items-center text-center gap-1.5">
-                      <span className="text-[11px] text-muted-foreground leading-tight">{item.label}</span>
-                      <Badge className={`text-[11px] px-2 py-0.5 ${docStatusColor(item.value as DocumentaryStatus)}`}>
-                        {docStatusLabel(item.value as DocumentaryStatus)}
-                      </Badge>
+            {/* Documentary preparation — refined, explanatory layout */}
+            {(() => {
+              const docItems = [
+                { key: 'testament', icon: FileCheck, label: t.doc_status_testament, desc: t.dash_doc_desc_testament, value: circle.testament_status },
+                { key: 'mandate', icon: Shield, label: t.doc_status_mandate, desc: t.dash_doc_desc_mandate, value: circle.mandate_status },
+                { key: 'notary', icon: Briefcase, label: t.doc_status_notary, desc: t.dash_doc_desc_notary, value: circle.notary_status },
+                { key: 'beneficiaries', icon: Users, label: t.doc_status_beneficiaries, desc: t.dash_doc_desc_beneficiaries, value: circle.beneficiary_designation_status },
+              ];
+              const score = (v: string) => v === 'professionally_confirmed' ? 100 : v === 'located' ? 66 : v === 'declared' ? 33 : 0;
+              const progress = Math.round(docItems.reduce((s, i) => s + score(String(i.value)), 0) / docItems.length);
+              return (
+                <Card className="shadow-card overflow-hidden border-border/60">
+                  <div className="px-5 pt-5 pb-3 border-b border-border/50 bg-gradient-to-br from-accent/5 to-transparent">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        <div className="h-9 w-9 rounded-lg bg-accent/15 flex items-center justify-center shrink-0">
+                          <FileCheck className="h-4.5 w-4.5 text-accent" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-heading text-base font-semibold text-foreground leading-tight">{t.dash_documentary_prep}</h3>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{t.dash_documentary_subtitle}</p>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-[11px] shrink-0 bg-background">{dossierLabel(circle.dossier_readiness_status)}</Badge>
                     </div>
-                  ))}
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/circle')} className="w-full mt-4 text-xs text-accent hover:text-accent/80">
-                  {t.dash_manage_statuses} <ChevronRight className="h-3.5 w-3.5 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+                        <span>{t.dash_doc_progress_label}</span>
+                        <span className="font-medium text-foreground">{progress}%</span>
+                      </div>
+                      <Progress value={progress} className="h-1.5" />
+                    </div>
+                  </div>
+                  <CardContent className="p-0">
+                    <ul className="divide-y divide-border/50">
+                      {docItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <li key={item.key} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/30 transition-colors">
+                            <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center shrink-0">
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-foreground leading-tight">{item.label}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{item.desc}</p>
+                            </div>
+                            <Badge className={`text-[11px] px-2 py-0.5 shrink-0 ${docStatusColor(item.value as DocumentaryStatus)}`}>
+                              {docStatusLabel(item.value as DocumentaryStatus)}
+                            </Badge>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="px-5 py-3 border-t border-border/50 bg-muted/20 flex items-center justify-between gap-3 flex-wrap">
+                      <p className="text-[10.5px] text-muted-foreground leading-tight flex-1 min-w-0">{t.dash_doc_legend}</p>
+                      <Button variant="ghost" size="sm" onClick={() => navigate('/circle')} className="h-7 text-xs text-accent hover:text-accent/80 px-2">
+                        {t.dash_manage_statuses} <ChevronRight className="h-3.5 w-3.5 ml-0.5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
 
             {/* Governance summary */}
             {govSummary.total > 0 && (
