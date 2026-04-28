@@ -55,8 +55,9 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const { data: profile } = await supabase.from('profiles').select('full_name').eq('user_id', user.id).single();
+      const { data: profile } = await supabase.from('profiles').select('full_name, guided_onboarding_completed_at').eq('user_id', user.id).single();
       if (profile) setProfileName(profile.full_name || user.email?.split('@')[0] || '');
+      const onboardingDone = !!profile?.guided_onboarding_completed_at;
 
       const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
       if (circles && circles.length > 0) {
