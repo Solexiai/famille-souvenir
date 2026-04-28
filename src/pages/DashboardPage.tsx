@@ -29,7 +29,7 @@ const DashboardPage: React.FC = () => {
   const [executorSummary, setExecutorSummary] = useState<{ proposed: string | null; testamentNamed: string | null; verified: string | null }>({ proposed: null, testamentNamed: null, verified: null });
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
-  const [userRole, setUserRole] = useState<AppRole | null>(null);
+  const [, setUserRole] = useState<AppRole | null>(null);
   const [showGuided, setShowGuided] = useState(false);
 
   const docStatusLabel = (s: DocumentaryStatus) => {
