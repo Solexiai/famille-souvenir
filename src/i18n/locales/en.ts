@@ -199,7 +199,7 @@ const en: Translations = {
   dash_documentary_prep: 'Documentary preparation',
   dash_documentary_disclaimer: 'Overview of declared statuses. Indicative — does not constitute legal validation.',
   dash_manage_statuses: 'Manage statuses →',
-  dash_governance: 'Governance',
+  dash_governance: 'Shared Roles',
   dash_responsibilities: 'Responsibilities',
   dash_completed: '{count} completed',
   dash_attention_required: '{count} attention required',
