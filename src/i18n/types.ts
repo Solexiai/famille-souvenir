@@ -195,7 +195,14 @@ export interface Translations {
   dash_blocked: string;
   dash_pro_review_required: string;
   dash_documentary_prep: string;
+  dash_documentary_subtitle: string;
   dash_documentary_disclaimer: string;
+  dash_doc_progress_label: string;
+  dash_doc_legend: string;
+  dash_doc_desc_testament: string;
+  dash_doc_desc_mandate: string;
+  dash_doc_desc_notary: string;
+  dash_doc_desc_beneficiaries: string;
   dash_manage_statuses: string;
   dash_governance: string;
   dash_responsibilities: string;
