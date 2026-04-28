@@ -28,6 +28,7 @@ const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [profileName, setProfileName] = useState('');
   const [userRole, setUserRole] = useState<AppRole | null>(null);
+  const [showGuided, setShowGuided] = useState(false);
 
   const docStatusLabel = (s: DocumentaryStatus) => {
     const m: Record<string, string> = {
