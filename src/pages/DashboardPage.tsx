@@ -209,82 +209,166 @@ const DashboardPage: React.FC = () => {
 
         {circle && (
           <>
-            {/* Stats row — sanctuary-toned */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
-                <CardContent className="flex items-center gap-4 py-5 px-5">
-                  <div className="h-12 w-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
-                    <Users className="h-5 w-5 text-accent" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{memberCount}</p>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{memberCount !== 1 ? t.members : t.member}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
-                <CardContent className="flex items-center gap-4 py-5 px-5">
-                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <FolderOpen className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-heading text-3xl font-semibold text-primary leading-none">{docCount}</p>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_documents}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-card border-border/60 hover:shadow-elevated transition-shadow">
-                <CardContent className="flex items-center gap-4 py-5 px-5">
-                  <div className="h-12 w-12 rounded-2xl bg-secondary flex items-center justify-center shrink-0">
-                    <CheckSquare className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline gap-1.5">
-                      <p className="font-heading text-3xl font-semibold text-primary leading-none">{checklistSummary.completed}</p>
-                      <p className="text-sm text-muted-foreground">/ {checklistSummary.total}</p>
+            {/* Premiers pas — only when the user is just starting */}
+            {(memberCount + invitationCount <= 1 && docCount === 0 && memoryCount === 0) && (
+              <Card className="shadow-elevated border-accent/40 overflow-hidden">
+                <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent px-5 sm:px-7 py-6">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
+                      <Sparkles className="h-5 w-5 text-accent" />
                     </div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mt-1.5">{t.dash_checklist}</p>
-                    {checklistSummary.total > 0 && (
-                      <Progress value={checklistProgress} className="mt-2 h-1.5" />
-                    )}
+                    <div className="min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider text-accent font-semibold">{t.dash_first_steps_title.split('—')[0]?.trim()}</p>
+                      <h2 className="font-heading text-xl sm:text-2xl font-semibold text-primary leading-tight mt-0.5">{t.dash_first_steps_title.split('—')[1]?.trim() || t.dash_first_steps_title}</h2>
+                      <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{t.dash_first_steps_desc}</p>
+                    </div>
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-5">
+                    <Button onClick={() => navigate('/circle')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
+                      <Users className="h-4 w-4 mr-2 text-accent shrink-0" />
+                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_circle}</span>
+                    </Button>
+                    <Button onClick={() => navigate('/circle/members')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
+                      <UserPlus className="h-4 w-4 mr-2 text-accent shrink-0" />
+                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_invite}</span>
+                    </Button>
+                    <Button onClick={() => navigate('/documents')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
+                      <FolderOpen className="h-4 w-4 mr-2 text-accent shrink-0" />
+                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_doc}</span>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* Stats row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { icon: Users, value: memberCount, label: memberCount !== 1 ? t.members : t.member, tint: 'accent' as const },
+                { icon: FolderOpen, value: docCount, label: t.dash_documents, tint: 'primary' as const },
+                { icon: Image, value: memoryCount, label: t.dash_memories, tint: 'accent' as const },
+                { icon: CheckSquare, value: `${checklistSummary.completed}/${checklistSummary.total || 0}`, label: t.dash_checklist, tint: 'primary' as const },
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                const tintBg = stat.tint === 'accent' ? 'bg-accent/15' : 'bg-primary/10';
+                const tintFg = stat.tint === 'accent' ? 'text-accent' : 'text-primary';
+                return (
+                  <Card key={i} className="shadow-card border-border/60">
+                    <CardContent className="flex items-center gap-3 py-4 px-4">
+                      <div className={`h-10 w-10 rounded-xl ${tintBg} flex items-center justify-center shrink-0`}>
+                        <Icon className={`h-4 w-4 ${tintFg}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-heading text-2xl font-semibold text-primary leading-none">{stat.value}</p>
+                        <p className="text-[10.5px] uppercase tracking-wider text-muted-foreground mt-1.5 truncate">{stat.label}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Journey — 6 numbered steps */}
+            {(() => {
+              const steps = [
+                { n: 1, icon: Users, title: t.dash_step_circle_title, desc: t.dash_step_circle_desc, done: !!circle, route: '/circle' },
+                { n: 2, icon: UserPlus, title: t.dash_step_members_title, desc: t.dash_step_members_desc, done: memberCount > 1 || invitationCount > 0, route: '/circle/members' },
+                { n: 3, icon: Shield, title: t.dash_step_roles_title, desc: t.dash_step_roles_desc, done: govSummary.total > 0, route: '/governance' },
+                { n: 4, icon: FolderOpen, title: t.dash_step_documents_title, desc: t.dash_step_documents_desc, done: docCount > 0, route: '/documents' },
+                { n: 5, icon: Image, title: t.dash_step_memories_title, desc: t.dash_step_memories_desc, done: memoryCount > 0, route: '/memories' },
+                { n: 6, icon: CheckSquare, title: t.dash_step_checklist_title, desc: t.dash_step_checklist_desc, done: checklistSummary.completed > 0, route: '/checklist' },
+              ];
+              const doneCount = steps.filter(s => s.done).length;
+              const pct = Math.round((doneCount / steps.length) * 100);
+              return (
+                <Card className="shadow-card overflow-hidden border-border/60">
+                  <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-border/50">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0">
+                        <h2 className="font-heading text-lg sm:text-xl font-semibold text-primary leading-tight">{t.dash_journey_title}</h2>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-snug">{t.dash_journey_subtitle}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-heading text-2xl font-semibold text-accent leading-none">{pct}%</p>
+                        <p className="text-[10.5px] uppercase tracking-wider text-muted-foreground mt-1">{t.dash_journey_progress.replace('{done}', String(doneCount)).replace('{total}', String(steps.length))}</p>
+                      </div>
+                    </div>
+                    <Progress value={pct} className="h-1.5" />
+                  </div>
+                  <CardContent className="p-0">
+                    <ol className="divide-y divide-border/50">
+                      {steps.map((step) => {
+                        const Icon = step.icon;
+                        return (
+                          <li key={step.n}>
+                            <button
+                              onClick={() => navigate(step.route)}
+                              className="w-full flex items-center gap-3 sm:gap-4 px-5 sm:px-6 py-3.5 hover:bg-muted/40 transition-colors text-left group"
+                            >
+                              <div className={`h-9 w-9 rounded-full flex items-center justify-center font-heading text-sm font-semibold border-2 transition-colors shrink-0 ${
+                                step.done
+                                  ? 'bg-accent border-accent text-accent-foreground'
+                                  : 'bg-card border-border text-muted-foreground group-hover:border-accent/50'
+                              }`}>
+                                {step.done ? <Check className="h-4 w-4" /> : step.n}
+                              </div>
+                              <div className="hidden sm:flex h-9 w-9 rounded-lg bg-secondary items-center justify-center shrink-0">
+                                <Icon className="h-4 w-4 text-primary" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="font-heading text-sm sm:text-base font-medium text-primary leading-tight">{step.title}</p>
+                                  <Badge
+                                    variant="outline"
+                                    className={`text-[10px] px-1.5 py-0 ${step.done ? 'bg-accent/10 text-accent border-accent/30' : 'bg-muted text-muted-foreground border-border'}`}
+                                  >
+                                    {step.done ? t.dash_step_done : t.dash_step_todo}
+                                  </Badge>
+                                </div>
+                                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 leading-snug">{step.desc}</p>
+                              </div>
+                              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
+            {/* Helpers row — Assistant + Scan */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Card className="shadow-card border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
+                    <Sparkles className="h-5 w-5 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-heading text-sm font-medium text-primary leading-tight">{aiT.next_step_open_assistant}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{aiT.empty_assistant}</p>
+                  </div>
+                  <Button onClick={() => navigate('/assistant')} size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full shrink-0">
+                    {aiT.nav_assistant}
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Camera className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-heading text-sm font-medium text-primary leading-tight">{aiT.scan_dashboard_title}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{aiT.scan_dashboard_desc}</p>
+                  </div>
+                  <Button onClick={() => navigate('/documents?scan=1')} size="sm" variant="outline" className="rounded-full border-primary/30 text-primary hover:bg-primary/10 shrink-0">
+                    {aiT.scan_dashboard_cta}
+                  </Button>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Next recommended step — AI Assistant */}
-            <Card className="shadow-card border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
-              <CardContent className="p-5 flex items-center gap-4 flex-wrap">
-                <div className="h-12 w-12 rounded-2xl bg-accent/15 flex items-center justify-center shrink-0">
-                  <Sparkles className="h-5 w-5 text-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-accent font-medium">{aiT.next_step_title}</p>
-                  <p className="font-heading text-base text-primary mt-0.5">{aiT.next_step_open_assistant}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{aiT.empty_assistant}</p>
-                </div>
-                <Button onClick={() => navigate('/assistant')} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full">
-                  <Sparkles className="h-4 w-4 mr-2" />{aiT.nav_assistant}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Mobile scan next-step card */}
-            <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-              <CardContent className="p-5 flex items-center gap-4 flex-wrap">
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <Camera className="h-5 w-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-primary font-medium">{aiT.next_step_title}</p>
-                  <p className="font-heading text-base text-primary mt-0.5">{aiT.scan_dashboard_title}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{aiT.scan_dashboard_desc}</p>
-                </div>
-                <Button onClick={() => navigate('/documents?scan=1')} variant="outline" className="rounded-full border-primary/30 text-primary hover:bg-primary/10">
-                  <Camera className="h-4 w-4 mr-2" />{aiT.scan_dashboard_cta}
-                </Button>
-              </CardContent>
-            </Card>
 
             {/* Alerts row */}
             {(checklistSummary.needsReview > 0 || checklistSummary.blocked > 0 || checklistSummary.proReview > 0) && (
