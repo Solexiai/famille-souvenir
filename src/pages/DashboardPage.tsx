@@ -148,7 +148,7 @@ const DashboardPage: React.FC = () => {
     { label: t.dash_governance, icon: Shield, action: () => navigate('/governance'), color: 'text-emerald-600' },
     { label: t.dash_checklist, icon: CheckSquare, action: () => navigate('/checklist'), color: 'text-violet-600' },
     { label: t.dash_memories, icon: Image, action: () => navigate('/memories'), color: 'text-rose-500' },
-    { label: executorLabel, icon: Briefcase, action: () => navigate('/executor'), color: 'text-amber-600', roles: ['owner', 'family_manager', 'proposed_executor', 'verified_executor'] as AppRole[] },
+    
     { label: t.members, icon: UserPlus, action: () => navigate('/circle/members'), color: 'text-cyan-600', roles: ['owner', 'family_manager'] as AppRole[] },
   ];
 
