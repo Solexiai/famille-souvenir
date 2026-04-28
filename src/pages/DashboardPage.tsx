@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles, Camera } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
+import { GuidedOnboarding } from '@/components/GuidedOnboarding';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
