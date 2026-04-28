@@ -15,7 +15,7 @@ import { GuidedOnboarding } from '@/components/GuidedOnboarding';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { t, terms, lang } = useLocale();
+  const { t, lang } = useLocale();
   const aiLang: AILang = (['fr', 'en', 'es'].includes(lang) ? lang : 'en') as AILang;
   const aiT = AI_COPY[aiLang];
   const navigate = useNavigate();
