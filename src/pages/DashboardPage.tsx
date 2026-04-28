@@ -59,7 +59,22 @@ const DashboardPage: React.FC = () => {
       if (profile) setProfileName(profile.full_name || user.email?.split('@')[0] || '');
       const onboardingDone = !!profile?.guided_onboarding_completed_at;
 
-      const { data: circles } = await supabase.from('family_circles').select('*').limit(1);
+      let { data: circles } = await supabase.from('family_circles').select('*').limit(1);
+
+      // Auto-create a default circle for first-time users so the guided onboarding modal
+      // can run immediately (without forcing them through the /circle page first).
+      if ((!circles || circles.length === 0) && !onboardingDone) {
+        const defaultName = (profile?.full_name?.split(' ')?.[0]
+          ? `${t.app_name} · ${profile.full_name.split(' ')[0]}`
+          : t.app_name);
+        const { data: newCircle } = await supabase
+          .from('family_circles')
+          .insert({ name: defaultName, owner_id: user.id })
+          .select()
+          .single();
+        if (newCircle) circles = [newCircle];
+      }
+
       if (circles && circles.length > 0) {
         const c = circles[0] as FamilyCircle;
         setCircle(c);
@@ -124,7 +139,7 @@ const DashboardPage: React.FC = () => {
       setLoading(false);
     };
     load();
-  }, [user]);
+  }, [user, t.app_name, t.doc_status_confirmed]);
 
   const executorLabel = terms.executor.charAt(0).toUpperCase() + terms.executor.slice(1);
 
