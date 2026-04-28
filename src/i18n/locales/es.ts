@@ -199,7 +199,7 @@ const es: Translations = {
   dash_documentary_prep: 'Preparación documentaria',
   dash_documentary_disclaimer: 'Vista general de los estados declarados. Indicativo — no constituye validación legal.',
   dash_manage_statuses: 'Gestionar estados →',
-  dash_governance: 'Gobernanza',
+  dash_governance: 'Roles compartidos',
   dash_responsibilities: 'Responsabilidades',
   dash_completed: '{count} completada(s)',
   dash_attention_required: '{count} atención requerida',

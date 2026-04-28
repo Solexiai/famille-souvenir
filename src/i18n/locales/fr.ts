@@ -207,7 +207,7 @@ const fr: Translations = {
   dash_documentary_prep: 'Préparation documentaire',
   dash_documentary_disclaimer: 'Vue d\'ensemble des statuts déclarés. Indicatif — ne constitue pas une validation juridique.',
   dash_manage_statuses: 'Gérer les statuts →',
-  dash_governance: 'Gouvernance',
+  dash_governance: 'Rôles partagés',
   dash_responsibilities: 'Responsabilités',
   dash_completed: '{count} complétée(s)',
   dash_attention_required: '{count} attention requise',
