@@ -220,6 +220,24 @@ const ChecklistPage: React.FC = () => {
     setSaving(false);
   };
 
+  const handleDelete = async () => {
+    if (!editItem) return;
+    const confirmed = window.confirm(`Supprimer définitivement « ${editItem.title} » ? Cette action est irréversible.`);
+    if (!confirmed) return;
+    setSaving(true);
+    const { error } = await supabase.from('checklist_items').delete().eq('id', editItem.id);
+    if (error) {
+      toast.error('Erreur lors de la suppression');
+    } else {
+      toast.success('Élément supprimé');
+      await auditLog('checklist_item_deleted', { item_id: editItem.id, title: editItem.title, category: editItem.category });
+      resetForm();
+      setDialogOpen(false);
+      loadData();
+    }
+    setSaving(false);
+  };
+
   const handleQuickStatus = async (item: ChecklistItem, newStatus: ChecklistStatus) => {
     const { error } = await supabase.from('checklist_items').update({ status: newStatus }).eq('id', item.id);
     if (error) toast.error(t.error_generic);
