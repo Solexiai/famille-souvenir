@@ -392,6 +392,51 @@ export type Database = {
           },
         ]
       }
+      draft_members: {
+        Row: {
+          circle_id: string
+          created_at: string
+          created_by: string
+          email: string | null
+          full_name: string
+          id: string
+          invitation_id: string | null
+          invited: boolean
+          invited_at: string | null
+          relationship_label: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          created_by: string
+          email?: string | null
+          full_name: string
+          id?: string
+          invitation_id?: string | null
+          invited?: boolean
+          invited_at?: string | null
+          relationship_label?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          invitation_id?: string | null
+          invited?: boolean
+          invited_at?: string | null
+          relationship_label?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -837,6 +882,7 @@ export type Database = {
           email: string
           first_name: string
           full_name: string
+          guided_onboarding_completed_at: string | null
           id: string
           is_emergency_contact: boolean
           is_visible_to_family: boolean
@@ -846,6 +892,7 @@ export type Database = {
           notes: string | null
           phone: string | null
           preferred_language: string | null
+          preparing_for: string | null
           region_code: string | null
           relationship_label: string | null
           secondary_phone: string | null
@@ -863,6 +910,7 @@ export type Database = {
           email?: string
           first_name?: string
           full_name?: string
+          guided_onboarding_completed_at?: string | null
           id?: string
           is_emergency_contact?: boolean
           is_visible_to_family?: boolean
@@ -872,6 +920,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           preferred_language?: string | null
+          preparing_for?: string | null
           region_code?: string | null
           relationship_label?: string | null
           secondary_phone?: string | null
@@ -889,6 +938,7 @@ export type Database = {
           email?: string
           first_name?: string
           full_name?: string
+          guided_onboarding_completed_at?: string | null
           id?: string
           is_emergency_contact?: boolean
           is_visible_to_family?: boolean
@@ -898,6 +948,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           preferred_language?: string | null
+          preparing_for?: string | null
           region_code?: string | null
           relationship_label?: string | null
           secondary_phone?: string | null
