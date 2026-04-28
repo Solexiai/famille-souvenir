@@ -195,7 +195,14 @@ export interface Translations {
   dash_blocked: string;
   dash_pro_review_required: string;
   dash_documentary_prep: string;
+  dash_documentary_subtitle: string;
   dash_documentary_disclaimer: string;
+  dash_doc_progress_label: string;
+  dash_doc_legend: string;
+  dash_doc_desc_testament: string;
+  dash_doc_desc_mandate: string;
+  dash_doc_desc_notary: string;
+  dash_doc_desc_beneficiaries: string;
   dash_manage_statuses: string;
   dash_governance: string;
   dash_responsibilities: string;
@@ -210,6 +217,31 @@ export interface Translations {
   dash_view_designations: string;
   dash_memories: string;
   dash_executor: string;
+
+  // Dashboard — Premiers pas & Parcours
+  dash_first_steps_title: string;
+  dash_first_steps_desc: string;
+  dash_first_steps_cta_circle: string;
+  dash_first_steps_cta_invite: string;
+  dash_first_steps_cta_doc: string;
+  dash_journey_title: string;
+  dash_journey_subtitle: string;
+  dash_journey_progress: string;
+  dash_step_done: string;
+  dash_step_todo: string;
+  dash_step_open: string;
+  dash_step_circle_title: string;
+  dash_step_circle_desc: string;
+  dash_step_members_title: string;
+  dash_step_members_desc: string;
+  dash_step_roles_title: string;
+  dash_step_roles_desc: string;
+  dash_step_documents_title: string;
+  dash_step_documents_desc: string;
+  dash_step_memories_title: string;
+  dash_step_memories_desc: string;
+  dash_step_checklist_title: string;
+  dash_step_checklist_desc: string;
 
   // Documentary status labels
   doc_status_unknown: string;

@@ -22,7 +22,7 @@ import MemoriesPage from "./pages/MemoriesPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import GovernancePage from "./pages/GovernancePage";
 import ChecklistPage from "./pages/ChecklistPage";
-import ExecutorPage from "./pages/ExecutorPage";
+
 import VaultPage from "./pages/VaultPage";
 import SettingsPage from "./pages/SettingsPage";
 import PrivacyPage from "./pages/PrivacyPage";
@@ -51,7 +51,7 @@ const App = () => (
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/setup" element={<SetupPage />} />
+              <Route path="/setup" element={<ProtectedRoute><SetupPage /></ProtectedRoute>} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               
@@ -70,7 +70,7 @@ const App = () => (
               <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
               <Route path="/checklist" element={<ProtectedRoute><ChecklistPage /></ProtectedRoute>} />
               <Route path="/memories" element={<ProtectedRoute><MemoriesPage /></ProtectedRoute>} />
-              <Route path="/executor" element={<ProtectedRoute><ExecutorPage /></ProtectedRoute>} />
+              
               <Route path="/vault" element={<ProtectedRoute><VaultPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="/assistant" element={<ProtectedRoute><AssistantPage /></ProtectedRoute>} />
