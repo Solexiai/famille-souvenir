@@ -220,24 +220,6 @@ const ChecklistPage: React.FC = () => {
     setSaving(false);
   };
 
-  const handleDelete = async () => {
-    if (!editItem) return;
-    const confirmed = window.confirm(`Supprimer définitivement « ${editItem.title} » ? Cette action est irréversible.`);
-    if (!confirmed) return;
-    setSaving(true);
-    const { error } = await supabase.from('checklist_items').delete().eq('id', editItem.id);
-    if (error) {
-      toast.error('Erreur lors de la suppression');
-    } else {
-      toast.success('Élément supprimé');
-      await auditLog('checklist_item_deleted', { item_id: editItem.id, title: editItem.title, category: editItem.category });
-      resetForm();
-      setDialogOpen(false);
-      loadData();
-    }
-    setSaving(false);
-  };
-
   const handleQuickStatus = async (item: ChecklistItem, newStatus: ChecklistStatus) => {
     const { error } = await supabase.from('checklist_items').update({ status: newStatus }).eq('id', item.id);
     if (error) toast.error(t.error_generic);
@@ -411,23 +393,10 @@ const ChecklistPage: React.FC = () => {
                     <Switch checked={requiresPro} onCheckedChange={setRequiresPro} />
                     <Label className="text-sm">{t.checklist_pro_review}</Label>
                   </div>
-                  <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
-                    {editItem && (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={handleDelete}
-                        disabled={saving}
-                        className="sm:w-auto"
-                      >
-                        Supprimer
-                      </Button>
-                    )}
-                    <Button type="submit" className="flex-1" disabled={saving}>
-                      {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-                      {editItem ? t.save : t.add}
-                    </Button>
-                  </div>
+                  <Button type="submit" className="w-full" disabled={saving}>
+                    {saving && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {editItem ? t.save : t.add}
+                  </Button>
                 </form>
               </DialogContent>
             </Dialog>

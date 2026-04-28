@@ -25,7 +25,7 @@ const navKeys = [
   { href: '/documents', labelKey: 'documents', icon: FolderOpen },
   { href: '/checklist', labelKey: 'checklist', icon: CheckSquare },
   { href: '/memories', labelKey: 'memories', icon: Image },
-  
+  { href: '/executor', labelKey: 'executor', icon: Briefcase },
   { href: '/settings', labelKey: 'settings', icon: Settings },
 ] as const;
 

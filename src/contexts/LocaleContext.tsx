@@ -70,16 +70,9 @@ export function useLocale() {
       console.warn('[useLocale] called outside LocaleProvider — using English fallback.');
     }
     return {
-      lang: ((typeof localStorage !== 'undefined' && (localStorage.getItem('solexi_lang') as SupportedLanguage)) || 'en') as SupportedLanguage,
-      setLang: (l: SupportedLanguage) => {
-        try {
-          localStorage.setItem('solexi_lang', l);
-          document.documentElement.lang = l;
-        } catch {}
-        // Force a reload so the proper provider picks up the new language
-        if (typeof window !== 'undefined') window.location.reload();
-      },
-      t: locales[((typeof localStorage !== 'undefined' && (localStorage.getItem('solexi_lang') as SupportedLanguage)) || 'en') as SupportedLanguage] || locales.en,
+      lang: 'en' as SupportedLanguage,
+      setLang: () => {},
+      t: locales.en,
       terms: getTerminology(null),
       jurisdictionPack: null,
       setJurisdictionPack: () => {},

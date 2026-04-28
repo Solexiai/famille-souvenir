@@ -64,12 +64,7 @@ const SetupPage: React.FC = () => {
     }
 
     setSaving(false);
-    if (user) {
-      // Hard navigate so ProtectedRoute re-reads the freshly saved profile
-      window.location.assign('/dashboard');
-    } else {
-      navigate('/signup');
-    }
+    navigate(user ? '/onboarding' : '/signup');
   };
 
   return (
@@ -86,44 +81,29 @@ const SetupPage: React.FC = () => {
               <Globe className="h-5 w-5 text-accent" />
               {t.setup_country_group}
             </CardTitle>
-            <CardDescription>
-              {countryGroup === 'canada'
-                ? 'Canada → choisissez votre province.'
-                : countryGroup === 'united_states'
-                  ? 'United States → select your state.'
-                  : countryGroup === 'latin_america'
-                    ? 'América Latina → seleccione su país.'
-                    : 'Sélectionnez d’abord votre pays ou région.'}
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {/* Country group */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Globe className="h-4 w-4 text-muted-foreground" />
-                Pays / Région
-              </label>
-              <Select
-                value={countryGroup ?? ''}
-                onValueChange={(v) => {
-                  setCountryGroup(v as CountryGroup);
-                  setRegionCode(null);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un pays ou une région…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRY_GROUP_ORDER.map(g => (
-                    <SelectItem key={g} value={g}>{t.setup_country_group_options[g]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select
+              value={countryGroup ?? ''}
+              onValueChange={(v) => {
+                setCountryGroup(v as CountryGroup);
+                setRegionCode(null);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t.setup_country_group} />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRY_GROUP_ORDER.map(g => (
+                  <SelectItem key={g} value={g}>{t.setup_country_group_options[g]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Region / State / Country */}
             {countryGroup && (
-              <div className="space-y-2 animate-fade-in">
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                   {regionLabel}
@@ -132,7 +112,7 @@ const SetupPage: React.FC = () => {
                   <SelectTrigger>
                     <SelectValue placeholder={countryGroup === 'latin_america' ? t.setup_country_placeholder : t.setup_region_placeholder} />
                   </SelectTrigger>
-                  <SelectContent className="max-h-72">
+                  <SelectContent>
                     {regionOptions.map(r => (
                       <SelectItem key={r.code} value={r.code}>{r.label}</SelectItem>
                     ))}
@@ -160,13 +140,8 @@ const SetupPage: React.FC = () => {
             </div>
 
             <Button onClick={handleContinue} className="w-full" size="lg" disabled={!canContinue || saving}>
-              {saving ? 'Enregistrement…' : t.continue_btn}
+              {t.continue_btn}
             </Button>
-            {!countryGroup && (
-              <p className="text-xs text-muted-foreground text-center">
-                Choisissez votre pays ci-dessus pour faire apparaître la liste des provinces / états.
-              </p>
-            )}
           </CardContent>
         </Card>
       </div>
