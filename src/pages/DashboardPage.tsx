@@ -198,33 +198,6 @@ const DashboardPage: React.FC = () => {
           <>
 
 
-            {/* Stats row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { icon: Users, value: memberCount, label: memberCount !== 1 ? t.members : t.member, tint: 'accent' as const },
-                { icon: FolderOpen, value: docCount, label: t.dash_documents, tint: 'primary' as const },
-                { icon: Image, value: memoryCount, label: t.dash_memories, tint: 'accent' as const },
-                { icon: CheckSquare, value: `${checklistSummary.completed}/${checklistSummary.total || 0}`, label: t.dash_checklist, tint: 'primary' as const },
-              ].map((stat, i) => {
-                const Icon = stat.icon;
-                const tintBg = stat.tint === 'accent' ? 'bg-accent/15' : 'bg-primary/10';
-                const tintFg = stat.tint === 'accent' ? 'text-accent' : 'text-primary';
-                return (
-                  <Card key={i} className="shadow-card border-border/60">
-                    <CardContent className="flex items-center gap-3 py-4 px-4">
-                      <div className={`h-10 w-10 rounded-xl ${tintBg} flex items-center justify-center shrink-0`}>
-                        <Icon className={`h-4 w-4 ${tintFg}`} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-heading text-2xl font-semibold text-primary leading-none">{stat.value}</p>
-                        <p className="text-[10.5px] uppercase tracking-wider text-muted-foreground mt-1.5 truncate">{stat.label}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-
             {/* Journey — 6 numbered steps */}
             {(() => {
               const steps = [
