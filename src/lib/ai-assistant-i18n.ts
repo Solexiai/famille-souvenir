@@ -28,6 +28,8 @@ export const AI_COPY: Record<AILang, {
   chat_suggestion_1: string;
   chat_suggestion_2: string;
   chat_suggestion_3: string;
+  chat_suggestion_4: string;
+  chat_suggestion_5: string;
   generate_checklist: string;
   generating_checklist: string;
   checklist_empty: string;
