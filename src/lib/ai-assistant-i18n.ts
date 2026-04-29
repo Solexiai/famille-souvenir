@@ -174,6 +174,8 @@ export const AI_COPY: Record<AILang, {
     chat_suggestion_1: 'Quels documents devrais-je préparer pour ma famille ?',
     chat_suggestion_2: 'Aide-moi à organiser mes documents avant de rencontrer un notaire.',
     chat_suggestion_3: 'Que devrais-je préparer avant une discussion successorale ?',
+    chat_suggestion_4: 'Aide-moi à écrire une lettre à un proche.',
+    chat_suggestion_5: 'Aide-moi à formuler mes volontés.',
     generate_checklist: 'Générer ma liste de préparation',
     generating_checklist: 'Création de votre liste personnalisée…',
     checklist_empty: 'Cliquez sur « Générer ma liste » pour obtenir un plan adapté à votre pays et à votre province.',
