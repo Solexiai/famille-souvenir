@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { resolvedSupabaseUrl, resolvedSupabasePublishableKey } from '@/integrations/supabase/config';
+import { getSafeAppOrigin, resolvedSupabaseUrl, resolvedSupabasePublishableKey } from '@/integrations/supabase/config';
 import type { AppRole } from '@/types/database';
 
 interface InvitationEmailPayload {
@@ -25,20 +25,8 @@ interface SendInvitationEmailResult {
   reason?: string;
 }
 
-// Resolve the app origin to use in invitation links. We use the current
-// deployment's origin so invitees land back in the same app that sent them
-// the invitation (preview, lovable.app, or custom domain).
-const PRODUCTION_APP_URL = 'https://famille-memories-vault.lovable.app';
-
-const getAppOrigin = () => {
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin.replace(/\/$/, '');
-  }
-  return PRODUCTION_APP_URL;
-};
-
 export const buildInvitationAcceptUrl = (token: string) => {
-  return `${getAppOrigin()}/invitation/accept?token=${token}`;
+  return `${getSafeAppOrigin()}/invitation/accept?token=${token}`;
 };
 
 export const sendInvitationEmail = async ({
@@ -47,7 +35,6 @@ export const sendInvitationEmail = async ({
   invitation,
 }: SendInvitationEmailInput): Promise<SendInvitationEmailResult> => {
   const fallbackLink = buildInvitationAcceptUrl(invitation.token);
-  const appUrl = getAppOrigin();
 
   // Always use the in-app invitation acceptance page. Magic links via
   // supabase.auth.admin.generateLink redirect through the global Supabase
