@@ -221,24 +221,24 @@ const DocumentsPage: React.FC = () => {
       <div className="w-full max-w-3xl mx-auto px-3 sm:px-4 space-y-4 sm:space-y-6 animate-fade-in">
         {/* Header */}
         <div className="space-y-3">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+          <div className="space-y-3 sm:flex sm:items-start sm:justify-between sm:gap-4 sm:space-y-0">
+            <div className="min-w-0 flex-1">
               <h1 className="font-heading text-xl sm:text-2xl font-semibold text-foreground flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 sm:h-6 sm:w-6 text-accent shrink-0" />
-                {t.docs_title}
+                <span className="truncate">{t.docs_title}</span>
               </h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                 {t.docs_subtitle}
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button size="sm" variant="outline" className="gap-1.5 text-xs sm:text-sm" onClick={() => setScanOpen(true)}>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2 sm:shrink-0">
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs sm:text-sm w-full sm:w-auto" onClick={() => setScanOpen(true)}>
                 <Camera className="h-4 w-4" />
                 {aiT.scan_btn}
               </Button>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="gap-1.5 text-xs sm:text-sm">
+                  <Button size="sm" className="gap-1.5 text-xs sm:text-sm w-full sm:w-auto">
                     <Plus className="h-4 w-4" />
                     {t.docs_add}
                   </Button>
