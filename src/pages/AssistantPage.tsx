@@ -552,7 +552,7 @@ const AssistantPage: React.FC = () => {
                       <p className="font-heading text-lg text-foreground">{t.chat_empty_title}</p>
                       <p className="text-xs text-muted-foreground">{t.chat_empty_hint}</p>
                       <div className="flex flex-col gap-2 max-w-md mx-auto">
-                        {[t.chat_suggestion_1, t.chat_suggestion_2, t.chat_suggestion_3].map((s) => (
+                        {[t.chat_suggestion_1, t.chat_suggestion_2, t.chat_suggestion_3, t.chat_suggestion_4, t.chat_suggestion_5].map((s) => (
                           <Button key={s} variant="outline" size="sm" className="text-xs justify-start text-left h-auto py-2 whitespace-normal" onClick={() => sendMessage(s)}>
                             {s}
                           </Button>
