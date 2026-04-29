@@ -208,22 +208,11 @@ const DashboardPage: React.FC = () => {
                 { n: 5, icon: Image, title: t.dash_step_memories_title, desc: t.dash_step_memories_desc, done: memoryCount > 0, route: '/memories' },
                 { n: 6, icon: CheckSquare, title: t.dash_step_checklist_title, desc: t.dash_step_checklist_desc, done: checklistSummary.completed > 0, route: '/checklist' },
               ];
-              const doneCount = steps.filter(s => s.done).length;
-              const pct = Math.round((doneCount / steps.length) * 100);
               return (
                 <Card className="shadow-card overflow-hidden border-border/60">
-                  <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-border/50">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div className="min-w-0">
-                        <h2 className="font-heading text-lg sm:text-xl font-semibold text-primary leading-tight">{t.dash_journey_title}</h2>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-1 leading-snug">{t.dash_journey_subtitle}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-heading text-2xl font-semibold text-accent leading-none">{pct}%</p>
-                        <p className="text-[10.5px] uppercase tracking-wider text-muted-foreground mt-1">{t.dash_journey_progress.replace('{done}', String(doneCount)).replace('{total}', String(steps.length))}</p>
-                      </div>
-                    </div>
-                    <Progress value={pct} className="h-1.5" />
+                  <div className="px-5 sm:px-6 pt-6 pb-5 border-b border-border/50">
+                    <h2 className="font-heading text-lg sm:text-xl font-semibold text-primary leading-tight">{t.dash_journey_title}</h2>
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-snug">{t.dash_journey_subtitle}</p>
                   </div>
                   <CardContent className="p-0">
                     <ol className="divide-y divide-border/50">
