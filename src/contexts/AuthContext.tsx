@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { getSupabaseConfigError, isSupabaseConfigured } from '@/integrations/supabase/config';
+import { getSafeAppOrigin, getSupabaseConfigError, isSupabaseConfigured } from '@/integrations/supabase/config';
 
 interface AuthContextType {
   user: User | null;
@@ -89,9 +89,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const invitationToken = typeof window !== 'undefined'
       ? localStorage.getItem('solexi_invitation_token')
       : null;
+    const appOrigin = getSafeAppOrigin();
     const emailRedirectTo = invitationToken
-      ? `${window.location.origin}/auth/callback?invitation_token=${encodeURIComponent(invitationToken)}`
-      : `${window.location.origin}/auth/callback`;
+      ? `${appOrigin}/auth/callback?invitation_token=${encodeURIComponent(invitationToken)}`
+      : `${appOrigin}/auth/callback`;
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -126,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${getSafeAppOrigin()}/reset-password`,
     });
     return { error: error as Error | null };
   };
