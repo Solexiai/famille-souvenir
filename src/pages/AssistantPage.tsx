@@ -526,10 +526,19 @@ const AssistantPage: React.FC = () => {
         )}
 
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="chat" className="gap-1.5"><MessageCircle className="h-3.5 w-3.5" />{t.tab_chat}</TabsTrigger>
-            <TabsTrigger value="checklist" className="gap-1.5"><ListChecks className="h-3.5 w-3.5" />{t.tab_checklist}</TabsTrigger>
-            <TabsTrigger value="settings" className="gap-1.5"><SettingsIcon className="h-3.5 w-3.5" />{t.tab_settings}</TabsTrigger>
+          <TabsList className="grid grid-cols-3 w-full h-auto p-1 gap-1">
+            <TabsTrigger value="chat" className="flex-col sm:flex-row gap-1 sm:gap-1.5 text-[11px] sm:text-sm py-2 px-1 sm:px-3 whitespace-normal leading-tight">
+              <MessageCircle className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-center">{t.tab_chat}</span>
+            </TabsTrigger>
+            <TabsTrigger value="checklist" className="flex-col sm:flex-row gap-1 sm:gap-1.5 text-[11px] sm:text-sm py-2 px-1 sm:px-3 whitespace-normal leading-tight">
+              <ListChecks className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-center">{t.tab_checklist}</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex-col sm:flex-row gap-1 sm:gap-1.5 text-[11px] sm:text-sm py-2 px-1 sm:px-3 whitespace-normal leading-tight">
+              <SettingsIcon className="h-3.5 w-3.5 shrink-0" />
+              <span className="text-center">{t.tab_settings}</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Chat */}
