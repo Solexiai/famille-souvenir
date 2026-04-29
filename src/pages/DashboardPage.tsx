@@ -196,37 +196,7 @@ const DashboardPage: React.FC = () => {
 
         {circle && (
           <>
-            {/* Premiers pas — only when the user is just starting */}
-            {(memberCount + invitationCount <= 1 && docCount === 0 && memoryCount === 0) && (
-              <Card className="shadow-elevated border-accent/40 overflow-hidden">
-                <div className="bg-gradient-to-br from-accent/10 via-accent/5 to-transparent px-5 sm:px-7 py-6">
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="h-10 w-10 rounded-xl bg-accent/20 flex items-center justify-center shrink-0">
-                      <Sparkles className="h-5 w-5 text-accent" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-wider text-accent font-semibold">{t.dash_first_steps_title.split('—')[0]?.trim()}</p>
-                      <h2 className="font-heading text-xl sm:text-2xl font-semibold text-primary leading-tight mt-0.5">{t.dash_first_steps_title.split('—')[1]?.trim() || t.dash_first_steps_title}</h2>
-                      <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">{t.dash_first_steps_desc}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-5">
-                    <Button onClick={() => navigate('/circle')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
-                      <Users className="h-4 w-4 mr-2 text-accent shrink-0" />
-                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_circle}</span>
-                    </Button>
-                    <Button onClick={() => navigate('/circle/members')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
-                      <UserPlus className="h-4 w-4 mr-2 text-accent shrink-0" />
-                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_invite}</span>
-                    </Button>
-                    <Button onClick={() => navigate('/documents')} className="h-auto py-3 justify-start bg-card text-primary hover:bg-card/80 border border-border shadow-card">
-                      <FolderOpen className="h-4 w-4 mr-2 text-accent shrink-0" />
-                      <span className="text-xs sm:text-sm text-left leading-tight">{t.dash_first_steps_cta_doc}</span>
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            )}
+
 
             {/* Stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
