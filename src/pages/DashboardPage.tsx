@@ -12,6 +12,7 @@ import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, Ale
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 import { GuidedOnboarding } from '@/components/GuidedOnboarding';
+import { DemoTour } from '@/components/DemoTour';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -257,8 +258,10 @@ const DashboardPage: React.FC = () => {
               );
             })()}
 
-            {/* Helpers row — Assistant + Scan */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Helpers row — Assistant + Demo + Scan */}
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-stretch">
+              {/* Demo button column placed BETWEEN the two helper cards on desktop */}
+              {/* (rendered via order classes below) */}
               <Card className="shadow-card border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="h-11 w-11 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
@@ -273,6 +276,10 @@ const DashboardPage: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
+              {/* Demo button — positioned between the two helper cards */}
+              <div className="flex items-center justify-center md:px-1">
+                <DemoTour triggerClassName="w-full md:w-auto" />
+              </div>
               <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
