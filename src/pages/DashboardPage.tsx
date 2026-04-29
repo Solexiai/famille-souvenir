@@ -276,6 +276,10 @@ const DashboardPage: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
+              {/* Demo button — positioned between the two helper cards */}
+              <div className="flex items-center justify-center md:px-1">
+                <DemoTour triggerClassName="w-full md:w-auto" />
+              </div>
               <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
