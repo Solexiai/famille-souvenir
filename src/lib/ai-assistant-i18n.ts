@@ -28,6 +28,8 @@ export const AI_COPY: Record<AILang, {
   chat_suggestion_1: string;
   chat_suggestion_2: string;
   chat_suggestion_3: string;
+  chat_suggestion_4: string;
+  chat_suggestion_5: string;
   generate_checklist: string;
   generating_checklist: string;
   checklist_empty: string;
@@ -172,6 +174,8 @@ export const AI_COPY: Record<AILang, {
     chat_suggestion_1: 'Quels documents devrais-je préparer pour ma famille ?',
     chat_suggestion_2: 'Aide-moi à organiser mes documents avant de rencontrer un notaire.',
     chat_suggestion_3: 'Que devrais-je préparer avant une discussion successorale ?',
+    chat_suggestion_4: 'Aide-moi à écrire une lettre à un proche.',
+    chat_suggestion_5: 'Aide-moi à formuler mes volontés.',
     generate_checklist: 'Générer ma liste de préparation',
     generating_checklist: 'Création de votre liste personnalisée…',
     checklist_empty: 'Cliquez sur « Générer ma liste » pour obtenir un plan adapté à votre pays et à votre province.',
@@ -310,6 +314,8 @@ export const AI_COPY: Record<AILang, {
     chat_suggestion_1: 'What documents should I prepare for my family?',
     chat_suggestion_2: 'Help me organize my documents before meeting a notary.',
     chat_suggestion_3: 'What should I prepare before a succession discussion?',
+    chat_suggestion_4: 'Help me write a letter to a loved one.',
+    chat_suggestion_5: 'Help me put my wishes into words.',
     generate_checklist: 'Generate my preparation checklist',
     generating_checklist: 'Building your personalized checklist…',
     checklist_empty: 'Click "Generate my checklist" to receive a plan tailored to your country and province.',
@@ -448,6 +454,8 @@ export const AI_COPY: Record<AILang, {
     chat_suggestion_1: '¿Qué documentos debo preparar para mi familia?',
     chat_suggestion_2: 'Ayúdame a organizar mis documentos antes de ver a un notario.',
     chat_suggestion_3: '¿Qué debería preparar antes de una conversación sucesoria?',
+    chat_suggestion_4: 'Ayúdame a escribir una carta a un ser querido.',
+    chat_suggestion_5: 'Ayúdame a expresar mis voluntades.',
     generate_checklist: 'Generar mi lista de preparación',
     generating_checklist: 'Creando tu lista personalizada…',
     checklist_empty: 'Pulsa "Generar mi lista" para obtener un plan adaptado a tu país y provincia.',
