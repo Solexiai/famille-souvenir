@@ -38,6 +38,9 @@ import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
+import memoryCake from '@/assets/demo/memory-cake.jpg';
+import memoryChildhood from '@/assets/demo/memory-childhood.jpg';
+import memoryBeach from '@/assets/demo/memory-beach.jpg';
 
 const typeIcons: Record<MemoryType, React.FC<{ className?: string }>> = {
   photo: ImageIcon,
@@ -154,8 +157,7 @@ const DEMO_MEMORIES = [
     title: 'Le gâteau de grand-maman',
     author: 'Marguerite Dupont',
     year: '1968',
-    image:
-      'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=800&q=80',
+    image: memoryCake,
   },
   {
     id: 'demo-2',
@@ -165,8 +167,7 @@ const DEMO_MEMORIES = [
     author: 'Jean Dupont',
     year: '1985',
     duration: '15:42',
-    image:
-      'https://images.unsplash.com/photo-1559131397-f94da358f7ca?auto=format&fit=crop&w=800&q=80',
+    image: memoryChildhood,
   },
   {
     id: 'demo-3',
@@ -175,8 +176,7 @@ const DEMO_MEMORIES = [
     title: 'Vacances à la mer',
     author: 'Famille Dupont',
     year: '1959',
-    image:
-      'https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?auto=format&fit=crop&w=800&q=80',
+    image: memoryBeach,
   },
 ];
 
