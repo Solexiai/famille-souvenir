@@ -860,4 +860,5 @@ const fr: Translations = {
   category_doc_other: 'Autre',
 };
 
+__INSERT_FR__
 export default fr;

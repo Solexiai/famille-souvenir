@@ -850,4 +850,5 @@ const es: Translations = {
   category_doc_other: 'Otro',
 };
 
+__INSERT_ES__
 export default es;
