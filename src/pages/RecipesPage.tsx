@@ -386,100 +386,88 @@ const RecipesPage: React.FC = () => {
   // ====== Main list view ======
   return (
     <AppLayout>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-        {/* Header */}
-        <header className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(35_60%_92%)]">
-            <ChefHat className="h-7 w-7 text-[hsl(35_70%_45%)]" />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-10">
+        {/* 1. Header — chaleureux, simple */}
+        <header className="text-center max-w-2xl mx-auto space-y-4">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(35_60%_92%)]">
+            <ChefHat className="h-8 w-8 text-[hsl(35_70%_45%)]" />
           </div>
           <h1 className="font-heading text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-            Recettes familiales
+            Nos recettes de famille
           </h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Les saveurs, souvenirs et secrets transmis de génération en génération.
+          <p className="text-foreground/70 text-lg sm:text-xl leading-relaxed">
+            Gardons ensemble les recettes qui nous rassemblent.
           </p>
         </header>
 
-        {/* Search bar */}
-        <div className="relative max-w-3xl mx-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        {/* 2. LES DEUX GRANDES ACTIONS — au centre, très visibles */}
+        <section aria-label="Ajouter une recette" className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+          <button
+            onClick={() => setQuickAddOpen(true)}
+            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-8 rounded-2xl bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white shadow-md hover:shadow-lg transition-all"
+          >
+            <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
+              <Camera className="h-8 w-8" />
+            </div>
+            <div>
+              <h2 className="font-heading text-2xl font-bold">Prendre en photo</h2>
+              <p className="text-base text-white/90 mt-1">Photographiez une recette, l'IA s'occupe du reste.</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setRecipePrefill(null); setCreateOpen(true); }}
+            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-8 rounded-2xl bg-card border-2 border-border hover:border-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_97%)] text-foreground shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="h-16 w-16 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
+              <Pencil className="h-8 w-8" />
+            </div>
+            <div>
+              <h2 className="font-heading text-2xl font-bold">Écrire une recette</h2>
+              <p className="text-base text-foreground/70 mt-1">Remplissez vous-même, à votre rythme.</p>
+            </div>
+          </button>
+        </section>
+
+        {/* 3. Recherche — grosse, claire */}
+        <div className="relative max-w-2xl mx-auto">
+          <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher une recette, un ingrédient, une personne, un souvenir…"
-            className="pl-12 h-12 rounded-full bg-card border-border shadow-sm text-base"
+            placeholder="Chercher une recette ou un ingrédient…"
+            className="pl-14 h-14 rounded-full bg-card border-border shadow-sm text-lg"
           />
         </div>
 
-        {/* Filter chips */}
-        <div className="flex flex-wrap gap-2 justify-center">
-          {FILTER_CHIPS.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => setFilter(c.key)}
-              className={cn(
-                'px-4 py-2 rounded-full text-sm font-medium border transition-all',
-                filter === c.key
-                  ? 'bg-[hsl(35_60%_92%)] border-[hsl(35_60%_55%)] text-[hsl(35_70%_30%)]'
-                  : 'bg-card border-border text-foreground hover:border-[hsl(35_60%_55%)]/40'
-              )}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+        {/* 4. Nos recettes — la grille */}
+        <section aria-label="Nos recettes" className="space-y-5">
+          <h2 className="font-heading text-3xl font-semibold text-foreground text-center">
+            Nos recettes
+          </h2>
 
-        {/* Featured recipe */}
-        {(featured || !hasRealRecipes) && (
-          <FeaturedCard
-            recipe={featured}
-            onOpen={() => featured && openDetail(featured.id)}
-            onCreate={() => setCreateOpen(true)}
-            isFavorite={featured ? favorites.has(featured.id) : false}
-            onToggleFavorite={() => featured && toggleFavorite(featured.id)}
-          />
-        )}
-
-        {/* Classification grid */}
-        <section aria-label="Classification" className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {CLASSIFICATIONS.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => setView(c.key)}
-              className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-left shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-            >
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(35_60%_92%)] text-[hsl(35_70%_45%)]">
-                <c.Icon className="h-5 w-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-heading text-base font-semibold text-foreground leading-snug">{c.label}</h3>
-                <p className="text-xs text-muted-foreground">{c.hint}</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-accent group-hover:translate-x-1 transition-all" />
-            </button>
-          ))}
-        </section>
-
-        {/* Recipes grid */}
-        <section aria-label="Nos recettes">
-          <div className="flex items-baseline justify-between mb-4">
-            <h2 className="font-heading text-2xl font-semibold text-foreground">Nos recettes</h2>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                onClick={() => setQuickAddOpen(true)}
-                className="gap-1.5 bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white"
-              >
-                <Sparkles className="h-4 w-4" /> Scan IA
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => { setRecipePrefill(null); setCreateOpen(true); }} className="gap-1.5">
-                <Plus className="h-4 w-4" /> Manuel
-              </Button>
+          {/* Filtres simplifiés — 4 seulement, plus gros */}
+          {hasRealRecipes && (
+            <div className="flex flex-wrap gap-2 justify-center">
+              {FILTER_CHIPS.filter((c) => ['all', 'main', 'dessert', 'favorites'].includes(c.key)).map((c) => (
+                <button
+                  key={c.key}
+                  onClick={() => setFilter(c.key)}
+                  className={cn(
+                    'px-5 py-2.5 rounded-full text-base font-medium border-2 transition-all',
+                    filter === c.key
+                      ? 'bg-[hsl(35_60%_92%)] border-[hsl(35_60%_55%)] text-[hsl(35_70%_30%)]'
+                      : 'bg-card border-border text-foreground hover:border-[hsl(35_60%_55%)]/40'
+                  )}
+                >
+                  {c.label}
+                </button>
+              ))}
             </div>
-          </div>
+          )}
 
           {hasRealRecipes ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredRecipes.map((r) => (
                 <RecipeCard
                   key={r.id}
@@ -493,7 +481,7 @@ const RecipesPage: React.FC = () => {
                 />
               ))}
               {filteredRecipes.length === 0 && (
-                <p className="col-span-full text-center text-muted-foreground py-12">
+                <p className="col-span-full text-center text-foreground/70 text-lg py-12">
                   Aucune recette ne correspond à votre recherche.
                 </p>
               )}
@@ -503,7 +491,35 @@ const RecipesPage: React.FC = () => {
           )}
         </section>
 
-        {/* Empty state full block (only when no real recipes) */}
+        {/* 5. Ranger les recettes — visible seulement s'il y a déjà des recettes */}
+        {hasRealRecipes && (
+          <section aria-label="Ranger les recettes" className="space-y-4">
+            <h2 className="font-heading text-2xl font-semibold text-foreground text-center">
+              Ranger les recettes
+            </h2>
+            <p className="text-center text-foreground/70">Touchez une catégorie pour voir les recettes regroupées.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto">
+              {CLASSIFICATIONS.map((c) => (
+                <button
+                  key={c.key}
+                  onClick={() => setView(c.key)}
+                  className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-5 text-left shadow-sm hover:shadow-md hover:border-[hsl(35_60%_55%)]/40 transition-all"
+                >
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(35_60%_92%)] text-[hsl(35_70%_45%)]">
+                    <c.Icon className="h-6 w-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-heading text-lg font-semibold text-foreground leading-snug">{c.label}</h3>
+                    <p className="text-sm text-foreground/70">{c.hint}</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted-foreground/60 group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 6. Empty state — uniquement si rien encore */}
         {!hasRealRecipes && (
           <EmptyStateBlock
             onCreate={() => { setRecipePrefill(null); setCreateOpen(true); }}
@@ -512,7 +528,7 @@ const RecipesPage: React.FC = () => {
           />
         )}
 
-        {/* Heritage callout */}
+        {/* 7. Heritage callout */}
         <HeritageCallout onAddMemory={() => navigate('/memories')} />
       </div>
 
