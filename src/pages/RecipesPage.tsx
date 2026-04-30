@@ -20,6 +20,7 @@ import {
 import type { FamilyCircle } from '@/types/database';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
+import { RecipeQuickAddDialog, type ExtractedRecipe } from '@/components/recipes/RecipeQuickAddDialog';
 import recipeTourtiere from '@/assets/demo/recipe-tourtiere.jpg';
 import recipeApplePie from '@/assets/demo/recipe-apple-pie.jpg';
 import recipeSpaghetti from '@/assets/demo/recipe-spaghetti.jpg';
