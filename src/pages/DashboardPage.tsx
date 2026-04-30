@@ -588,6 +588,30 @@ const DashboardPage: React.FC = () => {
               </Card>
             )}
 
+            {/* ============ REASSURANCE BAND ============ */}
+            <section className="rounded-2xl bg-gradient-to-br from-accent/5 via-card to-card border border-border/60 p-6 sm:p-8 shadow-soft">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-border/50">
+                {[
+                  { icon: Heart,  title: t.dash_reassure_simple_title  ?? 'Simple',                       desc: t.dash_reassure_simple_desc ?? '', tint: 'bg-accent/15 text-accent' },
+                  { icon: Lock,   title: t.dash_reassure_secure_title  ?? 'Sécurisé',                     desc: t.dash_reassure_secure_desc ?? '', tint: 'bg-sky-100 text-sky-700' },
+                  { icon: Users,  title: t.dash_reassure_family_title  ?? 'Accessible à votre famille',   desc: t.dash_reassure_family_desc ?? '', tint: 'bg-emerald-100 text-emerald-700' },
+                ].map((b) => {
+                  const Icon = b.icon;
+                  return (
+                    <div key={b.title} className="flex items-start gap-4 pt-6 md:pt-0 md:px-4 first:pt-0">
+                      <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ${b.tint}`}>
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-heading text-base font-semibold text-primary leading-tight">{b.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1 leading-snug">{b.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
           </>
         )}
       </div>
