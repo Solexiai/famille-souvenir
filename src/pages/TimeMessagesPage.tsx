@@ -231,8 +231,8 @@ export default function TimeMessagesPage() {
 }
 
 function MessageList({
-  messages, emptyText, onChange,
-}: { messages: TimeMessage[]; emptyText: string; onChange: () => void }) {
+  messages, emptyText, onChange, t, lang,
+}: { messages: TimeMessage[]; emptyText: string; onChange: () => void; t: TmCopy; lang: 'fr' | 'en' | 'es' }) {
   if (messages.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -243,10 +243,10 @@ function MessageList({
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer ce message ? Cette action est définitive.')) return;
+    if (!confirm(t.tm_toast_confirm_delete_msg)) return;
     const { error } = await supabase.from('time_messages').delete().eq('id', id);
     if (error) toast.error(error.message);
-    else { toast.success('Message supprimé'); onChange(); }
+    else { toast.success(t.tm_toast_msg_deleted); onChange(); }
   };
 
   return (
@@ -261,7 +261,7 @@ function MessageList({
                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
-                  <Badge variant="outline" className="text-xs">{formatLabel(m.format)}</Badge>
+                  <Badge variant="outline" className="text-xs">{formatLabel(m.format, t)}</Badge>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}>
                   <Trash2 className="w-4 h-4 text-muted-foreground" />
@@ -270,7 +270,7 @@ function MessageList({
 
               <h3 className="font-heading text-lg mt-3 text-foreground">{m.title}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Pour <span className="font-medium text-foreground">{m.recipient_name}</span>
+                {t.tm_for} <span className="font-medium text-foreground">{m.recipient_name}</span>
                 {m.recipient_relationship && <> · {m.recipient_relationship}</>}
               </p>
               {(m.recipient_email || m.recipient_phone) && (
@@ -289,15 +289,15 @@ function MessageList({
                 {m.trigger_type === 'scheduled_date' && m.scheduled_for ? (
                   <>
                     <CalendarIcon className="w-3.5 h-3.5" />
-                    {new Date(m.scheduled_for).toLocaleDateString('fr-CA', {
+                    {new Date(m.scheduled_for).toLocaleDateString(tmLocale[lang], {
                       day: 'numeric', month: 'long', year: 'numeric',
                     })}
-                    {m.is_recurring && <Badge variant="secondary" className="text-xs">Chaque année</Badge>}
+                    {m.is_recurring && <Badge variant="secondary" className="text-xs">{t.tm_yearly}</Badge>}
                   </>
                 ) : (
                   <>
                     <Heart className="w-3.5 h-3.5" />
-                    À envoyer après mon décès
+                    {t.tm_send_after_death}
                   </>
                 )}
               </div>
