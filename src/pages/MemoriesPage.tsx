@@ -61,7 +61,9 @@ type MemoryCategoryKey =
   | 'tradition'
   | 'timeline_event';
 
-const CATEGORIES: Array<{
+type MemCopy = ReturnType<typeof useMemoriesCopy>;
+
+const buildCategories = (c: MemCopy): Array<{
   key: MemoryCategoryKey;
   title: string;
   description: string;
@@ -69,116 +71,42 @@ const CATEGORIES: Array<{
   iconBg: string;
   iconColor: string;
   prefilledType: MemoryType;
-}> = [
-  {
-    key: 'recipe',
-    title: 'Recettes familiales',
-    description: 'Les plats transmis de génération en génération',
-    Icon: ChefHat,
-    iconBg: 'bg-[hsl(35_60%_92%)]',
-    iconColor: 'text-[hsl(35_70%_45%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'story_audio',
-    title: 'Histoires racontées',
-    description: 'Souvenirs audio et anecdotes de vie',
-    Icon: Mic,
-    iconBg: 'bg-[hsl(220_45%_92%)]',
-    iconColor: 'text-[hsl(220_45%_40%)]',
-    prefilledType: 'audio',
-  },
-  {
-    key: 'photo_video',
-    title: 'Photos & vidéos',
-    description: 'Moments précieux à revoir ensemble',
-    Icon: ImageIcon,
-    iconBg: 'bg-[hsl(140_30%_88%)]',
-    iconColor: 'text-[hsl(140_35%_35%)]',
-    prefilledType: 'photo',
-  },
-  {
-    key: 'letter_message',
-    title: 'Lettres & messages',
-    description: 'Mots du cœur à conserver',
-    Icon: Mail,
-    iconBg: 'bg-[hsl(270_30%_92%)]',
-    iconColor: 'text-[hsl(270_35%_45%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'tradition',
-    title: 'Traditions & fêtes',
-    description: 'Rituels, célébrations et coutumes',
-    Icon: Sparkles,
-    iconBg: 'bg-[hsl(15_55%_90%)]',
-    iconColor: 'text-[hsl(15_60%_50%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'timeline_event',
-    title: 'Ligne du temps familiale',
-    description: 'Moments marquants de la famille',
-    Icon: GitBranch,
-    iconBg: 'bg-[hsl(210_20%_88%)]',
-    iconColor: 'text-[hsl(210_25%_40%)]',
-    prefilledType: 'text',
-  },
+}> => [
+  { key: 'recipe', title: c.cat_recipes_title, description: c.cat_recipes_desc, Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]', prefilledType: 'text' },
+  { key: 'story_audio', title: c.cat_stories_title, description: c.cat_stories_desc, Icon: Mic, iconBg: 'bg-[hsl(220_45%_92%)]', iconColor: 'text-[hsl(220_45%_40%)]', prefilledType: 'audio' },
+  { key: 'photo_video', title: c.cat_photos_title, description: c.cat_photos_desc, Icon: ImageIcon, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]', prefilledType: 'photo' },
+  { key: 'letter_message', title: c.cat_letters_title, description: c.cat_letters_desc, Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]', prefilledType: 'text' },
+  { key: 'tradition', title: c.cat_traditions_title, description: c.cat_traditions_desc, Icon: Sparkles, iconBg: 'bg-[hsl(15_55%_90%)]', iconColor: 'text-[hsl(15_60%_50%)]', prefilledType: 'text' },
+  { key: 'timeline_event', title: c.cat_timeline_title, description: c.cat_timeline_desc, Icon: GitBranch, iconBg: 'bg-[hsl(210_20%_88%)]', iconColor: 'text-[hsl(210_25%_40%)]', prefilledType: 'text' },
 ];
 
-const SUGGESTED_COLLECTIONS: Array<{
+const buildSuggestedCollections = (c: MemCopy): Array<{
   title: string;
   Icon: React.FC<{ className?: string }>;
   iconBg: string;
   iconColor: string;
-}> = [
-  { title: 'Recettes de grand-maman', Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]' },
-  { title: 'Naissances et mariages', Icon: Heart, iconBg: 'bg-[hsl(355_70%_94%)]', iconColor: 'text-[hsl(355_60%_55%)]' },
-  { title: 'Messages pour plus tard', Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]' },
-  { title: 'Maison familiale', Icon: Home, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]' },
+}> => [
+  { title: c.col_grandma_recipes, Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]' },
+  { title: c.col_births_weddings, Icon: Heart, iconBg: 'bg-[hsl(355_70%_94%)]', iconColor: 'text-[hsl(355_60%_55%)]' },
+  { title: c.col_messages_for_later, Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]' },
+  { title: c.col_family_home, Icon: Home, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]' },
 ];
 
 type FilterKey = 'all' | 'photo' | 'audio' | 'video' | 'text' | 'person' | 'generation';
-const FILTERS: Array<{ key: FilterKey; label: string; Icon: React.FC<{ className?: string }> }> = [
-  { key: 'all', label: 'Tous', Icon: LayoutGrid },
-  { key: 'text', label: 'Recettes', Icon: ChefHat },
-  { key: 'audio', label: 'Audio', Icon: Mic },
-  { key: 'video', label: 'Vidéo', Icon: Video },
-  { key: 'photo', label: 'Documents', Icon: FileText },
-  { key: 'person', label: 'Par personne', Icon: Users },
-  { key: 'generation', label: 'Par génération', Icon: Users2 },
+const buildFilters = (c: MemCopy): Array<{ key: FilterKey; label: string; Icon: React.FC<{ className?: string }> }> => [
+  { key: 'all', label: c.filter_all, Icon: LayoutGrid },
+  { key: 'text', label: c.filter_recipes, Icon: ChefHat },
+  { key: 'audio', label: c.filter_audio, Icon: Mic },
+  { key: 'video', label: c.filter_video, Icon: Video },
+  { key: 'photo', label: c.filter_documents, Icon: FileText },
+  { key: 'person', label: c.filter_by_person, Icon: Users },
+  { key: 'generation', label: c.filter_by_generation, Icon: Users2 },
 ];
 
-// Exemples de démonstration utilisés quand la base est vide
-const DEMO_MEMORIES = [
-  {
-    id: 'demo-1',
-    badge: 'RECETTE',
-    badgeIcon: ChefHat,
-    title: 'Le gâteau de grand-maman',
-    author: 'Marguerite Dupont',
-    year: '1968',
-    image: memoryCake,
-  },
-  {
-    id: 'demo-2',
-    badge: 'AUDIO',
-    badgeIcon: Mic,
-    title: 'Souvenirs de mon enfance',
-    author: 'Jean Dupont',
-    year: '1985',
-    duration: '15:42',
-    image: memoryChildhood,
-  },
-  {
-    id: 'demo-3',
-    badge: 'PHOTO',
-    badgeIcon: ImageIcon,
-    title: 'Vacances à la mer',
-    author: 'Famille Dupont',
-    year: '1959',
-    image: memoryBeach,
-  },
+const buildDemoMemories = (c: MemCopy) => [
+  { id: 'demo-1', badge: c.demo_recipe_badge, badgeIcon: ChefHat, title: c.demo_cake_title, author: c.demo_cake_author, year: '1968', image: memoryCake, duration: undefined as string | undefined },
+  { id: 'demo-2', badge: c.demo_audio_badge, badgeIcon: Mic, title: c.demo_childhood_title, author: c.demo_childhood_author, year: '1985', duration: '15:42', image: memoryChildhood },
+  { id: 'demo-3', badge: c.demo_photo_badge, badgeIcon: ImageIcon, title: c.demo_beach_title, author: c.demo_beach_author, year: '1959', image: memoryBeach, duration: undefined as string | undefined },
 ];
 
 const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
