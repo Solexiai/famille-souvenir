@@ -31,6 +31,8 @@ interface TimeMessage {
   media_path: string | null;
   recipient_name: string;
   recipient_relationship: string | null;
+  recipient_email: string | null;
+  recipient_phone: string | null;
   scheduled_for: string | null;
   occasion_label: string | null;
   is_recurring: boolean;
