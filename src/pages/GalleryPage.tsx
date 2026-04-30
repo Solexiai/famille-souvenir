@@ -175,13 +175,13 @@ export default function GalleryPage() {
   const grouped = useMemo(() => {
     const map = new Map<string, MediaItem[]>();
     items.forEach((it) => {
-      const key = monthLabel(it.taken_at || it.created_at);
+      const key = monthLabel(it.taken_at || it.created_at, t.common_locale);
       const arr = map.get(key) ?? [];
       arr.push(it);
       map.set(key, arr);
     });
     return Array.from(map.entries());
-  }, [items]);
+  }, [items, t.common_locale]);
 
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0 || !circleId || !user) return;
