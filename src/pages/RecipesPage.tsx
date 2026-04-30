@@ -1082,6 +1082,58 @@ const CreateRecipeDialog: React.FC<{
           <DialogDescription>Préservez une saveur, une histoire, un héritage.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Scanner IA + Photo du plat */}
+          <div className="rounded-xl border-2 border-dashed border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)] p-3 space-y-3">
+            {onOpenScanIA && (
+              <button
+                type="button"
+                onClick={onOpenScanIA}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-[hsl(35_60%_95%)] border border-[hsl(35_60%_55%)]/30 transition-all"
+              >
+                <div className="h-10 w-10 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)] shrink-0">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-heading font-semibold text-sm">Scanner avec IA</div>
+                  <div className="text-xs text-muted-foreground">Photographiez un carnet ou un livre — l'IA remplit le formulaire</div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
+
+            <div>
+              <Label className="text-sm font-medium">Photo du plat <span className="text-muted-foreground font-normal">(optionnel, compressée automatiquement)</span></Label>
+              {dishPhotoPreview ? (
+                <div className="mt-2 relative">
+                  <img src={dishPhotoPreview} alt="Aperçu du plat" className="w-full h-40 object-cover rounded-lg border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => { setDishPhoto(null); if (dishPhotoPreview) URL.revokeObjectURL(dishPhotoPreview); setDishPhotoPreview(null); }}
+                    className="absolute top-2 right-2 px-2 py-1 text-xs rounded-md bg-black/70 text-white hover:bg-black"
+                  >
+                    Retirer
+                  </button>
+                </div>
+              ) : (
+                <label className="mt-2 flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-[hsl(35_60%_95%)] border border-[hsl(35_60%_55%)]/30 transition-all cursor-pointer">
+                  <div className="h-10 w-10 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)] shrink-0">
+                    {photoBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-heading font-semibold text-sm">Ajouter une photo du plat</div>
+                    <div className="text-xs text-muted-foreground">Vos invités voient la recette en image (max 1600px)</div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handlePhotoSelected(e.target.files[0])}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="title">Titre *</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex. Tourtière de Grand-maman Louise" required />
