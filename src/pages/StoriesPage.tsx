@@ -368,7 +368,7 @@ const StoriesPage: React.FC = () => {
         <div className="text-center py-20">
           <p className="text-muted-foreground">{t.must_create_circle}</p>
           <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>
-            {t.create_circle_btn}
+            {t.create_circle}
           </Button>
         </div>
       </AppLayout>
@@ -386,18 +386,18 @@ const StoriesPage: React.FC = () => {
             className="self-start gap-2 text-muted-foreground"
             onClick={() => (window.location.href = '/memories')}
           >
-            <ArrowLeft className="h-4 w-4" /> Retour aux souvenirs
+            <ArrowLeft className="h-4 w-4" /> {t.st_back_memories}
           </Button>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(220_45%_92%)] text-[hsl(220_45%_25%)] text-xs font-medium">
-                <BookOpen className="h-3.5 w-3.5" /> Histoires racontées
+                <BookOpen className="h-3.5 w-3.5" /> {t.st_badge}
               </div>
               <h1 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight">
-                Vos histoires de famille
+                {t.st_title}
               </h1>
               <p className="text-muted-foreground max-w-2xl">
-                Préservez vos récits, vos tranches de vie et vos anecdotes. Écrivez-les, dictez-les, ajoutez des photos ou des vidéos.
+                {t.st_subtitle}
               </p>
             </div>
           </div>
@@ -413,9 +413,9 @@ const StoriesPage: React.FC = () => {
               <Pencil className="h-7 w-7 text-[hsl(220_45%_25%)]" />
             </div>
             <div>
-              <h3 className="font-heading text-xl font-semibold">Écrire une histoire</h3>
+              <h3 className="font-heading text-xl font-semibold">{t.st_write}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Rédigez vous-même votre récit, à votre rythme. Ajoutez photos et vidéos.
+                {t.st_write_hint}
               </p>
             </div>
           </button>
@@ -428,9 +428,9 @@ const StoriesPage: React.FC = () => {
               <Mic className="h-7 w-7 text-[hsl(355_60%_55%)]" />
             </div>
             <div>
-              <h3 className="font-heading text-xl font-semibold">Dicter une histoire</h3>
+              <h3 className="font-heading text-xl font-semibold">{t.st_dictate}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Parlez naturellement. L'IA transcrit, structure et résume pour vous.
+                {t.st_dictate_hint}
               </p>
             </div>
           </button>
