@@ -818,6 +818,72 @@ export type Database = {
           },
         ]
       }
+      media_items: {
+        Row: {
+          album_label: string | null
+          caption: string | null
+          circle_id: string
+          created_at: string
+          duration_seconds: number | null
+          file_name: string
+          file_size: number
+          height: number | null
+          id: string
+          media_type: string
+          mime_type: string
+          processing_status: string
+          source_folder: string | null
+          storage_path: string
+          taken_at: string | null
+          thumbnail_path: string | null
+          updated_at: string
+          uploaded_by: string
+          width: number | null
+        }
+        Insert: {
+          album_label?: string | null
+          caption?: string | null
+          circle_id: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name: string
+          file_size?: number
+          height?: number | null
+          id?: string
+          media_type: string
+          mime_type: string
+          processing_status?: string
+          source_folder?: string | null
+          storage_path: string
+          taken_at?: string | null
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by: string
+          width?: number | null
+        }
+        Update: {
+          album_label?: string | null
+          caption?: string | null
+          circle_id?: string
+          created_at?: string
+          duration_seconds?: number | null
+          file_name?: string
+          file_size?: number
+          height?: number | null
+          id?: string
+          media_type?: string
+          mime_type?: string
+          processing_status?: string
+          source_folder?: string | null
+          storage_path?: string
+          taken_at?: string | null
+          thumbnail_path?: string | null
+          updated_at?: string
+          uploaded_by?: string
+          width?: number | null
+        }
+        Relationships: []
+      }
       member_family_labels: {
         Row: {
           circle_id: string
@@ -1311,6 +1377,42 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_plans: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_free: boolean
+          label: string
+          price_30_years_cad: number | null
+          price_annual_cad: number | null
+          sort_order: number
+          storage_gb: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_free?: boolean
+          label: string
+          price_30_years_cad?: number | null
+          price_annual_cad?: number | null
+          sort_order?: number
+          storage_gb: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_free?: boolean
+          label?: string
+          price_30_years_cad?: number | null
+          price_annual_cad?: number | null
+          sort_order?: number
+          storage_gb?: number
+        }
+        Relationships: []
+      }
       stories: {
         Row: {
           ai_summary: string | null
@@ -1544,6 +1646,47 @@ export type Database = {
           videos_count?: number
         }
         Relationships: []
+      }
+      user_storage: {
+        Row: {
+          billing_cycle: string | null
+          circle_id: string
+          current_period_end: string | null
+          id: string
+          plan_code: string
+          quota_bytes: number
+          updated_at: string
+          used_bytes: number
+        }
+        Insert: {
+          billing_cycle?: string | null
+          circle_id: string
+          current_period_end?: string | null
+          id?: string
+          plan_code?: string
+          quota_bytes?: number
+          updated_at?: string
+          used_bytes?: number
+        }
+        Update: {
+          billing_cycle?: string | null
+          circle_id?: string
+          current_period_end?: string | null
+          id?: string
+          plan_code?: string
+          quota_bytes?: number
+          updated_at?: string
+          used_bytes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_storage_plan_code_fkey"
+            columns: ["plan_code"]
+            isOneToOne: false
+            referencedRelation: "storage_plans"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       vault_documents: {
         Row: {
