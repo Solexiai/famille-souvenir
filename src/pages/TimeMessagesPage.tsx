@@ -261,6 +261,13 @@ function MessageList({
                 Pour <span className="font-medium text-foreground">{m.recipient_name}</span>
                 {m.recipient_relationship && <> · {m.recipient_relationship}</>}
               </p>
+              {(m.recipient_email || m.recipient_phone) && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {m.recipient_email && <span>{m.recipient_email}</span>}
+                  {m.recipient_email && m.recipient_phone && <span> · </span>}
+                  {m.recipient_phone && <span>{m.recipient_phone}</span>}
+                </p>
+              )}
 
               {m.occasion_label && (
                 <p className="text-sm mt-2 text-[hsl(270_35%_45%)]">{m.occasion_label}</p>
