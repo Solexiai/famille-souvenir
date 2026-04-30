@@ -477,28 +477,28 @@ const StoriesPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl flex items-center gap-2">
               {composeSource === 'dictated' ? <Mic className="h-5 w-5 text-[hsl(355_60%_55%)]" /> : <Pencil className="h-5 w-5 text-[hsl(220_45%_25%)]" />}
-              {composeSource === 'dictated' ? 'Vérifier la dictée' : 'Écrire une histoire'}
+              {composeSource === 'dictated' ? t.st_dialog_check : t.st_dialog_write}
             </DialogTitle>
             <DialogDescription>
-              Donnez un titre à votre récit, ajoutez la date du souvenir et joignez des photos ou des vidéos si vous le souhaitez.
+              {t.st_dialog_desc}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="story-title" className="text-base">Titre</Label>
+              <Label htmlFor="story-title" className="text-base">{t.st_field_title}</Label>
               <Input
                 id="story-title"
                 value={composeTitle}
                 onChange={(e) => setComposeTitle(e.target.value)}
-                placeholder="Ex. Le mariage de tante Yvonne"
+                placeholder={t.st_field_title_ph}
                 className="text-base"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="story-date" className="text-base">Date du souvenir (facultatif)</Label>
+                <Label htmlFor="story-date" className="text-base">{t.st_field_date}</Label>
                 <Input
                   id="story-date"
                   type="date"
@@ -507,35 +507,35 @@ const StoriesPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-base">Visibilité</Label>
+                <Label className="text-base">{t.st_field_visibility}</Label>
                 <Select value={composeVisibility} onValueChange={(v) => setComposeVisibility(v as Visibility)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="circle">Toute la famille</SelectItem>
-                    <SelectItem value="managers">Gestionnaires uniquement</SelectItem>
-                    <SelectItem value="private">Privé (moi seulement)</SelectItem>
+                    <SelectItem value="circle">{t.st_vis_circle}</SelectItem>
+                    <SelectItem value="managers">{t.st_vis_managers}</SelectItem>
+                    <SelectItem value="private">{t.st_vis_private}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="story-content" className="text-base">Votre récit</Label>
+              <Label htmlFor="story-content" className="text-base">{t.st_field_content}</Label>
               <Textarea
                 id="story-content"
                 value={composeContent}
                 onChange={(e) => setComposeContent(e.target.value)}
                 rows={10}
-                placeholder="Racontez votre souvenir, une tranche de vie, une anecdote…"
+                placeholder={t.st_field_content_ph}
                 className="text-base leading-relaxed"
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="story-summary" className="text-base">Résumé (facultatif)</Label>
+                <Label htmlFor="story-summary" className="text-base">{t.st_field_summary}</Label>
                 <Button type="button" variant="outline" size="sm" onClick={summarizeContent} className="gap-2">
-                  <Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Résumer avec l'IA
+                  <Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {t.st_summarize_ai}
                 </Button>
               </div>
               <Textarea
@@ -543,13 +543,13 @@ const StoriesPage: React.FC = () => {
                 value={composeSummary}
                 onChange={(e) => setComposeSummary(e.target.value)}
                 rows={3}
-                placeholder="Un court résumé pour retrouver l'histoire facilement."
+                placeholder={t.st_field_summary_ph}
               />
             </div>
 
             {/* Media picker */}
             <div className="space-y-2">
-              <Label className="text-base">Photos, vidéos ou audio (facultatif)</Label>
+              <Label className="text-base">{t.st_field_media}</Label>
               <div className="rounded-xl border-2 border-dashed border-border p-4 space-y-3">
                 <input
                   id="story-files"
@@ -565,7 +565,7 @@ const StoriesPage: React.FC = () => {
                 />
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => document.getElementById('story-files')?.click()}>
-                    <Upload className="h-4 w-4" /> Ajouter des fichiers
+                    <Upload className="h-4 w-4" /> {t.st_add_files}
                   </Button>
                   <Button
                     type="button"
@@ -584,7 +584,7 @@ const StoriesPage: React.FC = () => {
                       input.click();
                     }}
                   >
-                    <Camera className="h-4 w-4" /> Prendre une photo
+                    <Camera className="h-4 w-4" /> {t.st_take_photo}
                   </Button>
                 </div>
                 {pendingFiles.length > 0 && (
@@ -612,11 +612,11 @@ const StoriesPage: React.FC = () => {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setComposeOpen(false)} disabled={saving}>
-              Annuler
+              {t.cancel}
             </Button>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              Enregistrer l'histoire
+              {t.st_save_btn}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -626,6 +626,8 @@ const StoriesPage: React.FC = () => {
       {selectedStoryId && (
         <StoryDetailDialog
           storyId={selectedStoryId}
+          lang={lang}
+          t={t}
           onClose={() => setSelectedStoryId(null)}
           onDeleted={() => {
             setSelectedStoryId(null);
