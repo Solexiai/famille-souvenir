@@ -1695,6 +1695,7 @@ export type Database = {
           recipient_email: string | null
           recipient_member_id: string | null
           recipient_name: string
+          recipient_phone: string | null
           recipient_relationship: string | null
           released_at: string | null
           scheduled_for: string | null
@@ -1720,6 +1721,7 @@ export type Database = {
           recipient_email?: string | null
           recipient_member_id?: string | null
           recipient_name: string
+          recipient_phone?: string | null
           recipient_relationship?: string | null
           released_at?: string | null
           scheduled_for?: string | null
@@ -1745,6 +1747,7 @@ export type Database = {
           recipient_email?: string | null
           recipient_member_id?: string | null
           recipient_name?: string
+          recipient_phone?: string | null
           recipient_relationship?: string | null
           released_at?: string | null
           scheduled_for?: string | null

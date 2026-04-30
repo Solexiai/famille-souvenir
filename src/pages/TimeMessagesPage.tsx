@@ -31,6 +31,8 @@ interface TimeMessage {
   media_path: string | null;
   recipient_name: string;
   recipient_relationship: string | null;
+  recipient_email: string | null;
+  recipient_phone: string | null;
   scheduled_for: string | null;
   occasion_label: string | null;
   is_recurring: boolean;
@@ -259,6 +261,13 @@ function MessageList({
                 Pour <span className="font-medium text-foreground">{m.recipient_name}</span>
                 {m.recipient_relationship && <> · {m.recipient_relationship}</>}
               </p>
+              {(m.recipient_email || m.recipient_phone) && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {m.recipient_email && <span>{m.recipient_email}</span>}
+                  {m.recipient_email && m.recipient_phone && <span> · </span>}
+                  {m.recipient_phone && <span>{m.recipient_phone}</span>}
+                </p>
+              )}
 
               {m.occasion_label && (
                 <p className="text-sm mt-2 text-[hsl(270_35%_45%)]">{m.occasion_label}</p>
@@ -299,6 +308,8 @@ function CreateMessageDialog({
   const [title, setTitle] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [relationship, setRelationship] = useState('');
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
   const [occasion, setOccasion] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [recurring, setRecurring] = useState(false);
@@ -314,7 +325,8 @@ function CreateMessageDialog({
 
   const reset = () => {
     setFormat('audio'); setTrigger('scheduled_date'); setTitle(''); setRecipientName('');
-    setRelationship(''); setOccasion(''); setScheduledFor(''); setRecurring(false);
+    setRelationship(''); setRecipientEmail(''); setRecipientPhone('');
+    setOccasion(''); setScheduledFor(''); setRecurring(false);
     setTextContent(''); setMediaBlob(null); setMediaUrl(null);
   };
 
@@ -407,6 +419,8 @@ function CreateMessageDialog({
         media_size_bytes: mediaSize,
         recipient_name: recipientName.trim(),
         recipient_relationship: relationship.trim() || null,
+        recipient_email: recipientEmail.trim() || null,
+        recipient_phone: recipientPhone.trim() || null,
         occasion_label: occasion.trim() || null,
         scheduled_for: trigger === 'scheduled_date' ? scheduledFor : null,
         is_recurring: trigger === 'scheduled_date' ? recurring : false,
@@ -538,6 +552,21 @@ function CreateMessageDialog({
               <Label htmlFor="rel">Lien</Label>
               <Input id="rel" value={relationship} onChange={(e) => setRelationship(e.target.value)}
                 placeholder="Ex: Petite-fille" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="email">Courriel du destinataire</Label>
+              <Input id="email" type="email" value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                placeholder="ex: lea.dupont@email.com" />
+            </div>
+            <div>
+              <Label htmlFor="phone">Téléphone du destinataire</Label>
+              <Input id="phone" type="tel" value={recipientPhone}
+                onChange={(e) => setRecipientPhone(e.target.value)}
+                placeholder="ex: +1 514 555 0123" />
             </div>
           </div>
 
