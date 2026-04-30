@@ -637,10 +637,10 @@ function CreateMessageDialog({
 }
 
 function GuardiansDialog({
-  open, onOpenChange, userId, circleId, guardians, onChange,
+  open, onOpenChange, userId, circleId, guardians, onChange, t,
 }: {
   open: boolean; onOpenChange: (o: boolean) => void;
-  userId: string; circleId: string; guardians: Guardian[]; onChange: () => void;
+  userId: string; circleId: string; guardians: Guardian[]; onChange: () => void; t: TmCopy;
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -649,7 +649,7 @@ function GuardiansDialog({
 
   const handleAdd = async () => {
     if (!name.trim() || !email.trim()) {
-      toast.error('Nom et courriel obligatoires');
+      toast.error(t.tm_toast_guardian_required);
       return;
     }
     setSaving(true);
@@ -663,14 +663,14 @@ function GuardiansDialog({
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     setName(''); setEmail(''); setRel('');
-    toast.success('Gardien ajouté');
+    toast.success(t.tm_toast_guardian_added);
     onChange();
   };
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from('time_message_guardians').delete().eq('id', id);
     if (error) toast.error(error.message);
-    else { toast.success('Gardien retiré'); onChange(); }
+    else { toast.success(t.tm_toast_guardian_removed); onChange(); }
   };
 
   return (
@@ -679,13 +679,12 @@ function GuardiansDialog({
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" />
-            Gardiens de confiance
+            {t.tm_guardians_dialog_title}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Ces personnes pourront confirmer votre décès et libérer vos messages posthumes.
-            Choisissez 1 à 2 personnes en qui vous avez pleinement confiance.
+            {t.tm_guardians_dialog_desc}
           </p>
 
           <div className="space-y-2">
