@@ -912,15 +912,62 @@ const RecipeDetailDialog: React.FC<{
               Aucune photo principale
             </div>
           )}
-          <button
-            type="button"
-            onClick={() => photoInputRef.current?.click()}
-            disabled={photoBusy}
-            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-background/90 backdrop-blur px-4 py-2 text-sm font-medium border border-border shadow-md hover:bg-background transition disabled:opacity-60"
-          >
-            {photoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-            {recipe.image_url ? 'Changer la photo' : 'Ajouter une photo'}
-          </button>
+
+          {/* Photo action menu */}
+          <div className="absolute bottom-3 right-3">
+            {!photoMenuOpen ? (
+              <button
+                type="button"
+                onClick={() => setPhotoMenuOpen(true)}
+                disabled={photoBusy}
+                className="inline-flex items-center gap-2 rounded-full bg-background/95 backdrop-blur px-4 py-2 text-sm font-medium border border-border shadow-md hover:bg-background transition disabled:opacity-60"
+              >
+                {photoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                {recipe.image_url ? 'Changer la photo' : 'Ajouter une photo'}
+              </button>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-2xl bg-background/95 backdrop-blur p-2 border border-border shadow-lg min-w-[220px]">
+                <button
+                  type="button"
+                  onClick={() => { setPhotoMenuOpen(false); cameraInputRef.current?.click(); }}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted text-left text-sm font-medium"
+                >
+                  <span className="h-8 w-8 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
+                    <Camera className="h-4 w-4" />
+                  </span>
+                  Prendre une photo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setPhotoMenuOpen(false); photoInputRef.current?.click(); }}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted text-left text-sm font-medium"
+                >
+                  <span className="h-8 w-8 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)]">
+                    <ImageIcon className="h-4 w-4" />
+                  </span>
+                  Choisir depuis l'appareil
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhotoMenuOpen(false)}
+                  className="text-xs text-muted-foreground hover:text-foreground py-1"
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Camera capture (mobile back camera) */}
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handlePhotoChange(e.target.files[0])}
+          />
+          {/* Library / file picker */}
           <input
             ref={photoInputRef}
             type="file"
@@ -930,11 +977,15 @@ const RecipeDetailDialog: React.FC<{
           />
         </div>
 
+        <div className="border-t border-border my-2" />
+
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Préparation</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
           <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Cuisson</div><div className="font-medium">{formatDuration(recipe.cooking_time_minutes)}</div></div>
           <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Portions</div><div className="font-medium">{recipe.servings || '—'}</div></div>
         </div>
+
+        <div className="border-t border-border my-2" />
 
         {recipe.story && (
           <section>
