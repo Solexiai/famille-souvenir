@@ -11,9 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { Loader2, Plus, GitBranch, Calendar, Trash2, Edit3, Heart, Baby, GraduationCap, Home, Plane, Star, Image as ImageIcon, Mic, Video, FileText } from 'lucide-react';
+import { Loader2, Plus, GitBranch, Calendar, Trash2, Edit3, Heart, Baby, GraduationCap, Home, Plane, Star, Image as ImageIcon, Mic, Video, FileText, Eye, Sparkles } from 'lucide-react';
 import type { FamilyCircle, MemoryType } from '@/types/database';
 import { z } from 'zod';
+import exampleTimeline from '@/assets/example-timeline.png';
 
 interface TimelineEvent {
   id: string;
@@ -221,16 +222,36 @@ const TimelinePage: React.FC = () => {
         )}
 
         {totalItems === 0 ? (
-          <Card className="shadow-card">
-            <CardContent className="py-16 text-center space-y-4">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(210_20%_88%)] mx-auto">
-                <GitBranch className="h-8 w-8 text-[hsl(210_25%_40%)]" />
+          <div className="space-y-6">
+            <Card className="shadow-card">
+              <CardContent className="py-12 text-center space-y-4">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(210_20%_88%)] mx-auto">
+                  <GitBranch className="h-8 w-8 text-[hsl(210_25%_40%)]" />
+                </div>
+                <h2 className="font-heading text-xl text-foreground">Votre ligne du temps est vide</h2>
+                <p className="text-muted-foreground max-w-md mx-auto">Ajoutez les naissances, mariages, voyages et grands moments de votre famille. Les souvenirs ayant une date apparaîtront aussi automatiquement ici.</p>
+                <Button onClick={() => setDialogOpen(true)} className="gap-2"><Plus className="h-4 w-4" />Ajouter le premier événement</Button>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card overflow-hidden border-accent/30">
+              <div className="bg-gradient-to-r from-accent/10 via-accent/5 to-transparent px-6 py-4 border-b border-accent/20 flex items-center gap-3">
+                <Sparkles className="h-5 w-5 text-accent shrink-0" />
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">Voici à quoi ressemblera votre ligne du temps</h3>
+                  <p className="text-sm text-muted-foreground">Un exemple pour vous inspirer. Ajoutez vos propres moments pour la voir prendre vie.</p>
+                </div>
               </div>
-              <h2 className="font-heading text-xl text-foreground">Votre ligne du temps est vide</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">Ajoutez les naissances, mariages, voyages et grands moments de votre famille. Les souvenirs ayant une date apparaîtront aussi automatiquement ici.</p>
-              <Button onClick={() => setDialogOpen(true)} className="gap-2"><Plus className="h-4 w-4" />Ajouter le premier événement</Button>
-            </CardContent>
-          </Card>
+              <div className="p-4 md:p-6 bg-muted/20">
+                <img
+                  src={exampleTimeline}
+                  alt="Exemple de ligne du temps familiale avec naissances, mariages, voyages et souvenirs"
+                  className="w-full h-auto rounded-lg border border-border shadow-sm"
+                  loading="lazy"
+                />
+              </div>
+            </Card>
+          </div>
         ) : (
           <div className="relative">
             {/* Vertical line */}
