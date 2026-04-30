@@ -80,7 +80,8 @@ const DictateStoryDialog: React.FC<{
   open: boolean;
   onClose: () => void;
   onTranscribed: (data: { title: string; content: string; summary: string }) => void;
-}> = ({ open, onClose, onTranscribed }) => {
+  t: StCopy;
+}> = ({ open, onClose, onTranscribed, t }) => {
   const [phase, setPhase] = useState<'idle' | 'recording' | 'processing'>('idle');
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -112,12 +113,12 @@ const DictateStoryDialog: React.FC<{
           });
           if (error) throw error;
           if (data?.error) throw new Error(data.error);
-          if (!data?.story) throw new Error('Aucune transcription');
+          if (!data?.story) throw new Error(t.st_toast_no_transcription);
           onTranscribed(data.story);
           cleanup();
           onClose();
         } catch (e: any) {
-          toast.error(e?.message || 'Échec de la transcription');
+          toast.error(e?.message || t.st_toast_transcription_failed);
           cleanup();
         }
       };
@@ -125,7 +126,7 @@ const DictateStoryDialog: React.FC<{
       recorderRef.current = mr;
       setPhase('recording');
     } catch {
-      toast.error("Impossible d'accéder au microphone. Autorisez l'accès et réessayez.");
+      toast.error(t.st_toast_mic_error);
     }
   };
 
@@ -147,10 +148,10 @@ const DictateStoryDialog: React.FC<{
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl flex items-center gap-2">
             <Mic className="h-5 w-5 text-[hsl(220_45%_25%)]" />
-            Dicter votre histoire
+            {t.st_dictate_dialog_title}
           </DialogTitle>
           <DialogDescription>
-            Racontez votre souvenir naturellement, comme à vos proches. L'IA transcrira et proposera un résumé.
+            {t.st_dictate_dialog_desc}
           </DialogDescription>
         </DialogHeader>
 
@@ -162,12 +163,12 @@ const DictateStoryDialog: React.FC<{
                 <Mic className="h-12 w-12 text-white" />
               </div>
             </div>
-            <p className="font-medium text-lg">Enregistrement en cours…</p>
+            <p className="font-medium text-lg">{t.st_recording}</p>
             <p className="text-sm text-muted-foreground px-4">
-              Prenez votre temps. Décrivez la scène, les personnes, vos émotions.
+              {t.st_recording_hint}
             </p>
             <Button onClick={stop} size="lg" className="gap-2 bg-[hsl(220_45%_25%)] text-white">
-              <Square className="h-4 w-4" /> Arrêter et transcrire
+              <Square className="h-4 w-4" /> {t.st_stop_transcribe}
             </Button>
           </div>
         )}
@@ -175,8 +176,8 @@ const DictateStoryDialog: React.FC<{
         {phase === 'processing' && (
           <div className="py-10 text-center space-y-3">
             <Loader2 className="h-10 w-10 animate-spin text-[hsl(220_45%_40%)] mx-auto" />
-            <p className="font-medium">L'IA transcrit votre récit…</p>
-            <p className="text-sm text-muted-foreground">Génération du titre et du résumé</p>
+            <p className="font-medium">{t.st_processing}</p>
+            <p className="text-sm text-muted-foreground">{t.st_processing_hint}</p>
           </div>
         )}
       </DialogContent>
