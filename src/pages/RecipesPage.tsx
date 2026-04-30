@@ -777,17 +777,22 @@ const FilteredView: React.FC<{
   favorites: Set<string>;
   onOpen: (id: string) => void;
   onToggleFavorite: (id: string) => void;
-}> = ({ view, recipes, branches, generations, occasions, recipeOccasions, favorites, onOpen, onToggleFavorite }) => {
+  c: MemoriesCopy;
+}> = ({ view, recipes, branches, generations, occasions, recipeOccasions, favorites, onOpen, onToggleFavorite, c }) => {
   const labels: Record<ClassificationKey, string> = {
-    family: 'Par famille', occasion: 'Par occasion', generation: 'Par génération',
-    dish: 'Par type de plat', scanned: 'Carnets numérisés', favorites: 'Favoris',
+    family: c.rec_class_family,
+    occasion: c.rec_class_occasion,
+    generation: c.rec_class_generation,
+    dish: c.rec_class_dish,
+    scanned: c.rec_class_scanned,
+    favorites: c.rec_class_favorites,
   };
 
   const renderGroup = (title: string, items: Recipe[]) => (
     <div key={title} className="space-y-3">
       <h3 className="font-heading text-xl font-semibold text-foreground">{title} <span className="text-sm text-muted-foreground font-normal">({items.length})</span></h3>
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune recette dans cette catégorie.</p>
+        <p className="text-sm text-muted-foreground">{c.rec_no_recipe_in_cat}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {items.map((r) => (
@@ -800,6 +805,7 @@ const FilteredView: React.FC<{
               isFavorite={favorites.has(r.id)}
               onToggleFavorite={() => onToggleFavorite(r.id)}
               onOpen={() => onOpen(r.id)}
+              c={c}
             />
           ))}
         </div>
@@ -812,25 +818,26 @@ const FilteredView: React.FC<{
   if (view === 'family') {
     groups = branches.map((b) => ({ title: b.name, items: recipes.filter((r) => r.family_branch_id === b.id) }));
     const orphans = recipes.filter((r) => !r.family_branch_id);
-    if (orphans.length) groups.push({ title: 'Sans branche', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_branch, items: orphans });
   } else if (view === 'generation') {
     groups = generations.map((g) => ({ title: g.name, items: recipes.filter((r) => r.generation_id === g.id) }));
     const orphans = recipes.filter((r) => !r.generation_id);
-    if (orphans.length) groups.push({ title: 'Sans génération', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_generation, items: orphans });
   } else if (view === 'occasion') {
     groups = occasions.map((o) => ({
       title: o.name,
       items: recipes.filter((r) => (recipeOccasions[r.id] || []).includes(o.id)),
     }));
     const orphans = recipes.filter((r) => !(recipeOccasions[r.id] || []).length);
-    if (orphans.length) groups.push({ title: 'Sans occasion', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_occasion, items: orphans });
   } else if (view === 'dish') {
     const types: DishType[] = ['appetizer', 'soup', 'main', 'side', 'dessert', 'preserve', 'drink', 'sauce', 'bread', 'other'];
-    groups = types.map((t) => ({ title: DISH_TYPE_LABEL[t], items: recipes.filter((r) => r.dish_type === t) })).filter((g) => g.items.length > 0);
+    const dl = dishTypeLabel(c);
+    groups = types.map((t) => ({ title: dl[t], items: recipes.filter((r) => r.dish_type === t) })).filter((g) => g.items.length > 0);
   } else if (view === 'scanned') {
-    groups = [{ title: 'Recettes manuscrites numérisées', items: recipes.filter((r) => r.has_handwritten_note || r.scanned_document_id) }];
+    groups = [{ title: c.rec_handwritten_group, items: recipes.filter((r) => r.has_handwritten_note || r.scanned_document_id) }];
   } else if (view === 'favorites') {
-    groups = [{ title: 'Vos recettes favorites', items: recipes.filter((r) => favorites.has(r.id)) }];
+    groups = [{ title: c.rec_favorites_group, items: recipes.filter((r) => favorites.has(r.id)) }];
   }
 
   return (
@@ -839,7 +846,7 @@ const FilteredView: React.FC<{
         <h2 className="font-heading text-3xl font-bold text-foreground">{labels[view]}</h2>
       </div>
       {groups.length === 0 ? (
-        <p className="text-muted-foreground">Aucune donnée à afficher. Commencez par ajouter une recette ou créer des branches familiales.</p>
+        <p className="text-muted-foreground">{c.rec_no_data_view}</p>
       ) : (
         groups.map((g) => renderGroup(g.title, g.items))
       )}
