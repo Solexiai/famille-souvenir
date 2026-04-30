@@ -253,6 +253,11 @@ const RecipesPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => {
+    const handler = () => loadAll();
+    window.addEventListener('recipes:reload', handler);
+    return () => window.removeEventListener('recipes:reload', handler);
+  }, [loadAll]);
 
   // Sync route /recipes/:id -> open detail
   useEffect(() => {
