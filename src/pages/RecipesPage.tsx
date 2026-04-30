@@ -356,8 +356,8 @@ const RecipesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Vous devez d'abord créer un cercle familial.</p>
-          <Button className="mt-4" onClick={() => navigate('/circle')}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{c.rec_must_create_circle}</p>
+          <Button className="mt-4" onClick={() => navigate('/circle')}>{c.rec_create_circle_btn}</Button>
         </div>
       </AppLayout>
     );
@@ -369,7 +369,7 @@ const RecipesPage: React.FC = () => {
       <AppLayout>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
           <Button variant="ghost" size="sm" onClick={() => setView('list')} className="gap-2">
-            <ArrowLeft className="h-4 w-4" /> Toutes les recettes
+            <ArrowLeft className="h-4 w-4" /> {c.rec_back_all}
           </Button>
           <FilteredView
             view={view as ClassificationKey}
