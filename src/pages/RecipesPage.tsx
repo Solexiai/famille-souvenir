@@ -1125,7 +1125,8 @@ const CreateRecipeDialog: React.FC<{
   onCreated: () => void;
   prefill?: RecipePrefill | null;
   onOpenScanIA?: () => void;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA }) => {
+  c: MemoriesCopy;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA, c }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
