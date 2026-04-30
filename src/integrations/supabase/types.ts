@@ -925,8 +925,10 @@ export type Database = {
           caption: string | null
           circle_id: string
           created_at: string
+          event_date: string | null
           id: string
           media_url: string | null
+          title: string | null
           type: Database["public"]["Enums"]["memory_type"]
           updated_at: string
           visibility: Database["public"]["Enums"]["memory_visibility"]
@@ -936,8 +938,10 @@ export type Database = {
           caption?: string | null
           circle_id: string
           created_at?: string
+          event_date?: string | null
           id?: string
           media_url?: string | null
+          title?: string | null
           type?: Database["public"]["Enums"]["memory_type"]
           updated_at?: string
           visibility?: Database["public"]["Enums"]["memory_visibility"]
@@ -947,8 +951,10 @@ export type Database = {
           caption?: string | null
           circle_id?: string
           created_at?: string
+          event_date?: string | null
           id?: string
           media_url?: string | null
+          title?: string | null
           type?: Database["public"]["Enums"]["memory_type"]
           updated_at?: string
           visibility?: Database["public"]["Enums"]["memory_visibility"]
@@ -1759,6 +1765,122 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      timeline_events: {
+        Row: {
+          author_id: string
+          category: string
+          circle_id: string
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          related_memory_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          circle_id: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          related_memory_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          circle_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          related_memory_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "timeline_events_related_memory_id_fkey"
+            columns: ["related_memory_id"]
+            isOneToOne: false
+            referencedRelation: "memories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traditions: {
+        Row: {
+          author_id: string
+          category: string
+          circle_id: string
+          created_at: string
+          day: number | null
+          description: string | null
+          id: string
+          month: number | null
+          name: string
+          origin_year: number | null
+          participants: string | null
+          recurrence: string
+          rituals: string | null
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          circle_id: string
+          created_at?: string
+          day?: number | null
+          description?: string | null
+          id?: string
+          month?: number | null
+          name: string
+          origin_year?: number | null
+          participants?: string | null
+          recurrence?: string
+          rituals?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          circle_id?: string
+          created_at?: string
+          day?: number | null
+          description?: string | null
+          id?: string
+          month?: number | null
+          name?: string
+          origin_year?: number | null
+          participants?: string | null
+          recurrence?: string
+          rituals?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "traditions_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       upload_quotas: {
         Row: {
