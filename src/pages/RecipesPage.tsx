@@ -119,33 +119,40 @@ const DEMO_RECIPES = [
 
 // ======== Helpers ========
 
-const FILTER_CHIPS = [
-  { key: 'all', label: 'Tous' },
-  { key: 'branch', label: 'Branche familiale' },
-  { key: 'dessert', label: 'Desserts' },
-  { key: 'main', label: 'Plats mijotés' },
-  { key: 'celebration', label: 'Fêtes' },
-  { key: 'quick', label: 'Rapide' },
-  { key: 'handwritten', label: 'Carnet manuscrit' },
-  { key: 'favorites', label: 'Favoris' },
+const buildFilterChips = (c: MemoriesCopy) => [
+  { key: 'all', label: c.rec_filter_all },
+  { key: 'branch', label: c.rec_class_family },
+  { key: 'dessert', label: c.rec_filter_dessert },
+  { key: 'main', label: c.rec_filter_main },
+  { key: 'celebration', label: c.rec_class_occasion },
+  { key: 'quick', label: c.rec_filter_main },
+  { key: 'handwritten', label: c.rec_class_scanned },
+  { key: 'favorites', label: c.rec_filter_favorites },
 ] as const;
-type FilterKey = (typeof FILTER_CHIPS)[number]['key'];
+type FilterKey = 'all' | 'branch' | 'dessert' | 'main' | 'celebration' | 'quick' | 'handwritten' | 'favorites';
 
-const CLASSIFICATIONS = [
-  { key: 'family', label: 'Par famille', Icon: UsersIcon, hint: 'Branches & lignées' },
-  { key: 'occasion', label: 'Par occasion', Icon: CalendarDays, hint: 'Noël, mariages, fêtes' },
-  { key: 'generation', label: 'Par génération', Icon: GitBranch, hint: 'Époques & lignées' },
-  { key: 'dish', label: 'Par type de plat', Icon: ChefHat, hint: 'Entrées, mains, desserts' },
-  { key: 'scanned', label: 'Carnets numérisés', Icon: BookOpen, hint: 'Recettes manuscrites' },
-  { key: 'favorites', label: 'Favoris', Icon: Heart, hint: 'Vos préférées' },
-] as const;
-type ClassificationKey = (typeof CLASSIFICATIONS)[number]['key'];
+const buildClassifications = (c: MemoriesCopy) => [
+  { key: 'family' as const, label: c.rec_class_family, Icon: UsersIcon, hint: c.rec_class_family_hint },
+  { key: 'occasion' as const, label: c.rec_class_occasion, Icon: CalendarDays, hint: c.rec_class_occasion_hint },
+  { key: 'generation' as const, label: c.rec_class_generation, Icon: GitBranch, hint: c.rec_class_generation_hint },
+  { key: 'dish' as const, label: c.rec_class_dish, Icon: ChefHat, hint: c.rec_class_dish_hint },
+  { key: 'scanned' as const, label: c.rec_class_scanned, Icon: BookOpen, hint: c.rec_class_scanned_hint },
+  { key: 'favorites' as const, label: c.rec_class_favorites, Icon: Heart, hint: c.rec_class_favorites_hint },
+];
+type ClassificationKey = 'family' | 'occasion' | 'generation' | 'dish' | 'scanned' | 'favorites';
 
-const DISH_TYPE_LABEL: Record<DishType, string> = {
-  appetizer: 'Entrée', soup: 'Soupe', main: 'Plat principal', side: 'Accompagnement',
-  dessert: 'Dessert', preserve: 'Conserve', drink: 'Boisson', sauce: 'Sauce',
-  bread: 'Pain', other: 'Autre',
-};
+const dishTypeLabel = (c: MemoriesCopy): Record<DishType, string> => ({
+  appetizer: c.rec_dish_appetizer,
+  soup: c.rec_dish_soup,
+  main: c.rec_dish_main,
+  side: c.rec_dish_side,
+  dessert: c.rec_dish_dessert,
+  preserve: c.rec_dish_preserve,
+  drink: c.rec_dish_drink,
+  sauce: c.rec_dish_sauce,
+  bread: c.rec_dish_bread,
+  other: c.rec_dish_other,
+});
 
 function formatDuration(minutes: number): string {
   if (!minutes) return '—';
@@ -159,6 +166,8 @@ function formatDuration(minutes: number): string {
 
 const RecipesPage: React.FC = () => {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const c = useMemoriesCopy(lang);
   const navigate = useNavigate();
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
