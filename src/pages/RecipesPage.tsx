@@ -175,8 +175,29 @@ const RecipesPage: React.FC = () => {
   const view: ClassificationKey | 'list' = (searchParams.get('view') as ClassificationKey) || 'list';
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [recipePrefill, setRecipePrefill] = useState<RecipePrefill | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
+
+  const handleExtracted = useCallback((extracted: ExtractedRecipe) => {
+    setRecipePrefill({
+      title: extracted.title,
+      story: extracted.notes || '',
+      ingredients: extracted.ingredients,
+      steps: extracted.steps,
+      preparation_time_minutes: extracted.preparation_time_minutes,
+      cooking_time_minutes: extracted.cooking_time_minutes,
+      servings: extracted.servings,
+      dish_type: extracted.dish_type,
+      difficulty: extracted.difficulty,
+      has_handwritten_note: !!extracted.is_handwritten,
+      scannedImageBase64: extracted.scannedImageBase64,
+    });
+    setQuickAddOpen(false);
+    setCreateOpen(true);
+    toast.success('Recette détectée ! Vérifiez et enregistrez.');
+  }, []);
 
   // ====== Data loading ======
   const loadAll = useCallback(async () => {
