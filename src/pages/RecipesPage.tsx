@@ -932,6 +932,9 @@ const CreateRecipeDialog: React.FC<{
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [hasHandwritten, setHasHandwritten] = useState(false);
   const [privacy, setPrivacy] = useState<Privacy>('circle');
+  const [dishPhoto, setDishPhoto] = useState<File | null>(null);
+  const [dishPhotoPreview, setDishPhotoPreview] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   // Apply prefill when dialog opens with new prefill data
   useEffect(() => {
