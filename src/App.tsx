@@ -23,6 +23,7 @@ import RecipesPage from "./pages/RecipesPage";
 import StoriesPage from "./pages/StoriesPage";
 import GalleryPage from "./pages/GalleryPage";
 import StoragePlansPage from "./pages/StoragePlansPage";
+import TimeMessagesPage from "./pages/TimeMessagesPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import GovernancePage from "./pages/GovernancePage";
 import ChecklistPage from "./pages/ChecklistPage";
@@ -79,6 +80,7 @@ const App = () => (
               <Route path="/stories" element={<ProtectedRoute><StoriesPage /></ProtectedRoute>} />
               <Route path="/gallery" element={<ProtectedRoute><GalleryPage /></ProtectedRoute>} />
               <Route path="/storage-plans" element={<ProtectedRoute><StoragePlansPage /></ProtectedRoute>} />
+              <Route path="/time-messages" element={<ProtectedRoute><TimeMessagesPage /></ProtectedRoute>} />
               
               <Route path="/vault" element={<ProtectedRoute><VaultPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
