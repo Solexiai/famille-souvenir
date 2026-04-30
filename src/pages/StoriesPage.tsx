@@ -188,6 +188,8 @@ const DictateStoryDialog: React.FC<{
 // ============ MAIN PAGE ============
 const StoriesPage: React.FC = () => {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const t = useMemoriesCopy(lang);
   const [circleId, setCircleId] = useState<string | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
