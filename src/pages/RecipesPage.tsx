@@ -959,6 +959,27 @@ const CreateRecipeDialog: React.FC<{
     setBranchId(''); setGenerationId(''); setTransmittedBy('');
     setSelectedOccasions([]); setSelectedMembers([]);
     setHasHandwritten(false); setPrivacy('circle');
+    setDishPhoto(null); setDishPhotoPreview(null);
+  };
+
+  const handlePhotoSelected = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez choisir une image');
+      return;
+    }
+    setPhotoBusy(true);
+    try {
+      const compressed = await prepareImageForUpload(file);
+      setDishPhoto(compressed);
+      const url = URL.createObjectURL(compressed);
+      setDishPhotoPreview(url);
+    } catch (err) {
+      console.warn('Compression failed', err);
+      setDishPhoto(file);
+      setDishPhotoPreview(URL.createObjectURL(file));
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
   const schema = z.object({
