@@ -25,6 +25,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onExtracted: (recipe: ExtractedRecipe) => void;
+  initialMode?: 'choose' | 'record';
 }
 
 const fileToBase64 = (file: File | Blob): Promise<string> =>
@@ -35,7 +36,7 @@ const fileToBase64 = (file: File | Blob): Promise<string> =>
     reader.readAsDataURL(file);
   });
 
-export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtracted }) => {
+export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtracted, initialMode }) => {
   const [mode, setMode] = useState<'choose' | 'scanning' | 'recording' | 'transcribing'>('choose');
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
