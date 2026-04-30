@@ -715,7 +715,7 @@ const StoryDetailDialog: React.FC<{
       author_id: user.id,
       content: newAnecdote.trim(),
     });
-    if (error) toast.error('Échec de l\'ajout');
+    if (error) toast.error(t.st_toast_anecdote_added_err);
     else {
       setNewAnecdote('');
       load();
@@ -730,9 +730,9 @@ const StoryDetailDialog: React.FC<{
       await supabase.storage.from('memories-media').remove(paths);
     }
     const { error } = await (supabase as any).from('stories').delete().eq('id', storyId);
-    if (error) toast.error('Échec de la suppression');
+    if (error) toast.error(t.st_toast_delete_err);
     else {
-      toast.success('Histoire supprimée');
+      toast.success(t.st_toast_deleted);
       onDeleted();
     }
   };
@@ -752,10 +752,10 @@ const StoryDetailDialog: React.FC<{
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       await (supabase as any).from('story_media').update({ ai_description: data.summary }).eq('id', mi.id);
-      toast.success('Description générée');
+      toast.success(t.st_toast_describe_done);
       load();
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de la description');
+      toast.error(e?.message || t.st_toast_describe_err);
     } finally {
       setSummarizingMedia(null);
     }
@@ -782,17 +782,17 @@ const StoryDetailDialog: React.FC<{
           <DialogHeader>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
-              Ajoutée le {formatFR(story.created_at)}
+              {t.st_added_on} {formatLocale(story.created_at, lang)}
               {story.story_date && (
-                <span className="ml-2">· Souvenir du {new Date(story.story_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                <span className="ml-2">· {t.st_memory_of} {new Date(story.story_date).toLocaleDateString(localeMap[lang], { day: '2-digit', month: 'long', year: 'numeric' })}</span>
               )}
               {story.source === 'dictated' && (
                 <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(355_60%_94%)] text-[hsl(355_60%_45%)] font-medium">
-                  <Mic className="h-3 w-3" /> Dictée
+                  <Mic className="h-3 w-3" /> {t.st_dictated_badge}
                 </span>
               )}
             </div>
-            <DialogTitle className="font-heading text-2xl md:text-3xl">{story.title || 'Sans titre'}</DialogTitle>
+            <DialogTitle className="font-heading text-2xl md:text-3xl">{story.title || t.st_no_title}</DialogTitle>
             {story.ai_summary && (
               <DialogDescription className="text-base italic border-l-4 border-[hsl(35_60%_55%)] pl-4 py-2 bg-[hsl(35_60%_97%)] rounded">
                 {story.ai_summary}
@@ -802,14 +802,14 @@ const StoryDetailDialog: React.FC<{
 
           {/* Content */}
           <article className="prose prose-sm max-w-none whitespace-pre-wrap text-base leading-relaxed text-foreground">
-            {story.content || <span className="text-muted-foreground italic">Aucun texte.</span>}
+            {story.content || <span className="text-muted-foreground italic">{t.st_no_text}</span>}
           </article>
 
           {/* Media */}
           {media.length > 0 && (
             <>
               <div className="border-t border-border pt-4">
-                <h3 className="font-heading text-lg font-semibold mb-3">Photos, vidéos & audio</h3>
+                <h3 className="font-heading text-lg font-semibold mb-3">{t.st_media_section}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {media.map((mi) => (
                     <div key={mi.id} className="rounded-xl border border-border overflow-hidden bg-muted/30">
@@ -836,7 +836,7 @@ const StoryDetailDialog: React.FC<{
                             disabled={summarizingMedia === mi.id}
                           >
                             {summarizingMedia === mi.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                            Décrire avec l'IA
+                            {t.st_describe_ai}
                           </Button>
                         ) : null}
                       </div>
@@ -851,11 +851,11 @@ const StoryDetailDialog: React.FC<{
           <div className="border-t border-border pt-4 space-y-3">
             <h3 className="font-heading text-lg font-semibold flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-[hsl(220_45%_25%)]" />
-              Anecdotes ({anecdotes.length})
+              {t.st_anecdotes_title} ({anecdotes.length})
             </h3>
             {anecdotes.length === 0 && (
               <p className="text-sm text-muted-foreground italic">
-                Pas encore d'anecdote. Ajoutez un détail savoureux, une variante, un souvenir lié.
+                {t.st_anecdote_empty}
               </p>
             )}
             <ul className="space-y-2">
@@ -863,7 +863,7 @@ const StoryDetailDialog: React.FC<{
                 <li key={a.id} className="rounded-xl bg-[hsl(40_33%_96%)] border border-border p-3">
                   <p className="text-sm whitespace-pre-wrap">{a.content}</p>
                   <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
-                    <Calendar className="h-3 w-3" /> {formatFR(a.created_at)}
+                    <Calendar className="h-3 w-3" /> {formatLocale(a.created_at, lang)}
                   </p>
                 </li>
               ))}
@@ -871,14 +871,14 @@ const StoryDetailDialog: React.FC<{
 
             <div className="space-y-2">
               <Textarea
-                placeholder="Ajouter une anecdote à cette histoire…"
+                placeholder={t.st_anecdote_ph}
                 value={newAnecdote}
                 onChange={(e) => setNewAnecdote(e.target.value)}
                 rows={3}
               />
               <Button onClick={addAnecdote} disabled={addingAnecdote || !newAnecdote.trim()} size="sm" className="gap-2">
                 {addingAnecdote ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Ajouter cette anecdote
+                {t.st_anecdote_add}
               </Button>
             </div>
           </div>
@@ -886,7 +886,7 @@ const StoryDetailDialog: React.FC<{
           {isAuthor && (
             <DialogFooter className="border-t border-border pt-4">
               <Button variant="destructive" onClick={() => setConfirmDelete(true)} className="gap-2">
-                <Trash2 className="h-4 w-4" /> Supprimer cette histoire
+                <Trash2 className="h-4 w-4" /> {t.st_delete_story}
               </Button>
             </DialogFooter>
           )}
@@ -896,15 +896,15 @@ const StoryDetailDialog: React.FC<{
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette histoire ?</AlertDialogTitle>
+            <AlertDialogTitle>{t.st_confirm_delete_title}</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est définitive. L'histoire, ses anecdotes et ses médias seront supprimés.
+              {t.st_confirm_delete_desc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t.common_cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={deleteStory} className={cn('bg-destructive text-destructive-foreground hover:bg-destructive/90')}>
-              Supprimer définitivement
+              {t.st_confirm_delete_yes}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
