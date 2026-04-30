@@ -565,6 +565,39 @@ export type Database = {
           },
         ]
       }
+      family_branches: {
+        Row: {
+          circle_id: string
+          color: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          circle_id: string
+          color?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          circle_id?: string
+          color?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       family_circles: {
         Row: {
           beneficiary_designation_status: Database["public"]["Enums"]["documentary_status"]
@@ -628,6 +661,36 @@ export type Database = {
           region_code?: string | null
           testament_status?: Database["public"]["Enums"]["documentary_status"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      generations: {
+        Row: {
+          circle_id: string
+          created_at: string
+          created_by: string
+          era: string | null
+          id: string
+          name: string
+          rank: number
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          created_by: string
+          era?: string | null
+          id?: string
+          name: string
+          rank?: number
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          created_by?: string
+          era?: string | null
+          id?: string
+          name?: string
+          rank?: number
         }
         Relationships: []
       }
@@ -870,6 +933,33 @@ export type Database = {
         }
         Relationships: []
       }
+      occasions: {
+        Row: {
+          circle_id: string
+          created_at: string
+          created_by: string
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          created_by: string
+          icon?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          created_by?: string
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -986,6 +1076,210 @@ export type Database = {
           window_start?: string
         }
         Relationships: []
+      }
+      recipe_favorites: {
+        Row: {
+          created_at: string
+          recipe_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          recipe_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          recipe_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_favorites_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_members: {
+        Row: {
+          member_id: string
+          recipe_id: string
+          relation: string | null
+        }
+        Insert: {
+          member_id: string
+          recipe_id: string
+          relation?: string | null
+        }
+        Update: {
+          member_id?: string
+          recipe_id?: string
+          relation?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_members_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_memories: {
+        Row: {
+          memory_id: string
+          recipe_id: string
+        }
+        Insert: {
+          memory_id: string
+          recipe_id: string
+        }
+        Update: {
+          memory_id?: string
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_memories_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_occasions: {
+        Row: {
+          occasion_id: string
+          recipe_id: string
+        }
+        Insert: {
+          occasion_id: string
+          recipe_id: string
+        }
+        Update: {
+          occasion_id?: string
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_occasions_occasion_id_fkey"
+            columns: ["occasion_id"]
+            isOneToOne: false
+            referencedRelation: "occasions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_occasions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipes: {
+        Row: {
+          circle_id: string
+          cooking_time_minutes: number | null
+          created_at: string
+          created_by: string
+          description: string | null
+          difficulty: Database["public"]["Enums"]["recipe_difficulty"]
+          dish_type: Database["public"]["Enums"]["recipe_dish_type"]
+          family_branch_id: string | null
+          generation_id: string | null
+          has_audio_memory: boolean
+          has_handwritten_note: boolean
+          id: string
+          image_url: string | null
+          ingredients: Json
+          is_featured: boolean
+          original_author_member_id: string | null
+          preparation_time_minutes: number | null
+          privacy_level: Database["public"]["Enums"]["recipe_privacy"]
+          scanned_document_id: string | null
+          servings: number | null
+          steps: Json
+          story: string | null
+          title: string
+          transmitted_by_member_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          circle_id: string
+          cooking_time_minutes?: number | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["recipe_difficulty"]
+          dish_type?: Database["public"]["Enums"]["recipe_dish_type"]
+          family_branch_id?: string | null
+          generation_id?: string | null
+          has_audio_memory?: boolean
+          has_handwritten_note?: boolean
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          is_featured?: boolean
+          original_author_member_id?: string | null
+          preparation_time_minutes?: number | null
+          privacy_level?: Database["public"]["Enums"]["recipe_privacy"]
+          scanned_document_id?: string | null
+          servings?: number | null
+          steps?: Json
+          story?: string | null
+          title: string
+          transmitted_by_member_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          circle_id?: string
+          cooking_time_minutes?: number | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          difficulty?: Database["public"]["Enums"]["recipe_difficulty"]
+          dish_type?: Database["public"]["Enums"]["recipe_dish_type"]
+          family_branch_id?: string | null
+          generation_id?: string | null
+          has_audio_memory?: boolean
+          has_handwritten_note?: boolean
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          is_featured?: boolean
+          original_author_member_id?: string | null
+          preparation_time_minutes?: number | null
+          privacy_level?: Database["public"]["Enums"]["recipe_privacy"]
+          scanned_document_id?: string | null
+          servings?: number | null
+          steps?: Json
+          story?: string | null
+          title?: string
+          transmitted_by_member_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipes_family_branch_id_fkey"
+            columns: ["family_branch_id"]
+            isOneToOne: false
+            referencedRelation: "family_branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "generations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       security_events: {
         Row: {
@@ -1184,6 +1478,10 @@ export type Database = {
         Args: { _circle_id: string; _user_id: string }
         Returns: boolean
       }
+      can_access_recipe: {
+        Args: { _recipe_id: string; _user_id: string }
+        Returns: boolean
+      }
       check_rate_limit: {
         Args: {
           _action: string
@@ -1313,6 +1611,19 @@ export type Database = {
       invitation_status: "pending" | "accepted" | "declined" | "expired"
       memory_type: "photo" | "video" | "audio" | "text"
       memory_visibility: "circle" | "managers" | "private"
+      recipe_difficulty: "easy" | "medium" | "hard"
+      recipe_dish_type:
+        | "appetizer"
+        | "soup"
+        | "main"
+        | "side"
+        | "dessert"
+        | "preserve"
+        | "drink"
+        | "sauce"
+        | "bread"
+        | "other"
+      recipe_privacy: "private" | "managers" | "circle"
       vault_visibility: "owner" | "managers" | "circle"
       verification_status:
         | "unreviewed"
@@ -1529,6 +1840,20 @@ export const Constants = {
       invitation_status: ["pending", "accepted", "declined", "expired"],
       memory_type: ["photo", "video", "audio", "text"],
       memory_visibility: ["circle", "managers", "private"],
+      recipe_difficulty: ["easy", "medium", "hard"],
+      recipe_dish_type: [
+        "appetizer",
+        "soup",
+        "main",
+        "side",
+        "dessert",
+        "preserve",
+        "drink",
+        "sauce",
+        "bread",
+        "other",
+      ],
+      recipe_privacy: ["private", "managers", "circle"],
       vault_visibility: ["owner", "managers", "circle"],
       verification_status: [
         "unreviewed",
