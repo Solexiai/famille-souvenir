@@ -19,6 +19,7 @@ import DashboardPage from "./pages/DashboardPage";
 import CirclePage from "./pages/CirclePage";
 import MembersPage from "./pages/MembersPage";
 import MemoriesPage from "./pages/MemoriesPage";
+import RecipesPage from "./pages/RecipesPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import GovernancePage from "./pages/GovernancePage";
 import ChecklistPage from "./pages/ChecklistPage";
@@ -70,6 +71,8 @@ const App = () => (
               <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
               <Route path="/checklist" element={<ProtectedRoute><ChecklistPage /></ProtectedRoute>} />
               <Route path="/memories" element={<ProtectedRoute><MemoriesPage /></ProtectedRoute>} />
+              <Route path="/recipes" element={<ProtectedRoute><RecipesPage /></ProtectedRoute>} />
+              <Route path="/recipes/:id" element={<ProtectedRoute><RecipesPage /></ProtectedRoute>} />
               
               <Route path="/vault" element={<ProtectedRoute><VaultPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />

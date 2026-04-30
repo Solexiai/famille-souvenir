@@ -445,7 +445,7 @@ const MemoriesPage: React.FC = () => {
           {CATEGORIES.map((cat) => (
             <button
               key={cat.key}
-              onClick={() => openCreateDialog(cat.prefilledType)}
+              onClick={() => cat.key === 'recipe' ? (window.location.href = '/recipes') : openCreateDialog(cat.prefilledType)}
               className="group text-left rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
             >
               <div className={cn('inline-flex h-12 w-12 items-center justify-center rounded-full mb-3', cat.iconBg)}>
