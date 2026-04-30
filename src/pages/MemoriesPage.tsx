@@ -120,7 +120,12 @@ const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
 
 const MemoriesPage: React.FC = () => {
   const { user } = useAuth();
-  const { t, lang } = useLocale();
+  const { lang } = useLocale();
+  const c = useMemoriesCopy(lang);
+  const CATEGORIES = useMemo(() => buildCategories(c), [c]);
+  const SUGGESTED_COLLECTIONS = useMemo(() => buildSuggestedCollections(c), [c]);
+  const FILTERS = useMemo(() => buildFilters(c), [c]);
+  const DEMO_MEMORIES = useMemo(() => buildDemoMemories(c), [c]);
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memories, setMemories] = useState<MemoryWithMedia[]>([]);
   const [memberCount, setMemberCount] = useState<number | null>(null);
@@ -135,7 +140,7 @@ const MemoriesPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const memorySchema = z.object({
-    caption: z.string().trim().min(1, t.memories_validation_caption).max(500),
+    caption: z.string().trim().min(1, c.mem_validation_caption).max(500),
     type: z.enum(['photo', 'video', 'audio', 'text']),
     visibility: z.enum(['circle', 'managers', 'private']),
   });
