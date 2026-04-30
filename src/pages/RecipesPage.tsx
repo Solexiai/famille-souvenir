@@ -558,11 +558,12 @@ const RecipesPage: React.FC = () => {
             onCreate={() => { setRecipePrefill(null); setCreateOpen(true); }}
             onScan={() => setQuickAddOpen(true)}
             onInvite={() => navigate('/circle/members')}
+            c={c}
           />
         )}
 
         {/* 7. Heritage callout */}
-        <HeritageCallout onAddMemory={() => navigate('/memories')} />
+        <HeritageCallout onAddMemory={() => navigate('/memories')} c={c} />
       </div>
 
       <RecipeQuickAddDialog
@@ -584,6 +585,7 @@ const RecipesPage: React.FC = () => {
         prefill={recipePrefill}
         onOpenScanIA={() => { setCreateOpen(false); setQuickAddOpen(true); }}
         onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
+        c={c}
       />
 
       <RecipeDetailDialog
@@ -598,6 +600,7 @@ const RecipesPage: React.FC = () => {
         members={members}
         isFavorite={activeRecipeId ? favorites.has(activeRecipeId) : false}
         onToggleFavorite={toggleFavorite}
+        c={c}
       />
     </AppLayout>
   );
