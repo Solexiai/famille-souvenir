@@ -612,7 +612,7 @@ const StoriesPage: React.FC = () => {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setComposeOpen(false)} disabled={saving}>
-              {t.cancel}
+              {t.common_cancel}
             </Button>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
