@@ -368,7 +368,7 @@ function CreateMessageDialog({
       recorderRef.current = recorder;
       setRecording(true);
     } catch (e: any) {
-      toast.error('Impossible d\'accéder au micro/caméra : ' + (e.message || ''));
+      toast.error(t.tm_toast_mic_err + ' : ' + (e.message || ''));
     }
   };
 
@@ -386,19 +386,19 @@ function CreateMessageDialog({
 
   const handleSave = async () => {
     if (!title.trim() || !recipientName.trim()) {
-      toast.error('Titre et destinataire sont obligatoires');
+      toast.error(t.tm_toast_required_title_recipient);
       return;
     }
     if (trigger === 'scheduled_date' && !scheduledFor) {
-      toast.error('Choisissez une date d\'envoi');
+      toast.error(t.tm_toast_required_date);
       return;
     }
     if (format !== 'text' && !mediaBlob) {
-      toast.error('Enregistrez ou téléchargez un fichier ' + formatLabel(format).toLowerCase());
+      toast.error(t.tm_toast_required_media + ' (' + formatLabel(format, t).toLowerCase() + ')');
       return;
     }
     if (format === 'text' && !textContent.trim()) {
-      toast.error('Écrivez votre message');
+      toast.error(t.tm_toast_required_text);
       return;
     }
 
