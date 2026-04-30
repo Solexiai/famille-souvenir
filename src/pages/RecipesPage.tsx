@@ -841,7 +841,7 @@ const RecipeDetailDialog: React.FC<{
     if (!file || !recipe) return;
     setPhotoBusy(true);
     try {
-      const prepared = await prepareImageForUpload(file, { maxDimension: 1600, quality: 0.8 });
+      const prepared = await prepareImageForUpload(file);
       const ext = (prepared.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
       const path = `${recipe.circle_id}/recipes/${recipe.id}-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage.from('memories-media').upload(path, prepared, { upsert: true, contentType: prepared.type });
