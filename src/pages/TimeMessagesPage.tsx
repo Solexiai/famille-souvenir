@@ -124,8 +124,8 @@ export default function TimeMessagesPage() {
     return (
       <AppLayout>
         <div className="max-w-2xl mx-auto p-8 text-center">
-          <p className="text-muted-foreground">Vous devez d'abord créer ou rejoindre un cercle familial.</p>
-          <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{t.must_create_circle}</p>
+          <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>{t.create_circle}</Button>
         </div>
       </AppLayout>
     );
@@ -139,24 +139,23 @@ export default function TimeMessagesPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(270_30%_92%)] text-[hsl(270_35%_45%)] text-xs font-medium mb-3">
               <Clock className="w-3.5 h-3.5" />
-              Messages dans le temps
+              {t.tm_badge}
             </div>
             <h1 className="font-heading text-3xl md:text-4xl text-foreground">
-              Vos mots, livrés au bon moment
+              {t.tm_title}
             </h1>
             <p className="text-muted-foreground mt-2 max-w-2xl">
-              Enregistrez aujourd'hui des messages vocaux, vidéo ou écrits qui seront envoyés à vos proches
-              à une date précise (anniversaire, mariage, naissance…) ou après votre décès.
+              {t.tm_subtitle}
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setGuardianOpen(true)} className="gap-2">
               <ShieldCheck className="w-4 h-4" />
-              Gardiens ({guardians.length})
+              {t.tm_guardians_btn} ({guardians.length})
             </Button>
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <Plus className="w-4 h-4" />
-              Nouveau message
+              {t.tm_new_btn}
             </Button>
           </div>
         </div>
@@ -167,13 +166,12 @@ export default function TimeMessagesPage() {
             <CardContent className="p-5 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-[hsl(35_70%_45%)] mt-0.5 shrink-0" />
               <div className="flex-1">
-                <h3 className="font-medium text-foreground">Configurez vos gardiens de confiance</h3>
+                <h3 className="font-medium text-foreground">{t.tm_setup_guardians_title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Pour les messages posthumes, désignez 1 ou 2 personnes qui pourront confirmer votre décès et
-                  déclencher l'envoi. Une vérification d'inactivité (6 mois sans connexion) sert de filet de sécurité.
+                  {t.tm_setup_guardians_desc}
                 </p>
                 <Button variant="link" className="px-0 h-auto mt-2" onClick={() => setGuardianOpen(true)}>
-                  Désigner un gardien →
+                  {t.tm_designate_guardian}
                 </Button>
               </div>
             </CardContent>
@@ -183,25 +181,29 @@ export default function TimeMessagesPage() {
         <Tabs defaultValue="scheduled" className="w-full">
           <TabsList>
             <TabsTrigger value="scheduled" className="gap-2">
-              <CalendarIcon className="w-4 h-4" /> À date précise ({upcoming.length})
+              <CalendarIcon className="w-4 h-4" /> {t.tm_tab_scheduled} ({upcoming.length})
             </TabsTrigger>
             <TabsTrigger value="posthumous" className="gap-2">
-              <Heart className="w-4 h-4" /> Après mon décès ({posthumous.length})
+              <Heart className="w-4 h-4" /> {t.tm_tab_posthumous} ({posthumous.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="scheduled" className="mt-6">
             <MessageList
               messages={upcoming}
-              emptyText="Aucun message programmé pour l'instant."
+              emptyText={t.tm_empty_scheduled}
               onChange={refresh}
+              t={t}
+              lang={lang}
             />
           </TabsContent>
           <TabsContent value="posthumous" className="mt-6">
             <MessageList
               messages={posthumous}
-              emptyText="Aucun message posthume enregistré."
+              emptyText={t.tm_empty_posthumous}
               onChange={refresh}
+              t={t}
+              lang={lang}
             />
           </TabsContent>
         </Tabs>
@@ -213,6 +215,7 @@ export default function TimeMessagesPage() {
         userId={user!.id}
         circleId={circleId}
         onCreated={refresh}
+        t={t}
       />
       <GuardiansDialog
         open={guardianOpen}
@@ -221,6 +224,7 @@ export default function TimeMessagesPage() {
         circleId={circleId}
         guardians={guardians}
         onChange={refresh}
+        t={t}
       />
     </AppLayout>
   );
