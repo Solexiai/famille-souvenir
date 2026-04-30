@@ -546,6 +546,21 @@ function CreateMessageDialog({
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="email">Courriel du destinataire</Label>
+              <Input id="email" type="email" value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                placeholder="ex: lea.dupont@email.com" />
+            </div>
+            <div>
+              <Label htmlFor="phone">Téléphone du destinataire</Label>
+              <Input id="phone" type="tel" value={recipientPhone}
+                onChange={(e) => setRecipientPhone(e.target.value)}
+                placeholder="ex: +1 514 555 0123" />
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="occ">Occasion (facultatif)</Label>
             <Input id="occ" value={occasion} onChange={(e) => setOccasion(e.target.value)}
