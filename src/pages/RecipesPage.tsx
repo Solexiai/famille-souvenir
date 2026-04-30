@@ -209,8 +209,8 @@ const RecipesPage: React.FC = () => {
     });
     setQuickAddOpen(false);
     setCreateOpen(true);
-    toast.success('Recette détectée ! Vérifiez et enregistrez.');
-  }, []);
+    toast.success(c.rec_toast_extracted);
+  }, [c]);
 
   // ====== Data loading ======
   const loadAll = useCallback(async () => {
