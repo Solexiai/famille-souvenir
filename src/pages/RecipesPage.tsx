@@ -381,6 +381,7 @@ const RecipesPage: React.FC = () => {
             favorites={favorites}
             onOpen={openDetail}
             onToggleFavorite={toggleFavorite}
+            c={c}
           />
         </div>
         <RecipeDetailDialog
@@ -395,6 +396,7 @@ const RecipesPage: React.FC = () => {
           members={members}
           isFavorite={activeRecipeId ? favorites.has(activeRecipeId) : false}
           onToggleFavorite={toggleFavorite}
+          c={c}
         />
       </AppLayout>
     );
