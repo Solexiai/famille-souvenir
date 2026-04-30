@@ -461,7 +461,8 @@ export interface MemoriesCopy {
   tm_toast_mic_err: string;
   tm_toast_guardian_added: string;
   tm_toast_guardian_required: string;
-}
+  tm_guardians_dialog_desc: string;
+  tm_toast_guardian_removed: string;
 
 const fr: MemoriesCopy = {
   common_loading: 'Chargement…',
