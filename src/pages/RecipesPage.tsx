@@ -253,6 +253,11 @@ const RecipesPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => {
+    const handler = () => loadAll();
+    window.addEventListener('recipes:reload', handler);
+    return () => window.removeEventListener('recipes:reload', handler);
+  }, [loadAll]);
 
   // Sync route /recipes/:id -> open detail
   useEffect(() => {
@@ -825,12 +830,60 @@ const RecipeDetailDialog: React.FC<{
 }> = ({ open, onClose, recipeId, recipes, branches, generations, occasions, recipeOccasions, members, isFavorite, onToggleFavorite }) => {
   const navigate = useNavigate();
   const recipe = recipeId ? recipes.find((r) => r.id === recipeId) : null;
+  const photoInputRef = React.useRef<HTMLInputElement>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   if (!recipe) return null;
   const branch = branches.find((b) => b.id === recipe.family_branch_id);
   const gen = generations.find((g) => g.id === recipe.generation_id);
   const occ = (recipeOccasions[recipe.id] || []).map((id) => occasions.find((o) => o.id === id)?.name).filter(Boolean) as string[];
   const transmittedBy = members.find((m) => m.id === recipe.transmitted_by_member_id)?.name;
   const author = members.find((m) => m.id === recipe.original_author_member_id)?.name;
+
+  const handlePhotoChange = async (file: File) => {
+    if (!file || !recipe) return;
+    setPhotoBusy(true);
+    try {
+      const prepared = await prepareImageForUpload(file);
+      const ext = (prepared.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+      const path = `${recipe.circle_id}/recipes/${recipe.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('memories-media').upload(path, prepared, { upsert: true, contentType: prepared.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('memories-media').getPublicUrl(path);
+      const { error: updErr } = await supabase.from('recipes').update({ image_url: pub.publicUrl }).eq('id', recipe.id);
+      if (updErr) throw updErr;
+      toast.success('Photo principale mise à jour');
+      // Mutate locally so UI reflects without a full reload
+      recipe.image_url = pub.publicUrl;
+      // Force re-render by closing then reopening — simpler: trigger via window event
+      window.dispatchEvent(new CustomEvent('recipes:reload'));
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Impossible de changer la photo");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!recipe) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from('recipes').delete().eq('id', recipe.id);
+      if (error) throw error;
+      toast.success('Recette supprimée');
+      setConfirmDelete(false);
+      onClose();
+      window.dispatchEvent(new CustomEvent('recipes:reload'));
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || 'Impossible de supprimer la recette');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -849,11 +902,31 @@ const RecipeDetailDialog: React.FC<{
           </div>
         </DialogHeader>
 
-        {recipe.image_url && (
-          <div className="rounded-lg overflow-hidden bg-muted aspect-[16/9]">
+        <div className="rounded-lg overflow-hidden bg-muted aspect-[16/9] relative group">
+          {recipe.image_url ? (
             <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" loading="lazy" />
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+              Aucune photo principale
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => photoInputRef.current?.click()}
+            disabled={photoBusy}
+            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-background/90 backdrop-blur px-4 py-2 text-sm font-medium border border-border shadow-md hover:bg-background transition disabled:opacity-60"
+          >
+            {photoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+            {recipe.image_url ? 'Changer la photo' : 'Ajouter une photo'}
+          </button>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handlePhotoChange(e.target.files[0])}
+          />
+        </div>
 
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Préparation</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
@@ -894,10 +967,42 @@ const RecipeDetailDialog: React.FC<{
           {occ.length > 0 && <div><span className="text-muted-foreground">Occasions : </span><span className="font-medium">{occ.join(', ')}</span></div>}
         </section>
 
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> Ajouter un souvenir</Button>
-          <Button onClick={onClose}>Fermer</Button>
+        <DialogFooter className="gap-2 flex-wrap sm:justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setConfirmDelete(true)}
+            className="gap-2 text-[hsl(355_60%_45%)] border-[hsl(355_60%_55%)]/40 hover:bg-[hsl(355_60%_97%)] hover:text-[hsl(355_60%_40%)]"
+          >
+            🗑️ Supprimer la recette
+          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> Ajouter un souvenir</Button>
+            <Button onClick={onClose}>Fermer</Button>
+          </div>
         </DialogFooter>
+
+        {/* Confirm delete */}
+        <Dialog open={confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(false)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-heading text-2xl">Supprimer cette recette ?</DialogTitle>
+              <DialogDescription>
+                Cette action est <strong>définitive</strong>. La recette « {recipe.title} » sera retirée du livre familial. Les souvenirs liés ne seront pas supprimés.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>Annuler</Button>
+              <Button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="bg-[hsl(355_60%_45%)] hover:bg-[hsl(355_60%_40%)] text-white gap-2"
+              >
+                {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                Oui, supprimer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   );
