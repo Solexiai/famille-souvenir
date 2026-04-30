@@ -37,6 +37,7 @@ import { z } from 'zod';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
 import { cn } from '@/lib/utils';
 import memoryCake from '@/assets/demo/memory-cake.jpg';
 import memoryChildhood from '@/assets/demo/memory-childhood.jpg';
