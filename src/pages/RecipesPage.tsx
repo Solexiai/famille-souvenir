@@ -1176,7 +1176,7 @@ const CreateRecipeDialog: React.FC<{
 
   const handlePhotoSelected = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Veuillez choisir une image');
+      toast.error(c.rec_choose_image);
       return;
     }
     setPhotoBusy(true);
@@ -1195,7 +1195,7 @@ const CreateRecipeDialog: React.FC<{
   };
 
   const schema = z.object({
-    title: z.string().trim().min(1, 'Le titre est requis').max(200),
+    title: z.string().trim().min(1, c.rec_title_required).max(200),
     story: z.string().max(5000).optional(),
   });
 
@@ -1263,7 +1263,7 @@ const CreateRecipeDialog: React.FC<{
     }).select().single();
 
     if (error || !data) {
-      toast.error("Impossible d'enregistrer la recette");
+      toast.error(c.rec_save_error);
       setSaving(false);
       return;
     }
@@ -1276,7 +1276,7 @@ const CreateRecipeDialog: React.FC<{
       await supabase.from('recipe_members').insert(selectedMembers.map((member_id) => ({ recipe_id: data.id, member_id })));
     }
 
-    toast.success('Recette ajoutée à votre livre familial');
+    toast.success(c.rec_save_success);
     reset();
     setSaving(false);
     onCreated();
