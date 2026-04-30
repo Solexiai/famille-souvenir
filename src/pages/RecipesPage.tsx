@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import {
   Loader2, ChefHat, Search, Star, Heart, Clock, Users as UsersIcon, GitBranch,
   CalendarDays, BookOpen, Sparkles, ChevronRight, Plus, ArrowLeft, FileText,
-  Mic, Image as ImageIcon, Pencil, ScanLine, UserPlus,
+  Mic, Image as ImageIcon, Pencil, ScanLine, UserPlus, Camera,
 } from 'lucide-react';
 import type { FamilyCircle } from '@/types/database';
 import { z } from 'zod';
