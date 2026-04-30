@@ -316,7 +316,8 @@ function CreateMessageDialog({
 
   const reset = () => {
     setFormat('audio'); setTrigger('scheduled_date'); setTitle(''); setRecipientName('');
-    setRelationship(''); setOccasion(''); setScheduledFor(''); setRecurring(false);
+    setRelationship(''); setRecipientEmail(''); setRecipientPhone('');
+    setOccasion(''); setScheduledFor(''); setRecurring(false);
     setTextContent(''); setMediaBlob(null); setMediaUrl(null);
   };
 
