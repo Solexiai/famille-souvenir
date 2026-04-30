@@ -266,8 +266,8 @@ export default function GalleryPage() {
 
     setUploading(false);
     setProgress({ done: 0, total: 0 });
-    if (uploaded > 0) toast.success(`${uploaded} fichier(s) ajouté(s) à votre album`);
-    if (skipped > 0) toast.warning(`${skipped} fichier(s) non importé(s)`);
+    if (uploaded > 0) toast.success(`${uploaded} ${t.gal_toast_added}`);
+    if (skipped > 0) toast.warning(`${skipped} ${t.gal_toast_skipped}`);
     await loadAll();
   }
 
@@ -280,10 +280,10 @@ export default function GalleryPage() {
   }
 
   async function deleteItem(item: MediaItem) {
-    if (!confirm('Supprimer définitivement ce souvenir ?')) return;
+    if (!confirm(t.gal_confirm_delete)) return;
     await supabase.storage.from('family-media').remove([item.storage_path]);
     await supabase.from('media_items').delete().eq('id', item.id);
-    toast.success('Souvenir supprimé');
+    toast.success(t.gal_toast_deleted);
     setPreviewItem(null);
     setPreviewUrl(null);
     await loadAll();
@@ -311,17 +311,16 @@ export default function GalleryPage() {
             className="gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Retour
+            {t.gal_back}
           </Button>
         </div>
 
         <div>
           <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            Album de la famille
+            {t.gal_title}
           </h1>
           <p className="text-base md:text-lg text-muted-foreground mt-2">
-            Toutes vos photos et vidéos, classées automatiquement par date.
-            Importez depuis votre téléphone, votre clé USB ou votre ordinateur.
+            {t.gal_subtitle}
           </p>
         </div>
 
@@ -335,12 +334,12 @@ export default function GalleryPage() {
                 </div>
                 <div>
                   <div className="text-xl md:text-2xl font-heading font-semibold text-foreground">
-                    {formatBytes(usedBytes)} sur {formatGB(quotaBytes)} utilisés
+                    {formatBytes(usedBytes)} / {formatGB(quotaBytes)} {t.gal_used_of}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {storage?.plan_code === 'free_5gb'
-                      ? 'Forfait gratuit — 5 Go inclus'
-                      : `Forfait ${storage?.plan_code}`}
+                      ? t.gal_plan_free
+                      : `${t.gal_plan_other} ${storage?.plan_code}`}
                   </div>
                 </div>
               </div>
@@ -351,7 +350,7 @@ export default function GalleryPage() {
                 className="gap-2"
               >
                 <Sparkles className="h-4 w-4" />
-                Augmenter mon stockage
+                {t.gal_increase}
               </Button>
             </div>
             <Progress value={usedPct} className="h-3" />
@@ -360,11 +359,10 @@ export default function GalleryPage() {
                 <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-destructive">
-                    Stockage plein
+                    {t.gal_full_title}
                   </div>
                   <p className="text-sm text-foreground/80 mt-1">
-                    Vous avez atteint la limite de 5 Go. Pour continuer à ajouter
-                    des photos et vidéos, choisissez un forfait.
+                    {t.gal_full_desc}
                   </p>
                 </div>
               </div>
@@ -373,8 +371,7 @@ export default function GalleryPage() {
               <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                 <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-foreground/80">
-                  Vous approchez de votre limite. Pensez à passer à un forfait
-                  plus grand pour ne pas être bloqué.
+                  {t.gal_near_desc}
                 </p>
               </div>
             )}
@@ -414,9 +411,9 @@ export default function GalleryPage() {
             className="h-auto py-6 text-base flex flex-col gap-2"
           >
             <Upload className="h-7 w-7" />
-            <span className="font-semibold">Choisir des fichiers</span>
+            <span className="font-semibold">{t.gal_pick_files}</span>
             <span className="text-xs opacity-80">
-              Photos et vidéos depuis votre téléphone ou ordinateur
+              {t.gal_pick_files_hint}
             </span>
           </Button>
           <Button
@@ -427,9 +424,9 @@ export default function GalleryPage() {
             className="h-auto py-6 text-base flex flex-col gap-2 border-2"
           >
             <FolderOpen className="h-7 w-7" />
-            <span className="font-semibold">Choisir un dossier complet</span>
+            <span className="font-semibold">{t.gal_pick_folder}</span>
             <span className="text-xs opacity-80">
-              Tout un dossier (clé USB, ancien ordinateur)
+              {t.gal_pick_folder_hint}
             </span>
           </Button>
         </div>
@@ -441,7 +438,7 @@ export default function GalleryPage() {
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 <span className="font-medium">
-                  Importation : {progress.done} / {progress.total}
+                  {t.gal_importing} : {progress.done} / {progress.total}
                 </span>
               </div>
               <Progress
@@ -458,11 +455,10 @@ export default function GalleryPage() {
             <CardContent className="p-12 text-center space-y-3">
               <ImageIcon className="h-16 w-16 text-muted-foreground/40 mx-auto" />
               <h3 className="font-heading text-xl font-semibold text-foreground">
-                Votre album est vide
+                {t.gal_empty_title}
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Commencez à transférer les photos et vidéos de votre famille.
-                Elles seront automatiquement classées par date.
+                {t.gal_empty_desc}
               </p>
             </CardContent>
           </Card>
@@ -564,7 +560,7 @@ export default function GalleryPage() {
               className="gap-2"
             >
               <Trash2 className="h-4 w-4" />
-              Supprimer
+              {t.gal_delete}
             </Button>
           </div>
         </DialogContent>
