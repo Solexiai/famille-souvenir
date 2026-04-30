@@ -217,7 +217,7 @@ const MemoriesPage: React.FC = () => {
       if (type === 'photo') processedFile = await prepareImageForUpload(file);
       const validation = await validateUpload(processedFile, type, circle.id);
       if (!validation.allowed) {
-        toast.error(validation.error || t.memories_upload_error);
+        toast.error(validation.error || c.mem_upload_error);
         setCreating(false);
         return;
       }
@@ -225,7 +225,7 @@ const MemoriesPage: React.FC = () => {
       const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('memories-media').upload(filePath, processedFile);
       if (uploadError) {
-        toast.error(t.memories_upload_error);
+        toast.error(c.mem_upload_error);
         setCreating(false);
         return;
       }
@@ -249,9 +249,9 @@ const MemoriesPage: React.FC = () => {
     });
 
     if (error) {
-      toast.error(t.memories_error);
+      toast.error(c.mem_error);
     } else {
-      toast.success(t.memories_added);
+      toast.success(c.mem_added);
       setCaption('');
       setType('text');
       setVisibility('circle');
@@ -285,9 +285,9 @@ const MemoriesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">{t.must_create_circle_first}</p>
+          <p className="text-muted-foreground">{c.must_create_circle}</p>
           <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>
-            {t.create_circle}
+            {c.create_circle}
           </Button>
         </div>
       </AppLayout>
@@ -299,51 +299,51 @@ const MemoriesPage: React.FC = () => {
       <DialogTrigger asChild>
         <Button size="lg" className="gap-2 rounded-xl shadow-md">
           <Plus className="h-5 w-5" />
-          {t.memories_new}
+          {c.mem_new}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-heading">{t.memories_add_title}</DialogTitle>
+          <DialogTitle className="font-heading">{c.mem_add_title}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleCreate} className="space-y-4">
           <div className="space-y-2">
-            <Label>{t.memories_type}</Label>
+            <Label>{c.mem_type}</Label>
             <Select value={type} onValueChange={(v) => setType(v as MemoryType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="text">{t.memories_type_labels.text}</SelectItem>
-                <SelectItem value="photo">{t.memories_type_labels.photo}</SelectItem>
-                <SelectItem value="video">{t.memories_type_labels.video}</SelectItem>
-                <SelectItem value="audio">{t.memories_type_labels.audio}</SelectItem>
+                <SelectItem value="text">{c.mem_type_text}</SelectItem>
+                <SelectItem value="photo">{c.mem_type_photo}</SelectItem>
+                <SelectItem value="video">{c.mem_type_video}</SelectItem>
+                <SelectItem value="audio">{c.mem_type_audio}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="caption">{t.memories_caption}</Label>
-            <Textarea id="caption" placeholder={t.memories_caption_placeholder} value={caption} onChange={(e) => setCaption(e.target.value)} required />
+            <Label htmlFor="caption">{c.mem_caption}</Label>
+            <Textarea id="caption" placeholder={c.mem_caption_placeholder} value={caption} onChange={(e) => setCaption(e.target.value)} required />
           </div>
           {type !== 'text' && (
             <div className="space-y-2">
-              <Label htmlFor="file">{t.memories_file}</Label>
+              <Label htmlFor="file">{c.mem_file}</Label>
               <Input id="file" type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} accept={type === 'photo' ? 'image/*' : type === 'video' ? 'video/*' : 'audio/*'} />
-              <p className="text-xs text-muted-foreground">{t.memories_file_hint}</p>
+              <p className="text-xs text-muted-foreground">{c.mem_file_hint}</p>
             </div>
           )}
           <div className="space-y-2">
-            <Label>{t.memories_visibility}</Label>
+            <Label>{c.mem_visibility}</Label>
             <Select value={visibility} onValueChange={(v) => setVisibility(v as MemoryVisibility)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="circle">{t.memories_visibility_labels.circle}</SelectItem>
-                <SelectItem value="managers">{t.memories_visibility_labels.managers}</SelectItem>
-                <SelectItem value="private">{t.memories_visibility_labels.private}</SelectItem>
+                <SelectItem value="circle">{c.mem_visibility_circle}</SelectItem>
+                <SelectItem value="managers">{c.mem_visibility_managers}</SelectItem>
+                <SelectItem value="private">{c.mem_visibility_private}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <Button type="submit" className="w-full" disabled={creating}>
             {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t.add}
+            {c.common_add}
           </Button>
         </form>
       </DialogContent>
