@@ -111,6 +111,15 @@ export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtract
     }
   };
 
+  // Auto-start recording when opened with initialMode='record'
+  useEffect(() => {
+    if (open && initialMode === 'record' && mode === 'choose') {
+      startRecording();
+    }
+    if (!open) setMode('choose');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialMode]);
+
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop();
