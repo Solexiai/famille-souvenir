@@ -177,6 +177,7 @@ const RecipesPage: React.FC = () => {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [quickAddInitialMode, setQuickAddInitialMode] = useState<'choose' | 'record'>('choose');
   const [recipePrefill, setRecipePrefill] = useState<RecipePrefill | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
