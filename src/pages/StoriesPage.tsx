@@ -439,21 +439,25 @@ const StoriesPage: React.FC = () => {
         {/* Stories list */}
         <section className="space-y-4">
           <h2 className="font-heading text-2xl font-semibold">
-            {stories.length > 0 ? `${stories.length} histoire${stories.length > 1 ? 's' : ''}` : 'Aucune histoire pour le moment'}
+            {stories.length === 0
+              ? t.st_count_none
+              : stories.length === 1
+              ? t.st_count_one.replace('{n}', '1')
+              : t.st_count_many.replace('{n}', String(stories.length))}
           </h2>
 
           {stories.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/40" />
               <p className="mt-4 text-muted-foreground">
-                Commencez par écrire ou dicter votre première histoire.
+                {t.st_empty_hint}
               </p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {stories.map((s) => (
-              <StoryCard key={s.id} story={s} onOpen={() => setSelectedStoryId(s.id)} />
+              <StoryCard key={s.id} story={s} lang={lang} t={t} onOpen={() => setSelectedStoryId(s.id)} />
             ))}
           </div>
         </section>
@@ -464,6 +468,7 @@ const StoriesPage: React.FC = () => {
         open={dictateOpen}
         onClose={() => setDictateOpen(false)}
         onTranscribed={handleDictated}
+        t={t}
       />
 
       {/* Compose / Edit dialog */}
