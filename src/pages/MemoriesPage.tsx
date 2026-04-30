@@ -357,7 +357,7 @@ const MemoriesPage: React.FC = () => {
         <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="space-y-3">
             <h1 className="font-heading text-3xl md:text-4xl font-semibold text-foreground tracking-tight">
-              Souvenirs
+              {c.mem_title}
             </h1>
             <div className="flex items-center gap-3">
               <span className="h-px w-16 bg-accent/60" />
@@ -365,7 +365,7 @@ const MemoriesPage: React.FC = () => {
               <span className="h-px w-16 bg-accent/60" />
             </div>
             <p className="text-muted-foreground max-w-2xl text-base">
-              Préservez les histoires, recettes, traditions et messages qui traversent les générations.
+              {c.mem_subtitle}
             </p>
           </div>
           <div className="shrink-0">{NewMemoryDialog}</div>
@@ -373,7 +373,7 @@ const MemoriesPage: React.FC = () => {
 
         {/* 2. Catégories */}
         <section
-          aria-label="Catégories de souvenirs"
+          aria-label={c.cat_aria}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
         >
           {CATEGORIES.map((cat) => (
@@ -404,7 +404,7 @@ const MemoriesPage: React.FC = () => {
 
         {/* 3. Bandeau statistiques */}
         <section
-          aria-label="Statistiques de votre cercle"
+          aria-label={c.stats_aria}
           className="rounded-2xl border border-border bg-card shadow-sm px-6 py-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
@@ -414,7 +414,7 @@ const MemoriesPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-2xl font-heading font-semibold text-foreground">{displayCount}</div>
-                <div className="text-sm text-muted-foreground">souvenirs</div>
+                <div className="text-sm text-muted-foreground">{c.stats_memories}</div>
               </div>
             </div>
             <div className="flex items-center gap-4 py-4 md:py-0 md:px-6">
@@ -423,7 +423,7 @@ const MemoriesPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-2xl font-heading font-semibold text-foreground">{generationsCount}</div>
-                <div className="text-sm text-muted-foreground">générations</div>
+                <div className="text-sm text-muted-foreground">{c.stats_generations}</div>
               </div>
             </div>
             <div className="flex items-center gap-4 pt-4 md:pt-0 md:pl-6">
@@ -431,8 +431,8 @@ const MemoriesPage: React.FC = () => {
                 <ShieldCheck className="h-6 w-6 text-[hsl(220_45%_35%)]" />
               </div>
               <div>
-                <div className="text-base font-heading font-semibold text-foreground">Privé et sécurisé</div>
-                <div className="text-sm text-muted-foreground">Vos souvenirs restent en famille</div>
+                <div className="text-base font-heading font-semibold text-foreground">{c.stats_secure_title}</div>
+                <div className="text-sm text-muted-foreground">{c.stats_secure_desc}</div>
               </div>
             </div>
           </div>
@@ -445,9 +445,9 @@ const MemoriesPage: React.FC = () => {
             <Card className="shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-heading text-xl font-semibold text-foreground">À redécouvrir</h2>
+                  <h2 className="font-heading text-xl font-semibold text-foreground">{c.rediscover_title}</h2>
                   <button className="text-sm text-accent hover:underline inline-flex items-center gap-1">
-                    Voir tout <ArrowRight className="h-3.5 w-3.5" />
+                    {c.common_view_all} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
@@ -469,7 +469,7 @@ const MemoriesPage: React.FC = () => {
                               </div>
                             )}
                             <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground uppercase text-[10px] tracking-wide">
-                              {t.memories_type_labels[memory.type]}
+                              {memory.type === 'text' ? c.mem_type_text : memory.type === 'photo' ? c.mem_type_photo : memory.type === 'video' ? c.mem_type_video : c.mem_type_audio}
                             </Badge>
                           </div>
                           <div className="p-3.5">
@@ -477,7 +477,7 @@ const MemoriesPage: React.FC = () => {
                               <h3 className="font-heading text-sm font-semibold text-foreground line-clamp-2">
                                 {memory.caption}
                               </h3>
-                              <button className="text-muted-foreground hover:text-foreground" aria-label="Options">
+                              <button className="text-muted-foreground hover:text-foreground" aria-label={c.common_options}>
                                 <MoreHorizontal className="h-4 w-4" />
                               </button>
                             </div>
@@ -520,7 +520,7 @@ const MemoriesPage: React.FC = () => {
                                 <h3 className="font-heading text-sm font-semibold text-foreground line-clamp-2">
                                   {m.title}
                                 </h3>
-                                <button className="text-muted-foreground hover:text-foreground" aria-label="Options">
+                                <button className="text-muted-foreground hover:text-foreground" aria-label={c.common_options}>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </button>
                               </div>
@@ -535,11 +535,11 @@ const MemoriesPage: React.FC = () => {
                     </div>
                     <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg bg-secondary/50 border border-border px-4 py-3">
                       <p className="text-sm text-muted-foreground">
-                        Commencez par une recette, une histoire audio ou une photo de famille.
+                        {c.rediscover_empty_hint}
                       </p>
                       <Button variant="outline" size="sm" onClick={() => openCreateDialog('text')} className="gap-1.5">
                         <Plus className="h-4 w-4" />
-                        Créer mon premier souvenir
+                        {c.rediscover_create_first}
                       </Button>
                     </div>
                   </>
@@ -553,7 +553,7 @@ const MemoriesPage: React.FC = () => {
             <Card className="shadow-sm h-full">
               <CardContent className="p-6">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-5">
-                  Collections suggérées
+                  {c.collections_title}
                 </h2>
                 <ul className="space-y-2">
                   {SUGGESTED_COLLECTIONS.map((col) => (
@@ -577,7 +577,7 @@ const MemoriesPage: React.FC = () => {
         </section>
 
         {/* 6. Barre de filtres */}
-        <section aria-label="Filtres" className="flex flex-wrap gap-2">
+        <section aria-label={c.filters_aria} className="flex flex-wrap gap-2">
           {FILTERS.map((f) => {
             const active = activeFilter === f.key;
             return (
