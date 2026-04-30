@@ -410,6 +410,8 @@ function CreateMessageDialog({
         media_size_bytes: mediaSize,
         recipient_name: recipientName.trim(),
         recipient_relationship: relationship.trim() || null,
+        recipient_email: recipientEmail.trim() || null,
+        recipient_phone: recipientPhone.trim() || null,
         occasion_label: occasion.trim() || null,
         scheduled_for: trigger === 'scheduled_date' ? scheduledFor : null,
         is_recurring: trigger === 'scheduled_date' ? recurring : false,
