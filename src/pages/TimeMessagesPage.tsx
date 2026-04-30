@@ -702,20 +702,20 @@ function GuardiansDialog({
               </div>
             ))}
             {guardians.length === 0 && (
-              <p className="text-sm text-center text-muted-foreground py-4">Aucun gardien désigné</p>
+              <p className="text-sm text-center text-muted-foreground py-4">{t.tm_no_guardians}</p>
             )}
           </div>
 
           <div className="border-t pt-4 space-y-3">
             <h4 className="font-medium text-sm flex items-center gap-2">
-              <UserPlus className="w-4 h-4" /> Ajouter un gardien
+              <UserPlus className="w-4 h-4" /> {t.tm_designate_guardian}
             </h4>
-            <Input placeholder="Nom complet" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input placeholder="Courriel" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <Input placeholder="Lien (ex: enfant aîné)" value={rel} onChange={(e) => setRel(e.target.value)} />
+            <Input placeholder={t.tm_guardian_name_ph} value={name} onChange={(e) => setName(e.target.value)} />
+            <Input placeholder={t.tm_guardian_email_ph} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input placeholder={t.tm_guardian_rel_ph} value={rel} onChange={(e) => setRel(e.target.value)} />
             <Button onClick={handleAdd} disabled={saving} className="w-full">
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Ajouter ce gardien
+              {t.tm_guardian_add}
             </Button>
           </div>
         </div>
