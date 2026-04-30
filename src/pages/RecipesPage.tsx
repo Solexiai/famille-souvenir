@@ -848,6 +848,20 @@ const RecipeDetailDialog: React.FC<{
 };
 
 // ====== Create dialog ======
+export interface RecipePrefill {
+  title?: string;
+  story?: string;
+  ingredients?: string[];
+  steps?: string[];
+  preparation_time_minutes?: number;
+  cooking_time_minutes?: number;
+  servings?: number;
+  dish_type?: DishType;
+  difficulty?: Difficulty;
+  has_handwritten_note?: boolean;
+  scannedImageBase64?: string;
+}
+
 const CreateRecipeDialog: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -858,7 +872,8 @@ const CreateRecipeDialog: React.FC<{
   occasions: Occasion[];
   members: Array<{ id: string; user_id: string; name: string }>;
   onCreated: () => void;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated }) => {
+  prefill?: RecipePrefill | null;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -876,6 +891,22 @@ const CreateRecipeDialog: React.FC<{
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [hasHandwritten, setHasHandwritten] = useState(false);
   const [privacy, setPrivacy] = useState<Privacy>('circle');
+
+  // Apply prefill when dialog opens with new prefill data
+  useEffect(() => {
+    if (open && prefill) {
+      if (prefill.title !== undefined) setTitle(prefill.title);
+      if (prefill.story !== undefined) setStory(prefill.story);
+      if (prefill.ingredients !== undefined) setIngredientsText(prefill.ingredients.join('\n'));
+      if (prefill.steps !== undefined) setStepsText(prefill.steps.join('\n'));
+      if (prefill.preparation_time_minutes !== undefined) setPrepTime(String(prefill.preparation_time_minutes || ''));
+      if (prefill.cooking_time_minutes !== undefined) setCookTime(String(prefill.cooking_time_minutes || ''));
+      if (prefill.servings !== undefined) setServings(String(prefill.servings || ''));
+      if (prefill.dish_type) setDishType(prefill.dish_type);
+      if (prefill.difficulty) setDifficulty(prefill.difficulty);
+      if (prefill.has_handwritten_note !== undefined) setHasHandwritten(prefill.has_handwritten_note);
+    }
+  }, [open, prefill]);
 
   const reset = () => {
     setTitle(''); setStory(''); setIngredientsText(''); setStepsText('');
