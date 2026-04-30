@@ -913,7 +913,8 @@ const CreateRecipeDialog: React.FC<{
   members: Array<{ id: string; user_id: string; name: string }>;
   onCreated: () => void;
   prefill?: RecipePrefill | null;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill }) => {
+  onOpenScanIA?: () => void;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
