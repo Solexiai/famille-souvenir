@@ -18,6 +18,11 @@ import {
   Clock, Mic, Video, FileText, Plus, Loader2, Calendar as CalendarIcon,
   Heart, ShieldCheck, Trash2, Play, Square, UserPlus, AlertCircle,
 } from 'lucide-react';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
+
+type TmCopy = ReturnType<typeof useMemoriesCopy>;
+const tmLocale = { fr: 'fr-CA', en: 'en-US', es: 'es-ES' } as const;
 
 type Format = 'audio' | 'video' | 'text';
 type Trigger = 'scheduled_date' | 'after_death';
@@ -49,7 +54,8 @@ interface Guardian {
 }
 
 const formatIcon = (f: Format) => f === 'audio' ? Mic : f === 'video' ? Video : FileText;
-const formatLabel = (f: Format) => f === 'audio' ? 'Audio' : f === 'video' ? 'Vidéo' : 'Texte';
+const formatLabel = (f: Format, t: TmCopy) =>
+  f === 'audio' ? t.tm_format_audio : f === 'video' ? t.tm_format_video : t.tm_format_text;
 
 export default function TimeMessagesPage() {
   const { user } = useAuth();
