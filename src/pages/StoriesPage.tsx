@@ -258,12 +258,12 @@ const StoriesPage: React.FC = () => {
     setComposeSummary(data.summary);
     setComposeSource('dictated');
     setComposeOpen(true);
-    toast.success('Transcription réussie. Vérifiez et enregistrez.');
+    toast.success(t.st_toast_transcribed);
   };
 
   const summarizeContent = async () => {
     if (!composeContent.trim()) {
-      toast.error('Écrivez d\'abord un peu de texte.');
+      toast.error(t.st_toast_write_first);
       return;
     }
     try {
@@ -273,16 +273,16 @@ const StoriesPage: React.FC = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setComposeSummary(data.summary || '');
-      toast.success('Résumé généré');
+      toast.success(t.st_toast_summary_done);
     } catch (e: any) {
-      toast.error(e?.message || 'Échec du résumé');
+      toast.error(e?.message || t.st_toast_summary_failed);
     }
   };
 
   const handleSave = async () => {
     if (!user || !circleId) return;
     if (!composeContent.trim() && !composeTitle.trim()) {
-      toast.error('Ajoutez au moins un titre ou un récit.');
+      toast.error(t.st_toast_need_content);
       return;
     }
     setSaving(true);
@@ -292,7 +292,7 @@ const StoriesPage: React.FC = () => {
         .insert({
           circle_id: circleId,
           author_id: user.id,
-          title: composeTitle || 'Sans titre',
+          title: composeTitle || t.st_no_title,
           content: composeContent,
           ai_summary: composeSummary || null,
           story_date: composeDate || null,
@@ -320,7 +320,7 @@ const StoriesPage: React.FC = () => {
         });
         if (upErr) {
           console.error(upErr);
-          toast.error(`Échec de l'envoi: ${file.name}`);
+          toast.error(`${t.st_toast_upload_err}: ${file.name}`);
           continue;
         }
         if (isImage) {
@@ -339,7 +339,7 @@ const StoriesPage: React.FC = () => {
         });
       }
 
-      toast.success('Histoire enregistrée');
+      toast.success(t.st_toast_saved);
       setComposeOpen(false);
       resetCompose();
       loadStories();
