@@ -37,6 +37,7 @@ import { z } from 'zod';
 import { validateUpload } from '@/lib/upload-validation';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
 import { cn } from '@/lib/utils';
 import memoryCake from '@/assets/demo/memory-cake.jpg';
 import memoryChildhood from '@/assets/demo/memory-childhood.jpg';
@@ -60,7 +61,9 @@ type MemoryCategoryKey =
   | 'tradition'
   | 'timeline_event';
 
-const CATEGORIES: Array<{
+type MemCopy = ReturnType<typeof useMemoriesCopy>;
+
+const buildCategories = (c: MemCopy): Array<{
   key: MemoryCategoryKey;
   title: string;
   description: string;
@@ -68,116 +71,42 @@ const CATEGORIES: Array<{
   iconBg: string;
   iconColor: string;
   prefilledType: MemoryType;
-}> = [
-  {
-    key: 'recipe',
-    title: 'Recettes familiales',
-    description: 'Les plats transmis de génération en génération',
-    Icon: ChefHat,
-    iconBg: 'bg-[hsl(35_60%_92%)]',
-    iconColor: 'text-[hsl(35_70%_45%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'story_audio',
-    title: 'Histoires racontées',
-    description: 'Souvenirs audio et anecdotes de vie',
-    Icon: Mic,
-    iconBg: 'bg-[hsl(220_45%_92%)]',
-    iconColor: 'text-[hsl(220_45%_40%)]',
-    prefilledType: 'audio',
-  },
-  {
-    key: 'photo_video',
-    title: 'Photos & vidéos',
-    description: 'Moments précieux à revoir ensemble',
-    Icon: ImageIcon,
-    iconBg: 'bg-[hsl(140_30%_88%)]',
-    iconColor: 'text-[hsl(140_35%_35%)]',
-    prefilledType: 'photo',
-  },
-  {
-    key: 'letter_message',
-    title: 'Lettres & messages',
-    description: 'Mots du cœur à conserver',
-    Icon: Mail,
-    iconBg: 'bg-[hsl(270_30%_92%)]',
-    iconColor: 'text-[hsl(270_35%_45%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'tradition',
-    title: 'Traditions & fêtes',
-    description: 'Rituels, célébrations et coutumes',
-    Icon: Sparkles,
-    iconBg: 'bg-[hsl(15_55%_90%)]',
-    iconColor: 'text-[hsl(15_60%_50%)]',
-    prefilledType: 'text',
-  },
-  {
-    key: 'timeline_event',
-    title: 'Ligne du temps familiale',
-    description: 'Moments marquants de la famille',
-    Icon: GitBranch,
-    iconBg: 'bg-[hsl(210_20%_88%)]',
-    iconColor: 'text-[hsl(210_25%_40%)]',
-    prefilledType: 'text',
-  },
+}> => [
+  { key: 'recipe', title: c.cat_recipes_title, description: c.cat_recipes_desc, Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]', prefilledType: 'text' },
+  { key: 'story_audio', title: c.cat_stories_title, description: c.cat_stories_desc, Icon: Mic, iconBg: 'bg-[hsl(220_45%_92%)]', iconColor: 'text-[hsl(220_45%_40%)]', prefilledType: 'audio' },
+  { key: 'photo_video', title: c.cat_photos_title, description: c.cat_photos_desc, Icon: ImageIcon, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]', prefilledType: 'photo' },
+  { key: 'letter_message', title: c.cat_letters_title, description: c.cat_letters_desc, Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]', prefilledType: 'text' },
+  { key: 'tradition', title: c.cat_traditions_title, description: c.cat_traditions_desc, Icon: Sparkles, iconBg: 'bg-[hsl(15_55%_90%)]', iconColor: 'text-[hsl(15_60%_50%)]', prefilledType: 'text' },
+  { key: 'timeline_event', title: c.cat_timeline_title, description: c.cat_timeline_desc, Icon: GitBranch, iconBg: 'bg-[hsl(210_20%_88%)]', iconColor: 'text-[hsl(210_25%_40%)]', prefilledType: 'text' },
 ];
 
-const SUGGESTED_COLLECTIONS: Array<{
+const buildSuggestedCollections = (c: MemCopy): Array<{
   title: string;
   Icon: React.FC<{ className?: string }>;
   iconBg: string;
   iconColor: string;
-}> = [
-  { title: 'Recettes de grand-maman', Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]' },
-  { title: 'Naissances et mariages', Icon: Heart, iconBg: 'bg-[hsl(355_70%_94%)]', iconColor: 'text-[hsl(355_60%_55%)]' },
-  { title: 'Messages pour plus tard', Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]' },
-  { title: 'Maison familiale', Icon: Home, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]' },
+}> => [
+  { title: c.col_grandma_recipes, Icon: ChefHat, iconBg: 'bg-[hsl(35_60%_92%)]', iconColor: 'text-[hsl(35_70%_45%)]' },
+  { title: c.col_births_weddings, Icon: Heart, iconBg: 'bg-[hsl(355_70%_94%)]', iconColor: 'text-[hsl(355_60%_55%)]' },
+  { title: c.col_messages_for_later, Icon: Mail, iconBg: 'bg-[hsl(270_30%_92%)]', iconColor: 'text-[hsl(270_35%_45%)]' },
+  { title: c.col_family_home, Icon: Home, iconBg: 'bg-[hsl(140_30%_88%)]', iconColor: 'text-[hsl(140_35%_35%)]' },
 ];
 
 type FilterKey = 'all' | 'photo' | 'audio' | 'video' | 'text' | 'person' | 'generation';
-const FILTERS: Array<{ key: FilterKey; label: string; Icon: React.FC<{ className?: string }> }> = [
-  { key: 'all', label: 'Tous', Icon: LayoutGrid },
-  { key: 'text', label: 'Recettes', Icon: ChefHat },
-  { key: 'audio', label: 'Audio', Icon: Mic },
-  { key: 'video', label: 'Vidéo', Icon: Video },
-  { key: 'photo', label: 'Documents', Icon: FileText },
-  { key: 'person', label: 'Par personne', Icon: Users },
-  { key: 'generation', label: 'Par génération', Icon: Users2 },
+const buildFilters = (c: MemCopy): Array<{ key: FilterKey; label: string; Icon: React.FC<{ className?: string }> }> => [
+  { key: 'all', label: c.filter_all, Icon: LayoutGrid },
+  { key: 'text', label: c.filter_recipes, Icon: ChefHat },
+  { key: 'audio', label: c.filter_audio, Icon: Mic },
+  { key: 'video', label: c.filter_video, Icon: Video },
+  { key: 'photo', label: c.filter_documents, Icon: FileText },
+  { key: 'person', label: c.filter_by_person, Icon: Users },
+  { key: 'generation', label: c.filter_by_generation, Icon: Users2 },
 ];
 
-// Exemples de démonstration utilisés quand la base est vide
-const DEMO_MEMORIES = [
-  {
-    id: 'demo-1',
-    badge: 'RECETTE',
-    badgeIcon: ChefHat,
-    title: 'Le gâteau de grand-maman',
-    author: 'Marguerite Dupont',
-    year: '1968',
-    image: memoryCake,
-  },
-  {
-    id: 'demo-2',
-    badge: 'AUDIO',
-    badgeIcon: Mic,
-    title: 'Souvenirs de mon enfance',
-    author: 'Jean Dupont',
-    year: '1985',
-    duration: '15:42',
-    image: memoryChildhood,
-  },
-  {
-    id: 'demo-3',
-    badge: 'PHOTO',
-    badgeIcon: ImageIcon,
-    title: 'Vacances à la mer',
-    author: 'Famille Dupont',
-    year: '1959',
-    image: memoryBeach,
-  },
+const buildDemoMemories = (c: MemCopy) => [
+  { id: 'demo-1', badge: c.demo_recipe_badge, badgeIcon: ChefHat, title: c.demo_cake_title, author: c.demo_cake_author, year: '1968', image: memoryCake, duration: undefined as string | undefined },
+  { id: 'demo-2', badge: c.demo_audio_badge, badgeIcon: Mic, title: c.demo_childhood_title, author: c.demo_childhood_author, year: '1985', duration: '15:42', image: memoryChildhood },
+  { id: 'demo-3', badge: c.demo_photo_badge, badgeIcon: ImageIcon, title: c.demo_beach_title, author: c.demo_beach_author, year: '1959', image: memoryBeach, duration: undefined as string | undefined },
 ];
 
 const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
@@ -191,7 +120,12 @@ const resolveMemoryMediaPath = (mediaUrl: string | null): string | null => {
 
 const MemoriesPage: React.FC = () => {
   const { user } = useAuth();
-  const { t, lang } = useLocale();
+  const { lang } = useLocale();
+  const c = useMemoriesCopy(lang);
+  const CATEGORIES = useMemo(() => buildCategories(c), [c]);
+  const SUGGESTED_COLLECTIONS = useMemo(() => buildSuggestedCollections(c), [c]);
+  const FILTERS = useMemo(() => buildFilters(c), [c]);
+  const DEMO_MEMORIES = useMemo(() => buildDemoMemories(c), [c]);
   const [circle, setCircle] = useState<FamilyCircle | null>(null);
   const [memories, setMemories] = useState<MemoryWithMedia[]>([]);
   const [memberCount, setMemberCount] = useState<number | null>(null);
@@ -206,7 +140,7 @@ const MemoriesPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
 
   const memorySchema = z.object({
-    caption: z.string().trim().min(1, t.memories_validation_caption).max(500),
+    caption: z.string().trim().min(1, c.mem_validation_caption).max(500),
     type: z.enum(['photo', 'video', 'audio', 'text']),
     visibility: z.enum(['circle', 'managers', 'private']),
   });
@@ -283,7 +217,7 @@ const MemoriesPage: React.FC = () => {
       if (type === 'photo') processedFile = await prepareImageForUpload(file);
       const validation = await validateUpload(processedFile, type, circle.id);
       if (!validation.allowed) {
-        toast.error(validation.error || t.memories_upload_error);
+        toast.error(validation.error || c.mem_upload_error);
         setCreating(false);
         return;
       }
@@ -291,7 +225,7 @@ const MemoriesPage: React.FC = () => {
       const filePath = `${user.id}/${crypto.randomUUID()}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('memories-media').upload(filePath, processedFile);
       if (uploadError) {
-        toast.error(t.memories_upload_error);
+        toast.error(c.mem_upload_error);
         setCreating(false);
         return;
       }
@@ -315,9 +249,9 @@ const MemoriesPage: React.FC = () => {
     });
 
     if (error) {
-      toast.error(t.memories_error);
+      toast.error(c.mem_error);
     } else {
-      toast.success(t.memories_added);
+      toast.success(c.mem_added);
       setCaption('');
       setType('text');
       setVisibility('circle');
@@ -351,9 +285,9 @@ const MemoriesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">{t.must_create_circle_first}</p>
+          <p className="text-muted-foreground">{c.must_create_circle}</p>
           <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>
-            {t.create_circle}
+            {c.create_circle}
           </Button>
         </div>
       </AppLayout>
@@ -365,51 +299,51 @@ const MemoriesPage: React.FC = () => {
       <DialogTrigger asChild>
         <Button size="lg" className="gap-2 rounded-xl shadow-md">
           <Plus className="h-5 w-5" />
-          {t.memories_new}
+          {c.mem_new}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-heading">{t.memories_add_title}</DialogTitle>
+          <DialogTitle className="font-heading">{c.mem_add_title}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleCreate} className="space-y-4">
           <div className="space-y-2">
-            <Label>{t.memories_type}</Label>
+            <Label>{c.mem_type}</Label>
             <Select value={type} onValueChange={(v) => setType(v as MemoryType)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="text">{t.memories_type_labels.text}</SelectItem>
-                <SelectItem value="photo">{t.memories_type_labels.photo}</SelectItem>
-                <SelectItem value="video">{t.memories_type_labels.video}</SelectItem>
-                <SelectItem value="audio">{t.memories_type_labels.audio}</SelectItem>
+                <SelectItem value="text">{c.mem_type_text}</SelectItem>
+                <SelectItem value="photo">{c.mem_type_photo}</SelectItem>
+                <SelectItem value="video">{c.mem_type_video}</SelectItem>
+                <SelectItem value="audio">{c.mem_type_audio}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="caption">{t.memories_caption}</Label>
-            <Textarea id="caption" placeholder={t.memories_caption_placeholder} value={caption} onChange={(e) => setCaption(e.target.value)} required />
+            <Label htmlFor="caption">{c.mem_caption}</Label>
+            <Textarea id="caption" placeholder={c.mem_caption_placeholder} value={caption} onChange={(e) => setCaption(e.target.value)} required />
           </div>
           {type !== 'text' && (
             <div className="space-y-2">
-              <Label htmlFor="file">{t.memories_file}</Label>
+              <Label htmlFor="file">{c.mem_file}</Label>
               <Input id="file" type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} accept={type === 'photo' ? 'image/*' : type === 'video' ? 'video/*' : 'audio/*'} />
-              <p className="text-xs text-muted-foreground">{t.memories_file_hint}</p>
+              <p className="text-xs text-muted-foreground">{c.mem_file_hint}</p>
             </div>
           )}
           <div className="space-y-2">
-            <Label>{t.memories_visibility}</Label>
+            <Label>{c.mem_visibility}</Label>
             <Select value={visibility} onValueChange={(v) => setVisibility(v as MemoryVisibility)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="circle">{t.memories_visibility_labels.circle}</SelectItem>
-                <SelectItem value="managers">{t.memories_visibility_labels.managers}</SelectItem>
-                <SelectItem value="private">{t.memories_visibility_labels.private}</SelectItem>
+                <SelectItem value="circle">{c.mem_visibility_circle}</SelectItem>
+                <SelectItem value="managers">{c.mem_visibility_managers}</SelectItem>
+                <SelectItem value="private">{c.mem_visibility_private}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <Button type="submit" className="w-full" disabled={creating}>
             {creating && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t.add}
+            {c.common_add}
           </Button>
         </form>
       </DialogContent>
@@ -423,7 +357,7 @@ const MemoriesPage: React.FC = () => {
         <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="space-y-3">
             <h1 className="font-heading text-3xl md:text-4xl font-semibold text-foreground tracking-tight">
-              Souvenirs
+              {c.mem_title}
             </h1>
             <div className="flex items-center gap-3">
               <span className="h-px w-16 bg-accent/60" />
@@ -431,7 +365,7 @@ const MemoriesPage: React.FC = () => {
               <span className="h-px w-16 bg-accent/60" />
             </div>
             <p className="text-muted-foreground max-w-2xl text-base">
-              Préservez les histoires, recettes, traditions et messages qui traversent les générations.
+              {c.mem_subtitle}
             </p>
           </div>
           <div className="shrink-0">{NewMemoryDialog}</div>
@@ -439,7 +373,7 @@ const MemoriesPage: React.FC = () => {
 
         {/* 2. Catégories */}
         <section
-          aria-label="Catégories de souvenirs"
+          aria-label={c.cat_aria}
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
         >
           {CATEGORIES.map((cat) => (
@@ -470,7 +404,7 @@ const MemoriesPage: React.FC = () => {
 
         {/* 3. Bandeau statistiques */}
         <section
-          aria-label="Statistiques de votre cercle"
+          aria-label={c.stats_aria}
           className="rounded-2xl border border-border bg-card shadow-sm px-6 py-5"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border">
@@ -480,7 +414,7 @@ const MemoriesPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-2xl font-heading font-semibold text-foreground">{displayCount}</div>
-                <div className="text-sm text-muted-foreground">souvenirs</div>
+                <div className="text-sm text-muted-foreground">{c.stats_memories}</div>
               </div>
             </div>
             <div className="flex items-center gap-4 py-4 md:py-0 md:px-6">
@@ -489,7 +423,7 @@ const MemoriesPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-2xl font-heading font-semibold text-foreground">{generationsCount}</div>
-                <div className="text-sm text-muted-foreground">générations</div>
+                <div className="text-sm text-muted-foreground">{c.stats_generations}</div>
               </div>
             </div>
             <div className="flex items-center gap-4 pt-4 md:pt-0 md:pl-6">
@@ -497,8 +431,8 @@ const MemoriesPage: React.FC = () => {
                 <ShieldCheck className="h-6 w-6 text-[hsl(220_45%_35%)]" />
               </div>
               <div>
-                <div className="text-base font-heading font-semibold text-foreground">Privé et sécurisé</div>
-                <div className="text-sm text-muted-foreground">Vos souvenirs restent en famille</div>
+                <div className="text-base font-heading font-semibold text-foreground">{c.stats_secure_title}</div>
+                <div className="text-sm text-muted-foreground">{c.stats_secure_desc}</div>
               </div>
             </div>
           </div>
@@ -511,9 +445,9 @@ const MemoriesPage: React.FC = () => {
             <Card className="shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="font-heading text-xl font-semibold text-foreground">À redécouvrir</h2>
+                  <h2 className="font-heading text-xl font-semibold text-foreground">{c.rediscover_title}</h2>
                   <button className="text-sm text-accent hover:underline inline-flex items-center gap-1">
-                    Voir tout <ArrowRight className="h-3.5 w-3.5" />
+                    {c.common_view_all} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
@@ -535,7 +469,7 @@ const MemoriesPage: React.FC = () => {
                               </div>
                             )}
                             <Badge className="absolute top-2 left-2 bg-accent text-accent-foreground uppercase text-[10px] tracking-wide">
-                              {t.memories_type_labels[memory.type]}
+                              {memory.type === 'text' ? c.mem_type_text : memory.type === 'photo' ? c.mem_type_photo : memory.type === 'video' ? c.mem_type_video : c.mem_type_audio}
                             </Badge>
                           </div>
                           <div className="p-3.5">
@@ -543,7 +477,7 @@ const MemoriesPage: React.FC = () => {
                               <h3 className="font-heading text-sm font-semibold text-foreground line-clamp-2">
                                 {memory.caption}
                               </h3>
-                              <button className="text-muted-foreground hover:text-foreground" aria-label="Options">
+                              <button className="text-muted-foreground hover:text-foreground" aria-label={c.common_options}>
                                 <MoreHorizontal className="h-4 w-4" />
                               </button>
                             </div>
@@ -586,7 +520,7 @@ const MemoriesPage: React.FC = () => {
                                 <h3 className="font-heading text-sm font-semibold text-foreground line-clamp-2">
                                   {m.title}
                                 </h3>
-                                <button className="text-muted-foreground hover:text-foreground" aria-label="Options">
+                                <button className="text-muted-foreground hover:text-foreground" aria-label={c.common_options}>
                                   <MoreHorizontal className="h-4 w-4" />
                                 </button>
                               </div>
@@ -601,11 +535,11 @@ const MemoriesPage: React.FC = () => {
                     </div>
                     <div className="mt-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg bg-secondary/50 border border-border px-4 py-3">
                       <p className="text-sm text-muted-foreground">
-                        Commencez par une recette, une histoire audio ou une photo de famille.
+                        {c.rediscover_empty_hint}
                       </p>
                       <Button variant="outline" size="sm" onClick={() => openCreateDialog('text')} className="gap-1.5">
                         <Plus className="h-4 w-4" />
-                        Créer mon premier souvenir
+                        {c.rediscover_create_first}
                       </Button>
                     </div>
                   </>
@@ -619,7 +553,7 @@ const MemoriesPage: React.FC = () => {
             <Card className="shadow-sm h-full">
               <CardContent className="p-6">
                 <h2 className="font-heading text-xl font-semibold text-foreground mb-5">
-                  Collections suggérées
+                  {c.collections_title}
                 </h2>
                 <ul className="space-y-2">
                   {SUGGESTED_COLLECTIONS.map((col) => (
@@ -643,7 +577,7 @@ const MemoriesPage: React.FC = () => {
         </section>
 
         {/* 6. Barre de filtres */}
-        <section aria-label="Filtres" className="flex flex-wrap gap-2">
+        <section aria-label={c.filters_aria} className="flex flex-wrap gap-2">
           {FILTERS.map((f) => {
             const active = activeFilter === f.key;
             return (
