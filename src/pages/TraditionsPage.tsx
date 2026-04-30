@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Loader2, Plus, Sparkles, Calendar, Users, Trash2, Edit3 } from 'lucide-react';
 import type { FamilyCircle } from '@/types/database';
 import { z } from 'zod';
+import exampleTraditions from '@/assets/example-traditions.png';
 
 interface Tradition {
   id: string;
@@ -246,16 +247,36 @@ const TraditionsPage: React.FC = () => {
         </header>
 
         {traditions.length === 0 ? (
-          <Card className="shadow-card">
-            <CardContent className="py-16 text-center space-y-4">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(15_55%_90%)] mx-auto">
-                <Sparkles className="h-8 w-8 text-[hsl(15_60%_50%)]" />
+          <div className="space-y-6">
+            <Card className="shadow-card">
+              <CardContent className="py-12 text-center space-y-4">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(15_55%_90%)] mx-auto">
+                  <Sparkles className="h-8 w-8 text-[hsl(15_60%_50%)]" />
+                </div>
+                <h2 className="font-heading text-xl text-foreground">Aucune tradition enregistrée</h2>
+                <p className="text-muted-foreground max-w-md mx-auto">Documentez les fêtes, rituels et coutumes qui font la richesse de votre famille pour les transmettre aux prochaines générations.</p>
+                <Button onClick={() => setDialogOpen(true)} className="gap-2"><Plus className="h-4 w-4" />Ajouter la première tradition</Button>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-card overflow-hidden border-accent/30">
+              <div className="bg-gradient-to-r from-accent/10 via-accent/5 to-transparent px-6 py-4 border-b border-accent/20 flex items-center gap-3">
+                <Sparkles className="h-5 w-5 text-accent shrink-0" />
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">Voici un exemple à suivre</h3>
+                  <p className="text-sm text-muted-foreground">Inspirez-vous de ce modèle pour documenter Noël, Pâques, anniversaires, recettes de famille et coutumes héritées.</p>
+                </div>
               </div>
-              <h2 className="font-heading text-xl text-foreground">Aucune tradition enregistrée</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">Documentez les fêtes, rituels et coutumes qui font la richesse de votre famille pour les transmettre aux prochaines générations.</p>
-              <Button onClick={() => setDialogOpen(true)} className="gap-2"><Plus className="h-4 w-4" />Ajouter la première tradition</Button>
-            </CardContent>
-          </Card>
+              <div className="p-4 md:p-6 bg-muted/20">
+                <img
+                  src={exampleTraditions}
+                  alt="Exemple de page Traditions et fêtes avec Réveillon de Noël, Brunch de Pâques, recettes et anniversaires"
+                  className="w-full h-auto rounded-lg border border-border shadow-sm"
+                  loading="lazy"
+                />
+              </div>
+            </Card>
+          </div>
         ) : (
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {traditions.map(t => (
