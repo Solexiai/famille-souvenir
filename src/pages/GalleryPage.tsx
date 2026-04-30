@@ -22,6 +22,8 @@ import {
 import { prepareImageForUpload } from '@/lib/image-preparation';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
 
 interface MediaItem {
   id: string;
@@ -60,9 +62,9 @@ function formatGB(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} Go`;
 }
 
-function monthLabel(dateStr: string): string {
+function monthLabel(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
 export default function GalleryPage() {
