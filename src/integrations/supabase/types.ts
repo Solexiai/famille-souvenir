@@ -1605,6 +1605,158 @@ export type Database = {
         }
         Relationships: []
       }
+      time_message_guardians: {
+        Row: {
+          accepted_at: string | null
+          author_id: string
+          circle_id: string
+          created_at: string
+          guardian_email: string
+          guardian_name: string
+          guardian_relationship: string | null
+          guardian_user_id: string | null
+          id: string
+          invited_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          author_id: string
+          circle_id: string
+          created_at?: string
+          guardian_email: string
+          guardian_name: string
+          guardian_relationship?: string | null
+          guardian_user_id?: string | null
+          id?: string
+          invited_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          author_id?: string
+          circle_id?: string
+          created_at?: string
+          guardian_email?: string
+          guardian_name?: string
+          guardian_relationship?: string | null
+          guardian_user_id?: string | null
+          id?: string
+          invited_at?: string
+        }
+        Relationships: []
+      }
+      time_message_releases: {
+        Row: {
+          author_id: string
+          confirmed_at: string
+          confirmed_by_user_id: string
+          guardian_id: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          author_id: string
+          confirmed_at?: string
+          confirmed_by_user_id: string
+          guardian_id: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          author_id?: string
+          confirmed_at?: string
+          confirmed_by_user_id?: string
+          guardian_id?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_message_releases_guardian_id_fkey"
+            columns: ["guardian_id"]
+            isOneToOne: false
+            referencedRelation: "time_message_guardians"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_messages: {
+        Row: {
+          author_id: string
+          circle_id: string
+          created_at: string
+          format: Database["public"]["Enums"]["time_message_format"]
+          id: string
+          is_recurring: boolean
+          media_duration_seconds: number | null
+          media_mime_type: string | null
+          media_path: string | null
+          media_size_bytes: number | null
+          occasion_label: string | null
+          recipient_email: string | null
+          recipient_member_id: string | null
+          recipient_name: string
+          recipient_relationship: string | null
+          released_at: string | null
+          scheduled_for: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["time_message_status"]
+          text_content: string | null
+          title: string
+          trigger_type: Database["public"]["Enums"]["time_message_trigger"]
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          circle_id: string
+          created_at?: string
+          format: Database["public"]["Enums"]["time_message_format"]
+          id?: string
+          is_recurring?: boolean
+          media_duration_seconds?: number | null
+          media_mime_type?: string | null
+          media_path?: string | null
+          media_size_bytes?: number | null
+          occasion_label?: string | null
+          recipient_email?: string | null
+          recipient_member_id?: string | null
+          recipient_name: string
+          recipient_relationship?: string | null
+          released_at?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["time_message_status"]
+          text_content?: string | null
+          title: string
+          trigger_type: Database["public"]["Enums"]["time_message_trigger"]
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          circle_id?: string
+          created_at?: string
+          format?: Database["public"]["Enums"]["time_message_format"]
+          id?: string
+          is_recurring?: boolean
+          media_duration_seconds?: number | null
+          media_mime_type?: string | null
+          media_path?: string | null
+          media_size_bytes?: number | null
+          occasion_label?: string | null
+          recipient_email?: string | null
+          recipient_member_id?: string | null
+          recipient_name?: string
+          recipient_relationship?: string | null
+          released_at?: string | null
+          scheduled_for?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["time_message_status"]
+          text_content?: string | null
+          title?: string
+          trigger_type?: Database["public"]["Enums"]["time_message_trigger"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       upload_quotas: {
         Row: {
           circle_id: string
@@ -1644,6 +1796,27 @@ export type Database = {
           updated_at?: string
           videos_bytes?: number
           videos_count?: number
+        }
+        Relationships: []
+      }
+      user_activity_pings: {
+        Row: {
+          inactivity_threshold_months: number
+          last_seen_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          inactivity_threshold_months?: number
+          last_seen_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          inactivity_threshold_months?: number
+          last_seen_at?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1890,6 +2063,14 @@ export type Database = {
         | "bread"
         | "other"
       recipe_privacy: "private" | "managers" | "circle"
+      time_message_format: "audio" | "video" | "text"
+      time_message_status:
+        | "draft"
+        | "scheduled"
+        | "released"
+        | "sent"
+        | "cancelled"
+      time_message_trigger: "scheduled_date" | "after_death"
       vault_visibility: "owner" | "managers" | "circle"
       verification_status:
         | "unreviewed"
@@ -2120,6 +2301,15 @@ export const Constants = {
         "other",
       ],
       recipe_privacy: ["private", "managers", "circle"],
+      time_message_format: ["audio", "video", "text"],
+      time_message_status: [
+        "draft",
+        "scheduled",
+        "released",
+        "sent",
+        "cancelled",
+      ],
+      time_message_trigger: ["scheduled_date", "after_death"],
       vault_visibility: ["owner", "managers", "circle"],
       verification_status: [
         "unreviewed",

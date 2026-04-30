@@ -449,6 +449,7 @@ const MemoriesPage: React.FC = () => {
                 if (cat.key === 'recipe') { window.location.href = '/recipes'; return; }
                 if (cat.key === 'story_audio') { window.location.href = '/stories'; return; }
                 if (cat.key === 'photo_video') { window.location.href = '/gallery'; return; }
+                if (cat.key === 'letter_message') { window.location.href = '/time-messages'; return; }
                 openCreateDialog(cat.prefilledType);
               }}
               className="group text-left rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
