@@ -21,6 +21,10 @@ import {
 } from 'lucide-react';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
+
+type StCopy = ReturnType<typeof useMemoriesCopy>;
 
 type Visibility = 'circle' | 'managers' | 'private';
 
@@ -65,8 +69,9 @@ const fileToBase64 = (file: File | Blob): Promise<string> =>
     r.readAsDataURL(file);
   });
 
-const formatFR = (iso: string) =>
-  new Date(iso).toLocaleString('fr-FR', {
+const localeMap = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' } as const;
+const formatLocale = (iso: string, lang: 'fr' | 'en' | 'es') =>
+  new Date(iso).toLocaleString(localeMap[lang], {
     day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 
