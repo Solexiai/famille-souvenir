@@ -831,7 +831,9 @@ const RecipeDetailDialog: React.FC<{
   const navigate = useNavigate();
   const recipe = recipeId ? recipes.find((r) => r.id === recipeId) : null;
   const photoInputRef = React.useRef<HTMLInputElement>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoMenuOpen, setPhotoMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
