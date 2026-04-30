@@ -440,12 +440,12 @@ function CreateMessageDialog({
       });
       if (error) throw error;
 
-      toast.success('Message enregistré');
+      toast.success(t.tm_toast_msg_saved);
       reset();
       onOpenChange(false);
       onCreated();
     } catch (e: any) {
-      toast.error(e.message || 'Erreur lors de l\'enregistrement');
+      toast.error(e.message || t.tm_toast_save_err);
     } finally {
       setSaving(false);
     }
@@ -455,13 +455,13 @@ function CreateMessageDialog({
     <Dialog open={open} onOpenChange={(o) => { if (!o) { reset(); } onOpenChange(o); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">Nouveau message dans le temps</DialogTitle>
+          <DialogTitle className="font-heading text-2xl">{t.tm_dialog_title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
           {/* Format */}
           <div>
-            <Label className="mb-2 block">Format</Label>
+            <Label className="mb-2 block">{t.tm_field_format}</Label>
             <div className="grid grid-cols-3 gap-2">
               {(['audio', 'video', 'text'] as Format[]).map((f) => {
                 const Icon = formatIcon(f);
@@ -475,7 +475,7 @@ function CreateMessageDialog({
                     }`}
                   >
                     <Icon className="w-5 h-5 mx-auto mb-1 text-primary" />
-                    <div className="text-sm font-medium">{formatLabel(f)}</div>
+                    <div className="text-sm font-medium">{formatLabel(f, t)}</div>
                   </button>
                 );
               })}
@@ -485,18 +485,18 @@ function CreateMessageDialog({
           {/* Recording / file / text */}
           {format === 'text' ? (
             <div>
-              <Label htmlFor="text">Votre message</Label>
+              <Label htmlFor="text">{t.tm_field_text}</Label>
               <Textarea
                 id="text"
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
                 rows={6}
-                placeholder="Mon cher petit-fils, le jour de tes 18 ans…"
+                placeholder={t.tm_field_text_ph}
               />
             </div>
           ) : (
             <div className="space-y-3">
-              <Label>Enregistrement</Label>
+              <Label>{t.tm_field_recording}</Label>
               {format === 'video' && (
                 <video
                   ref={videoPreviewRef}
@@ -549,53 +549,53 @@ function CreateMessageDialog({
           )}
 
           <div>
-            <Label htmlFor="title">Titre du message</Label>
+            <Label htmlFor="title">{t.tm_field_title}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: Bonne fête pour tes 18 ans" />
+              placeholder={t.tm_field_title_ph} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="recipient">Destinataire</Label>
+              <Label htmlFor="recipient">{t.tm_field_recipient}</Label>
               <Input id="recipient" value={recipientName} onChange={(e) => setRecipientName(e.target.value)}
-                placeholder="Ex: Léa Dupont" />
+                placeholder={t.tm_field_recipient_ph} />
             </div>
             <div>
-              <Label htmlFor="rel">Lien</Label>
+              <Label htmlFor="rel">{t.tm_field_relationship}</Label>
               <Input id="rel" value={relationship} onChange={(e) => setRelationship(e.target.value)}
-                placeholder="Ex: Petite-fille" />
+                placeholder={t.tm_field_relationship_ph} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="email">Courriel du destinataire</Label>
+              <Label htmlFor="email">{t.tm_field_email}</Label>
               <Input id="email" type="email" value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
-                placeholder="ex: lea.dupont@email.com" />
+                placeholder={t.tm_field_email_ph} />
             </div>
             <div>
-              <Label htmlFor="phone">Téléphone du destinataire</Label>
+              <Label htmlFor="phone">{t.tm_field_phone}</Label>
               <Input id="phone" type="tel" value={recipientPhone}
                 onChange={(e) => setRecipientPhone(e.target.value)}
-                placeholder="ex: +1 514 555 0123" />
+                placeholder="+1 514 555 0123" />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="occ">Occasion (facultatif)</Label>
+            <Label htmlFor="occ">{t.tm_field_occasion}</Label>
             <Input id="occ" value={occasion} onChange={(e) => setOccasion(e.target.value)}
-              placeholder="Ex: 18 ans, mariage, naissance…" />
+              placeholder={t.tm_field_occasion_ph} />
           </div>
 
           {/* Trigger */}
           <div>
-            <Label className="mb-2 block">Quand l'envoyer ?</Label>
+            <Label className="mb-2 block">{t.tm_field_when}</Label>
             <Select value={trigger} onValueChange={(v) => setTrigger(v as Trigger)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="scheduled_date">À une date précise</SelectItem>
-                <SelectItem value="after_death">Après mon décès</SelectItem>
+                <SelectItem value="scheduled_date">{t.tm_when_scheduled}</SelectItem>
+                <SelectItem value="after_death">{t.tm_when_after_death}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -603,14 +603,14 @@ function CreateMessageDialog({
           {trigger === 'scheduled_date' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="date">Date d'envoi</Label>
+                <Label htmlFor="date">{t.tm_field_date}</Label>
                 <Input id="date" type="date" value={scheduledFor}
                   onChange={(e) => setScheduledFor(e.target.value)} />
               </div>
               <div className="flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
-                  <span className="text-sm">Répéter chaque année</span>
+                  <span className="text-sm">{t.tm_repeat_yearly}</span>
                 </label>
               </div>
             </div>
@@ -619,16 +619,15 @@ function CreateMessageDialog({
           {trigger === 'after_death' && (
             <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground flex gap-2">
               <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
-              Ce message sera libéré quand vos gardiens de confiance confirmeront votre décès,
-              ou après une longue inactivité (6 mois par défaut).
+              {t.tm_after_death_info}
             </div>
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>{t.common_cancel}</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Enregistrer le message
+              {t.tm_save_btn}
             </Button>
           </div>
         </div>
