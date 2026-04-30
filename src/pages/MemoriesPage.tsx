@@ -448,6 +448,7 @@ const MemoriesPage: React.FC = () => {
               onClick={() => {
                 if (cat.key === 'recipe') { window.location.href = '/recipes'; return; }
                 if (cat.key === 'story_audio') { window.location.href = '/stories'; return; }
+                if (cat.key === 'photo_video') { window.location.href = '/gallery'; return; }
                 openCreateDialog(cat.prefilledType);
               }}
               className="group text-left rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
