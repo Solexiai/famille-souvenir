@@ -346,7 +346,7 @@ const StoriesPage: React.FC = () => {
       setSelectedStoryId(storyId);
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || "Échec de l'enregistrement");
+      toast.error(e?.message || t.st_toast_save_error);
     } finally {
       setSaving(false);
     }
@@ -366,9 +366,9 @@ const StoriesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Créez d'abord un cercle familial.</p>
+          <p className="text-muted-foreground">{t.must_create_circle}</p>
           <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>
-            Créer un cercle
+            {t.create_circle_btn}
           </Button>
         </div>
       </AppLayout>
