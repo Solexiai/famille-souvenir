@@ -21,6 +21,7 @@ import type { FamilyCircle } from '@/types/database';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { RecipeQuickAddDialog, type ExtractedRecipe } from '@/components/recipes/RecipeQuickAddDialog';
+import { prepareImageForUpload } from '@/lib/image-preparation';
 import recipeTourtiere from '@/assets/demo/recipe-tourtiere.jpg';
 import recipeApplePie from '@/assets/demo/recipe-apple-pie.jpg';
 import recipeSpaghetti from '@/assets/demo/recipe-spaghetti.jpg';
@@ -531,6 +532,7 @@ const RecipesPage: React.FC = () => {
         occasions={occasions}
         members={members}
         prefill={recipePrefill}
+        onOpenScanIA={() => { setCreateOpen(false); setQuickAddOpen(true); }}
         onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
       />
 
@@ -911,7 +913,8 @@ const CreateRecipeDialog: React.FC<{
   members: Array<{ id: string; user_id: string; name: string }>;
   onCreated: () => void;
   prefill?: RecipePrefill | null;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill }) => {
+  onOpenScanIA?: () => void;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -929,6 +932,9 @@ const CreateRecipeDialog: React.FC<{
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [hasHandwritten, setHasHandwritten] = useState(false);
   const [privacy, setPrivacy] = useState<Privacy>('circle');
+  const [dishPhoto, setDishPhoto] = useState<File | null>(null);
+  const [dishPhotoPreview, setDishPhotoPreview] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
 
   // Apply prefill when dialog opens with new prefill data
   useEffect(() => {
@@ -953,6 +959,27 @@ const CreateRecipeDialog: React.FC<{
     setBranchId(''); setGenerationId(''); setTransmittedBy('');
     setSelectedOccasions([]); setSelectedMembers([]);
     setHasHandwritten(false); setPrivacy('circle');
+    setDishPhoto(null); setDishPhotoPreview(null);
+  };
+
+  const handlePhotoSelected = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez choisir une image');
+      return;
+    }
+    setPhotoBusy(true);
+    try {
+      const compressed = await prepareImageForUpload(file);
+      setDishPhoto(compressed);
+      const url = URL.createObjectURL(compressed);
+      setDishPhotoPreview(url);
+    } catch (err) {
+      console.warn('Compression failed', err);
+      setDishPhoto(file);
+      setDishPhotoPreview(URL.createObjectURL(file));
+    } finally {
+      setPhotoBusy(false);
+    }
   };
 
   const schema = z.object({
@@ -972,27 +999,35 @@ const CreateRecipeDialog: React.FC<{
     const ingredients = ingredientsText.split('\n').map((s) => s.trim()).filter(Boolean);
     const steps = stepsText.split('\n').map((s) => s.trim()).filter(Boolean);
 
-    // If we have a scanned image to attach, upload it first to memories-media
+    // Photo du plat (compressée) prend priorité ; sinon on garde l'image scannée du carnet
     let imageUrl: string | null = null;
-    if (prefill?.scannedImageBase64) {
-      try {
+    try {
+      if (dishPhoto) {
+        const ext = (dishPhoto.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+        const path = `${userId}/recipes/dish-${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('memories-media').upload(path, dishPhoto, { contentType: dishPhoto.type });
+        if (!upErr) {
+          const { data: signed } = await supabase.storage.from('memories-media').createSignedUrl(path, 60 * 60 * 24 * 365);
+          imageUrl = signed?.signedUrl || null;
+        }
+      } else if (prefill?.scannedImageBase64) {
         const base64Data = prefill.scannedImageBase64.split(',')[1];
         const mimeMatch = prefill.scannedImageBase64.match(/^data:(.*?);base64/);
         const mime = mimeMatch?.[1] || 'image/jpeg';
-        const ext = mime.split('/')[1] || 'jpg';
+        const ext = (mime.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
         const byteChars = atob(base64Data);
         const byteNumbers = new Array(byteChars.length);
         for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
         const blob = new Blob([new Uint8Array(byteNumbers)], { type: mime });
-        const path = `${userId}/recipes/${Date.now()}.${ext}`;
+        const path = `${userId}/recipes/scan-${Date.now()}.${ext}`;
         const { error: upErr } = await supabase.storage.from('memories-media').upload(path, blob, { contentType: mime });
         if (!upErr) {
           const { data: signed } = await supabase.storage.from('memories-media').createSignedUrl(path, 60 * 60 * 24 * 365);
           imageUrl = signed?.signedUrl || null;
         }
-      } catch (err) {
-        console.warn('Image upload failed', err);
       }
+    } catch (err) {
+      console.warn('Image upload failed', err);
     }
 
     const { data, error } = await supabase.from('recipes').insert({
@@ -1047,6 +1082,58 @@ const CreateRecipeDialog: React.FC<{
           <DialogDescription>Préservez une saveur, une histoire, un héritage.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Scanner IA + Photo du plat */}
+          <div className="rounded-xl border-2 border-dashed border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)] p-3 space-y-3">
+            {onOpenScanIA && (
+              <button
+                type="button"
+                onClick={onOpenScanIA}
+                className="w-full flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-[hsl(35_60%_95%)] border border-[hsl(35_60%_55%)]/30 transition-all"
+              >
+                <div className="h-10 w-10 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)] shrink-0">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-heading font-semibold text-sm">Scanner avec IA</div>
+                  <div className="text-xs text-muted-foreground">Photographiez un carnet ou un livre — l'IA remplit le formulaire</div>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
+
+            <div>
+              <Label className="text-sm font-medium">Photo du plat <span className="text-muted-foreground font-normal">(optionnel, compressée automatiquement)</span></Label>
+              {dishPhotoPreview ? (
+                <div className="mt-2 relative">
+                  <img src={dishPhotoPreview} alt="Aperçu du plat" className="w-full h-40 object-cover rounded-lg border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => { setDishPhoto(null); if (dishPhotoPreview) URL.revokeObjectURL(dishPhotoPreview); setDishPhotoPreview(null); }}
+                    className="absolute top-2 right-2 px-2 py-1 text-xs rounded-md bg-black/70 text-white hover:bg-black"
+                  >
+                    Retirer
+                  </button>
+                </div>
+              ) : (
+                <label className="mt-2 flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-[hsl(35_60%_95%)] border border-[hsl(35_60%_55%)]/30 transition-all cursor-pointer">
+                  <div className="h-10 w-10 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)] shrink-0">
+                    {photoBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-heading font-semibold text-sm">Ajouter une photo du plat</div>
+                    <div className="text-xs text-muted-foreground">Vos invités voient la recette en image (max 1600px)</div>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handlePhotoSelected(e.target.files[0])}
+                  />
+                </label>
+              )}
+            </div>
+          </div>
+
           <div>
             <Label htmlFor="title">Titre *</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex. Tourtière de Grand-maman Louise" required />
