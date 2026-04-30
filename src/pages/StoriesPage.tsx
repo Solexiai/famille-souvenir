@@ -21,6 +21,10 @@ import {
 } from 'lucide-react';
 import { prepareImageForUpload, prepareImageThumbnail } from '@/lib/image-preparation';
 import { cn } from '@/lib/utils';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
+
+type StCopy = ReturnType<typeof useMemoriesCopy>;
 
 type Visibility = 'circle' | 'managers' | 'private';
 
@@ -65,8 +69,9 @@ const fileToBase64 = (file: File | Blob): Promise<string> =>
     r.readAsDataURL(file);
   });
 
-const formatFR = (iso: string) =>
-  new Date(iso).toLocaleString('fr-FR', {
+const localeMap = { fr: 'fr-FR', en: 'en-US', es: 'es-ES' } as const;
+const formatLocale = (iso: string, lang: 'fr' | 'en' | 'es') =>
+  new Date(iso).toLocaleString(localeMap[lang], {
     day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
 
@@ -75,7 +80,8 @@ const DictateStoryDialog: React.FC<{
   open: boolean;
   onClose: () => void;
   onTranscribed: (data: { title: string; content: string; summary: string }) => void;
-}> = ({ open, onClose, onTranscribed }) => {
+  t: StCopy;
+}> = ({ open, onClose, onTranscribed, t }) => {
   const [phase, setPhase] = useState<'idle' | 'recording' | 'processing'>('idle');
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -107,12 +113,12 @@ const DictateStoryDialog: React.FC<{
           });
           if (error) throw error;
           if (data?.error) throw new Error(data.error);
-          if (!data?.story) throw new Error('Aucune transcription');
+          if (!data?.story) throw new Error(t.st_toast_no_transcription);
           onTranscribed(data.story);
           cleanup();
           onClose();
         } catch (e: any) {
-          toast.error(e?.message || 'Échec de la transcription');
+          toast.error(e?.message || t.st_toast_transcription_failed);
           cleanup();
         }
       };
@@ -120,7 +126,7 @@ const DictateStoryDialog: React.FC<{
       recorderRef.current = mr;
       setPhase('recording');
     } catch {
-      toast.error("Impossible d'accéder au microphone. Autorisez l'accès et réessayez.");
+      toast.error(t.st_toast_mic_error);
     }
   };
 
@@ -142,10 +148,10 @@ const DictateStoryDialog: React.FC<{
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl flex items-center gap-2">
             <Mic className="h-5 w-5 text-[hsl(220_45%_25%)]" />
-            Dicter votre histoire
+            {t.st_dictate_dialog_title}
           </DialogTitle>
           <DialogDescription>
-            Racontez votre souvenir naturellement, comme à vos proches. L'IA transcrira et proposera un résumé.
+            {t.st_dictate_dialog_desc}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,12 +163,12 @@ const DictateStoryDialog: React.FC<{
                 <Mic className="h-12 w-12 text-white" />
               </div>
             </div>
-            <p className="font-medium text-lg">Enregistrement en cours…</p>
+            <p className="font-medium text-lg">{t.st_recording}</p>
             <p className="text-sm text-muted-foreground px-4">
-              Prenez votre temps. Décrivez la scène, les personnes, vos émotions.
+              {t.st_recording_hint}
             </p>
             <Button onClick={stop} size="lg" className="gap-2 bg-[hsl(220_45%_25%)] text-white">
-              <Square className="h-4 w-4" /> Arrêter et transcrire
+              <Square className="h-4 w-4" /> {t.st_stop_transcribe}
             </Button>
           </div>
         )}
@@ -170,8 +176,8 @@ const DictateStoryDialog: React.FC<{
         {phase === 'processing' && (
           <div className="py-10 text-center space-y-3">
             <Loader2 className="h-10 w-10 animate-spin text-[hsl(220_45%_40%)] mx-auto" />
-            <p className="font-medium">L'IA transcrit votre récit…</p>
-            <p className="text-sm text-muted-foreground">Génération du titre et du résumé</p>
+            <p className="font-medium">{t.st_processing}</p>
+            <p className="text-sm text-muted-foreground">{t.st_processing_hint}</p>
           </div>
         )}
       </DialogContent>
@@ -182,6 +188,8 @@ const DictateStoryDialog: React.FC<{
 // ============ MAIN PAGE ============
 const StoriesPage: React.FC = () => {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const t = useMemoriesCopy(lang);
   const [circleId, setCircleId] = useState<string | null>(null);
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
@@ -250,12 +258,12 @@ const StoriesPage: React.FC = () => {
     setComposeSummary(data.summary);
     setComposeSource('dictated');
     setComposeOpen(true);
-    toast.success('Transcription réussie. Vérifiez et enregistrez.');
+    toast.success(t.st_toast_transcribed);
   };
 
   const summarizeContent = async () => {
     if (!composeContent.trim()) {
-      toast.error('Écrivez d\'abord un peu de texte.');
+      toast.error(t.st_toast_write_first);
       return;
     }
     try {
@@ -265,16 +273,16 @@ const StoriesPage: React.FC = () => {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setComposeSummary(data.summary || '');
-      toast.success('Résumé généré');
+      toast.success(t.st_toast_summary_done);
     } catch (e: any) {
-      toast.error(e?.message || 'Échec du résumé');
+      toast.error(e?.message || t.st_toast_summary_failed);
     }
   };
 
   const handleSave = async () => {
     if (!user || !circleId) return;
     if (!composeContent.trim() && !composeTitle.trim()) {
-      toast.error('Ajoutez au moins un titre ou un récit.');
+      toast.error(t.st_toast_need_content);
       return;
     }
     setSaving(true);
@@ -284,7 +292,7 @@ const StoriesPage: React.FC = () => {
         .insert({
           circle_id: circleId,
           author_id: user.id,
-          title: composeTitle || 'Sans titre',
+          title: composeTitle || t.st_no_title,
           content: composeContent,
           ai_summary: composeSummary || null,
           story_date: composeDate || null,
@@ -312,7 +320,7 @@ const StoriesPage: React.FC = () => {
         });
         if (upErr) {
           console.error(upErr);
-          toast.error(`Échec de l'envoi: ${file.name}`);
+          toast.error(`${t.st_toast_upload_err}: ${file.name}`);
           continue;
         }
         if (isImage) {
@@ -331,14 +339,14 @@ const StoriesPage: React.FC = () => {
         });
       }
 
-      toast.success('Histoire enregistrée');
+      toast.success(t.st_toast_saved);
       setComposeOpen(false);
       resetCompose();
       loadStories();
       setSelectedStoryId(storyId);
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || "Échec de l'enregistrement");
+      toast.error(e?.message || t.st_toast_save_error);
     } finally {
       setSaving(false);
     }
@@ -358,9 +366,9 @@ const StoriesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Créez d'abord un cercle familial.</p>
+          <p className="text-muted-foreground">{t.must_create_circle}</p>
           <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>
-            Créer un cercle
+            {t.create_circle}
           </Button>
         </div>
       </AppLayout>
@@ -378,18 +386,18 @@ const StoriesPage: React.FC = () => {
             className="self-start gap-2 text-muted-foreground"
             onClick={() => (window.location.href = '/memories')}
           >
-            <ArrowLeft className="h-4 w-4" /> Retour aux souvenirs
+            <ArrowLeft className="h-4 w-4" /> {t.st_back_memories}
           </Button>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(220_45%_92%)] text-[hsl(220_45%_25%)] text-xs font-medium">
-                <BookOpen className="h-3.5 w-3.5" /> Histoires racontées
+                <BookOpen className="h-3.5 w-3.5" /> {t.st_badge}
               </div>
               <h1 className="font-heading text-3xl md:text-4xl font-semibold tracking-tight">
-                Vos histoires de famille
+                {t.st_title}
               </h1>
               <p className="text-muted-foreground max-w-2xl">
-                Préservez vos récits, vos tranches de vie et vos anecdotes. Écrivez-les, dictez-les, ajoutez des photos ou des vidéos.
+                {t.st_subtitle}
               </p>
             </div>
           </div>
@@ -405,9 +413,9 @@ const StoriesPage: React.FC = () => {
               <Pencil className="h-7 w-7 text-[hsl(220_45%_25%)]" />
             </div>
             <div>
-              <h3 className="font-heading text-xl font-semibold">Écrire une histoire</h3>
+              <h3 className="font-heading text-xl font-semibold">{t.st_write}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Rédigez vous-même votre récit, à votre rythme. Ajoutez photos et vidéos.
+                {t.st_write_hint}
               </p>
             </div>
           </button>
@@ -420,9 +428,9 @@ const StoriesPage: React.FC = () => {
               <Mic className="h-7 w-7 text-[hsl(355_60%_55%)]" />
             </div>
             <div>
-              <h3 className="font-heading text-xl font-semibold">Dicter une histoire</h3>
+              <h3 className="font-heading text-xl font-semibold">{t.st_dictate}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Parlez naturellement. L'IA transcrit, structure et résume pour vous.
+                {t.st_dictate_hint}
               </p>
             </div>
           </button>
@@ -431,21 +439,25 @@ const StoriesPage: React.FC = () => {
         {/* Stories list */}
         <section className="space-y-4">
           <h2 className="font-heading text-2xl font-semibold">
-            {stories.length > 0 ? `${stories.length} histoire${stories.length > 1 ? 's' : ''}` : 'Aucune histoire pour le moment'}
+            {stories.length === 0
+              ? t.st_count_none
+              : stories.length === 1
+              ? t.st_count_one.replace('{n}', '1')
+              : t.st_count_many.replace('{n}', String(stories.length))}
           </h2>
 
           {stories.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-border p-10 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/40" />
               <p className="mt-4 text-muted-foreground">
-                Commencez par écrire ou dicter votre première histoire.
+                {t.st_empty_hint}
               </p>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {stories.map((s) => (
-              <StoryCard key={s.id} story={s} onOpen={() => setSelectedStoryId(s.id)} />
+              <StoryCard key={s.id} story={s} lang={lang} t={t} onOpen={() => setSelectedStoryId(s.id)} />
             ))}
           </div>
         </section>
@@ -456,6 +468,7 @@ const StoriesPage: React.FC = () => {
         open={dictateOpen}
         onClose={() => setDictateOpen(false)}
         onTranscribed={handleDictated}
+        t={t}
       />
 
       {/* Compose / Edit dialog */}
@@ -464,28 +477,28 @@ const StoriesPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl flex items-center gap-2">
               {composeSource === 'dictated' ? <Mic className="h-5 w-5 text-[hsl(355_60%_55%)]" /> : <Pencil className="h-5 w-5 text-[hsl(220_45%_25%)]" />}
-              {composeSource === 'dictated' ? 'Vérifier la dictée' : 'Écrire une histoire'}
+              {composeSource === 'dictated' ? t.st_dialog_check : t.st_dialog_write}
             </DialogTitle>
             <DialogDescription>
-              Donnez un titre à votre récit, ajoutez la date du souvenir et joignez des photos ou des vidéos si vous le souhaitez.
+              {t.st_dialog_desc}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="story-title" className="text-base">Titre</Label>
+              <Label htmlFor="story-title" className="text-base">{t.st_field_title}</Label>
               <Input
                 id="story-title"
                 value={composeTitle}
                 onChange={(e) => setComposeTitle(e.target.value)}
-                placeholder="Ex. Le mariage de tante Yvonne"
+                placeholder={t.st_field_title_ph}
                 className="text-base"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="story-date" className="text-base">Date du souvenir (facultatif)</Label>
+                <Label htmlFor="story-date" className="text-base">{t.st_field_date}</Label>
                 <Input
                   id="story-date"
                   type="date"
@@ -494,35 +507,35 @@ const StoriesPage: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-base">Visibilité</Label>
+                <Label className="text-base">{t.st_field_visibility}</Label>
                 <Select value={composeVisibility} onValueChange={(v) => setComposeVisibility(v as Visibility)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="circle">Toute la famille</SelectItem>
-                    <SelectItem value="managers">Gestionnaires uniquement</SelectItem>
-                    <SelectItem value="private">Privé (moi seulement)</SelectItem>
+                    <SelectItem value="circle">{t.st_vis_circle}</SelectItem>
+                    <SelectItem value="managers">{t.st_vis_managers}</SelectItem>
+                    <SelectItem value="private">{t.st_vis_private}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="story-content" className="text-base">Votre récit</Label>
+              <Label htmlFor="story-content" className="text-base">{t.st_field_content}</Label>
               <Textarea
                 id="story-content"
                 value={composeContent}
                 onChange={(e) => setComposeContent(e.target.value)}
                 rows={10}
-                placeholder="Racontez votre souvenir, une tranche de vie, une anecdote…"
+                placeholder={t.st_field_content_ph}
                 className="text-base leading-relaxed"
               />
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="story-summary" className="text-base">Résumé (facultatif)</Label>
+                <Label htmlFor="story-summary" className="text-base">{t.st_field_summary}</Label>
                 <Button type="button" variant="outline" size="sm" onClick={summarizeContent} className="gap-2">
-                  <Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Résumer avec l'IA
+                  <Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {t.st_summarize_ai}
                 </Button>
               </div>
               <Textarea
@@ -530,13 +543,13 @@ const StoriesPage: React.FC = () => {
                 value={composeSummary}
                 onChange={(e) => setComposeSummary(e.target.value)}
                 rows={3}
-                placeholder="Un court résumé pour retrouver l'histoire facilement."
+                placeholder={t.st_field_summary_ph}
               />
             </div>
 
             {/* Media picker */}
             <div className="space-y-2">
-              <Label className="text-base">Photos, vidéos ou audio (facultatif)</Label>
+              <Label className="text-base">{t.st_field_media}</Label>
               <div className="rounded-xl border-2 border-dashed border-border p-4 space-y-3">
                 <input
                   id="story-files"
@@ -552,7 +565,7 @@ const StoriesPage: React.FC = () => {
                 />
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant="outline" size="sm" className="gap-2" onClick={() => document.getElementById('story-files')?.click()}>
-                    <Upload className="h-4 w-4" /> Ajouter des fichiers
+                    <Upload className="h-4 w-4" /> {t.st_add_files}
                   </Button>
                   <Button
                     type="button"
@@ -571,7 +584,7 @@ const StoriesPage: React.FC = () => {
                       input.click();
                     }}
                   >
-                    <Camera className="h-4 w-4" /> Prendre une photo
+                    <Camera className="h-4 w-4" /> {t.st_take_photo}
                   </Button>
                 </div>
                 {pendingFiles.length > 0 && (
@@ -599,11 +612,11 @@ const StoriesPage: React.FC = () => {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setComposeOpen(false)} disabled={saving}>
-              Annuler
+              {t.common_cancel}
             </Button>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              Enregistrer l'histoire
+              {t.st_save_btn}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -613,6 +626,8 @@ const StoriesPage: React.FC = () => {
       {selectedStoryId && (
         <StoryDetailDialog
           storyId={selectedStoryId}
+          lang={lang}
+          t={t}
           onClose={() => setSelectedStoryId(null)}
           onDeleted={() => {
             setSelectedStoryId(null);
@@ -625,7 +640,7 @@ const StoriesPage: React.FC = () => {
 };
 
 // ============ STORY CARD ============
-const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOpen }) => {
+const StoryCard: React.FC<{ story: Story; lang: 'fr' | 'en' | 'es'; t: StCopy; onOpen: () => void }> = ({ story, lang, t, onOpen }) => {
   return (
     <button
       onClick={onOpen}
@@ -633,16 +648,16 @@ const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOp
     >
       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
         <Calendar className="h-3.5 w-3.5" />
-        {formatFR(story.created_at)}
+        {formatLocale(story.created_at, lang)}
         {story.source === 'dictated' && (
           <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(355_60%_94%)] text-[hsl(355_60%_45%)] text-[10px] font-medium">
-            <Mic className="h-3 w-3" /> Dictée
+            <Mic className="h-3 w-3" /> {t.st_dictated_badge}
           </span>
         )}
       </div>
-      <h3 className="font-heading text-lg font-semibold leading-snug line-clamp-2">{story.title || 'Sans titre'}</h3>
+      <h3 className="font-heading text-lg font-semibold leading-snug line-clamp-2">{story.title || t.st_no_title}</h3>
       <p className="text-sm text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
-        {story.ai_summary || story.content || 'Pas encore de contenu.'}
+        {story.ai_summary || story.content || t.st_no_content}
       </p>
     </button>
   );
@@ -651,9 +666,11 @@ const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOp
 // ============ STORY DETAIL ============
 const StoryDetailDialog: React.FC<{
   storyId: string;
+  lang: 'fr' | 'en' | 'es';
+  t: StCopy;
   onClose: () => void;
   onDeleted: () => void;
-}> = ({ storyId, onClose, onDeleted }) => {
+}> = ({ storyId, lang, t, onClose, onDeleted }) => {
   const { user } = useAuth();
   const [story, setStory] = useState<Story | null>(null);
   const [anecdotes, setAnecdotes] = useState<Anecdote[]>([]);
@@ -698,7 +715,7 @@ const StoryDetailDialog: React.FC<{
       author_id: user.id,
       content: newAnecdote.trim(),
     });
-    if (error) toast.error('Échec de l\'ajout');
+    if (error) toast.error(t.st_toast_anecdote_added_err);
     else {
       setNewAnecdote('');
       load();
@@ -713,9 +730,9 @@ const StoryDetailDialog: React.FC<{
       await supabase.storage.from('memories-media').remove(paths);
     }
     const { error } = await (supabase as any).from('stories').delete().eq('id', storyId);
-    if (error) toast.error('Échec de la suppression');
+    if (error) toast.error(t.st_toast_delete_err);
     else {
-      toast.success('Histoire supprimée');
+      toast.success(t.st_toast_deleted);
       onDeleted();
     }
   };
@@ -735,10 +752,10 @@ const StoryDetailDialog: React.FC<{
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       await (supabase as any).from('story_media').update({ ai_description: data.summary }).eq('id', mi.id);
-      toast.success('Description générée');
+      toast.success(t.st_toast_describe_done);
       load();
     } catch (e: any) {
-      toast.error(e?.message || 'Échec de la description');
+      toast.error(e?.message || t.st_toast_describe_err);
     } finally {
       setSummarizingMedia(null);
     }
@@ -765,17 +782,17 @@ const StoryDetailDialog: React.FC<{
           <DialogHeader>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
-              Ajoutée le {formatFR(story.created_at)}
+              {t.st_added_on} {formatLocale(story.created_at, lang)}
               {story.story_date && (
-                <span className="ml-2">· Souvenir du {new Date(story.story_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                <span className="ml-2">· {t.st_memory_of} {new Date(story.story_date).toLocaleDateString(localeMap[lang], { day: '2-digit', month: 'long', year: 'numeric' })}</span>
               )}
               {story.source === 'dictated' && (
                 <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(355_60%_94%)] text-[hsl(355_60%_45%)] font-medium">
-                  <Mic className="h-3 w-3" /> Dictée
+                  <Mic className="h-3 w-3" /> {t.st_dictated_badge}
                 </span>
               )}
             </div>
-            <DialogTitle className="font-heading text-2xl md:text-3xl">{story.title || 'Sans titre'}</DialogTitle>
+            <DialogTitle className="font-heading text-2xl md:text-3xl">{story.title || t.st_no_title}</DialogTitle>
             {story.ai_summary && (
               <DialogDescription className="text-base italic border-l-4 border-[hsl(35_60%_55%)] pl-4 py-2 bg-[hsl(35_60%_97%)] rounded">
                 {story.ai_summary}
@@ -785,14 +802,14 @@ const StoryDetailDialog: React.FC<{
 
           {/* Content */}
           <article className="prose prose-sm max-w-none whitespace-pre-wrap text-base leading-relaxed text-foreground">
-            {story.content || <span className="text-muted-foreground italic">Aucun texte.</span>}
+            {story.content || <span className="text-muted-foreground italic">{t.st_no_text}</span>}
           </article>
 
           {/* Media */}
           {media.length > 0 && (
             <>
               <div className="border-t border-border pt-4">
-                <h3 className="font-heading text-lg font-semibold mb-3">Photos, vidéos & audio</h3>
+                <h3 className="font-heading text-lg font-semibold mb-3">{t.st_media_section}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {media.map((mi) => (
                     <div key={mi.id} className="rounded-xl border border-border overflow-hidden bg-muted/30">
@@ -819,7 +836,7 @@ const StoryDetailDialog: React.FC<{
                             disabled={summarizingMedia === mi.id}
                           >
                             {summarizingMedia === mi.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                            Décrire avec l'IA
+                            {t.st_describe_ai}
                           </Button>
                         ) : null}
                       </div>
@@ -834,11 +851,11 @@ const StoryDetailDialog: React.FC<{
           <div className="border-t border-border pt-4 space-y-3">
             <h3 className="font-heading text-lg font-semibold flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-[hsl(220_45%_25%)]" />
-              Anecdotes ({anecdotes.length})
+              {t.st_anecdotes_title} ({anecdotes.length})
             </h3>
             {anecdotes.length === 0 && (
               <p className="text-sm text-muted-foreground italic">
-                Pas encore d'anecdote. Ajoutez un détail savoureux, une variante, un souvenir lié.
+                {t.st_anecdote_empty}
               </p>
             )}
             <ul className="space-y-2">
@@ -846,7 +863,7 @@ const StoryDetailDialog: React.FC<{
                 <li key={a.id} className="rounded-xl bg-[hsl(40_33%_96%)] border border-border p-3">
                   <p className="text-sm whitespace-pre-wrap">{a.content}</p>
                   <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
-                    <Calendar className="h-3 w-3" /> {formatFR(a.created_at)}
+                    <Calendar className="h-3 w-3" /> {formatLocale(a.created_at, lang)}
                   </p>
                 </li>
               ))}
@@ -854,14 +871,14 @@ const StoryDetailDialog: React.FC<{
 
             <div className="space-y-2">
               <Textarea
-                placeholder="Ajouter une anecdote à cette histoire…"
+                placeholder={t.st_anecdote_ph}
                 value={newAnecdote}
                 onChange={(e) => setNewAnecdote(e.target.value)}
                 rows={3}
               />
               <Button onClick={addAnecdote} disabled={addingAnecdote || !newAnecdote.trim()} size="sm" className="gap-2">
                 {addingAnecdote ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Ajouter cette anecdote
+                {t.st_anecdote_add}
               </Button>
             </div>
           </div>
@@ -869,7 +886,7 @@ const StoryDetailDialog: React.FC<{
           {isAuthor && (
             <DialogFooter className="border-t border-border pt-4">
               <Button variant="destructive" onClick={() => setConfirmDelete(true)} className="gap-2">
-                <Trash2 className="h-4 w-4" /> Supprimer cette histoire
+                <Trash2 className="h-4 w-4" /> {t.st_delete_story}
               </Button>
             </DialogFooter>
           )}
@@ -879,15 +896,15 @@ const StoryDetailDialog: React.FC<{
       <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette histoire ?</AlertDialogTitle>
+            <AlertDialogTitle>{t.st_confirm_delete_title}</AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est définitive. L'histoire, ses anecdotes et ses médias seront supprimés.
+              {t.st_confirm_delete_desc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t.common_cancel}</AlertDialogCancel>
             <AlertDialogAction onClick={deleteStory} className={cn('bg-destructive text-destructive-foreground hover:bg-destructive/90')}>
-              Supprimer définitivement
+              {t.st_confirm_delete_yes}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

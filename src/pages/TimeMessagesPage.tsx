@@ -18,6 +18,11 @@ import {
   Clock, Mic, Video, FileText, Plus, Loader2, Calendar as CalendarIcon,
   Heart, ShieldCheck, Trash2, Play, Square, UserPlus, AlertCircle,
 } from 'lucide-react';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy } from '@/lib/memories-i18n';
+
+type TmCopy = ReturnType<typeof useMemoriesCopy>;
+const tmLocale = { fr: 'fr-CA', en: 'en-US', es: 'es-ES' } as const;
 
 type Format = 'audio' | 'video' | 'text';
 type Trigger = 'scheduled_date' | 'after_death';
@@ -49,10 +54,13 @@ interface Guardian {
 }
 
 const formatIcon = (f: Format) => f === 'audio' ? Mic : f === 'video' ? Video : FileText;
-const formatLabel = (f: Format) => f === 'audio' ? 'Audio' : f === 'video' ? 'Vidéo' : 'Texte';
+const formatLabel = (f: Format, t: TmCopy) =>
+  f === 'audio' ? t.tm_format_audio : f === 'video' ? t.tm_format_video : t.tm_format_text;
 
 export default function TimeMessagesPage() {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const t = useMemoriesCopy(lang);
   const [circleId, setCircleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<TimeMessage[]>([]);
@@ -116,8 +124,8 @@ export default function TimeMessagesPage() {
     return (
       <AppLayout>
         <div className="max-w-2xl mx-auto p-8 text-center">
-          <p className="text-muted-foreground">Vous devez d'abord créer ou rejoindre un cercle familial.</p>
-          <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{t.must_create_circle}</p>
+          <Button className="mt-4" onClick={() => (window.location.href = '/circle')}>{t.create_circle}</Button>
         </div>
       </AppLayout>
     );
@@ -131,24 +139,23 @@ export default function TimeMessagesPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[hsl(270_30%_92%)] text-[hsl(270_35%_45%)] text-xs font-medium mb-3">
               <Clock className="w-3.5 h-3.5" />
-              Messages dans le temps
+              {t.tm_badge}
             </div>
             <h1 className="font-heading text-3xl md:text-4xl text-foreground">
-              Vos mots, livrés au bon moment
+              {t.tm_title}
             </h1>
             <p className="text-muted-foreground mt-2 max-w-2xl">
-              Enregistrez aujourd'hui des messages vocaux, vidéo ou écrits qui seront envoyés à vos proches
-              à une date précise (anniversaire, mariage, naissance…) ou après votre décès.
+              {t.tm_subtitle}
             </p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setGuardianOpen(true)} className="gap-2">
               <ShieldCheck className="w-4 h-4" />
-              Gardiens ({guardians.length})
+              {t.tm_guardians_btn} ({guardians.length})
             </Button>
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <Plus className="w-4 h-4" />
-              Nouveau message
+              {t.tm_new_btn}
             </Button>
           </div>
         </div>
@@ -159,13 +166,12 @@ export default function TimeMessagesPage() {
             <CardContent className="p-5 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-[hsl(35_70%_45%)] mt-0.5 shrink-0" />
               <div className="flex-1">
-                <h3 className="font-medium text-foreground">Configurez vos gardiens de confiance</h3>
+                <h3 className="font-medium text-foreground">{t.tm_setup_guardians_title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Pour les messages posthumes, désignez 1 ou 2 personnes qui pourront confirmer votre décès et
-                  déclencher l'envoi. Une vérification d'inactivité (6 mois sans connexion) sert de filet de sécurité.
+                  {t.tm_setup_guardians_desc}
                 </p>
                 <Button variant="link" className="px-0 h-auto mt-2" onClick={() => setGuardianOpen(true)}>
-                  Désigner un gardien →
+                  {t.tm_designate_guardian}
                 </Button>
               </div>
             </CardContent>
@@ -175,25 +181,29 @@ export default function TimeMessagesPage() {
         <Tabs defaultValue="scheduled" className="w-full">
           <TabsList>
             <TabsTrigger value="scheduled" className="gap-2">
-              <CalendarIcon className="w-4 h-4" /> À date précise ({upcoming.length})
+              <CalendarIcon className="w-4 h-4" /> {t.tm_tab_scheduled} ({upcoming.length})
             </TabsTrigger>
             <TabsTrigger value="posthumous" className="gap-2">
-              <Heart className="w-4 h-4" /> Après mon décès ({posthumous.length})
+              <Heart className="w-4 h-4" /> {t.tm_tab_posthumous} ({posthumous.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="scheduled" className="mt-6">
             <MessageList
               messages={upcoming}
-              emptyText="Aucun message programmé pour l'instant."
+              emptyText={t.tm_empty_scheduled}
               onChange={refresh}
+              t={t}
+              lang={lang}
             />
           </TabsContent>
           <TabsContent value="posthumous" className="mt-6">
             <MessageList
               messages={posthumous}
-              emptyText="Aucun message posthume enregistré."
+              emptyText={t.tm_empty_posthumous}
               onChange={refresh}
+              t={t}
+              lang={lang}
             />
           </TabsContent>
         </Tabs>
@@ -205,6 +215,7 @@ export default function TimeMessagesPage() {
         userId={user!.id}
         circleId={circleId}
         onCreated={refresh}
+        t={t}
       />
       <GuardiansDialog
         open={guardianOpen}
@@ -213,14 +224,15 @@ export default function TimeMessagesPage() {
         circleId={circleId}
         guardians={guardians}
         onChange={refresh}
+        t={t}
       />
     </AppLayout>
   );
 }
 
 function MessageList({
-  messages, emptyText, onChange,
-}: { messages: TimeMessage[]; emptyText: string; onChange: () => void }) {
+  messages, emptyText, onChange, t, lang,
+}: { messages: TimeMessage[]; emptyText: string; onChange: () => void; t: TmCopy; lang: 'fr' | 'en' | 'es' }) {
   if (messages.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
@@ -231,10 +243,10 @@ function MessageList({
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Supprimer ce message ? Cette action est définitive.')) return;
+    if (!confirm(t.tm_toast_confirm_delete_msg)) return;
     const { error } = await supabase.from('time_messages').delete().eq('id', id);
     if (error) toast.error(error.message);
-    else { toast.success('Message supprimé'); onChange(); }
+    else { toast.success(t.tm_toast_msg_deleted); onChange(); }
   };
 
   return (
@@ -249,7 +261,7 @@ function MessageList({
                   <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
-                  <Badge variant="outline" className="text-xs">{formatLabel(m.format)}</Badge>
+                  <Badge variant="outline" className="text-xs">{formatLabel(m.format, t)}</Badge>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => handleDelete(m.id)}>
                   <Trash2 className="w-4 h-4 text-muted-foreground" />
@@ -258,7 +270,7 @@ function MessageList({
 
               <h3 className="font-heading text-lg mt-3 text-foreground">{m.title}</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Pour <span className="font-medium text-foreground">{m.recipient_name}</span>
+                {t.tm_for} <span className="font-medium text-foreground">{m.recipient_name}</span>
                 {m.recipient_relationship && <> · {m.recipient_relationship}</>}
               </p>
               {(m.recipient_email || m.recipient_phone) && (
@@ -277,15 +289,15 @@ function MessageList({
                 {m.trigger_type === 'scheduled_date' && m.scheduled_for ? (
                   <>
                     <CalendarIcon className="w-3.5 h-3.5" />
-                    {new Date(m.scheduled_for).toLocaleDateString('fr-CA', {
+                    {new Date(m.scheduled_for).toLocaleDateString(tmLocale[lang], {
                       day: 'numeric', month: 'long', year: 'numeric',
                     })}
-                    {m.is_recurring && <Badge variant="secondary" className="text-xs">Chaque année</Badge>}
+                    {m.is_recurring && <Badge variant="secondary" className="text-xs">{t.tm_yearly}</Badge>}
                   </>
                 ) : (
                   <>
                     <Heart className="w-3.5 h-3.5" />
-                    À envoyer après mon décès
+                    {t.tm_send_after_death}
                   </>
                 )}
               </div>
@@ -298,10 +310,10 @@ function MessageList({
 }
 
 function CreateMessageDialog({
-  open, onOpenChange, userId, circleId, onCreated,
+  open, onOpenChange, userId, circleId, onCreated, t,
 }: {
   open: boolean; onOpenChange: (o: boolean) => void;
-  userId: string; circleId: string; onCreated: () => void;
+  userId: string; circleId: string; onCreated: () => void; t: TmCopy;
 }) {
   const [format, setFormat] = useState<Format>('audio');
   const [trigger, setTrigger] = useState<Trigger>('scheduled_date');
@@ -356,7 +368,7 @@ function CreateMessageDialog({
       recorderRef.current = recorder;
       setRecording(true);
     } catch (e: any) {
-      toast.error('Impossible d\'accéder au micro/caméra : ' + (e.message || ''));
+      toast.error(t.tm_toast_mic_err + ' : ' + (e.message || ''));
     }
   };
 
@@ -374,19 +386,19 @@ function CreateMessageDialog({
 
   const handleSave = async () => {
     if (!title.trim() || !recipientName.trim()) {
-      toast.error('Titre et destinataire sont obligatoires');
+      toast.error(t.tm_toast_required_title_recipient);
       return;
     }
     if (trigger === 'scheduled_date' && !scheduledFor) {
-      toast.error('Choisissez une date d\'envoi');
+      toast.error(t.tm_toast_required_date);
       return;
     }
     if (format !== 'text' && !mediaBlob) {
-      toast.error('Enregistrez ou téléchargez un fichier ' + formatLabel(format).toLowerCase());
+      toast.error(t.tm_toast_required_media + ' (' + formatLabel(format, t).toLowerCase() + ')');
       return;
     }
     if (format === 'text' && !textContent.trim()) {
-      toast.error('Écrivez votre message');
+      toast.error(t.tm_toast_required_text);
       return;
     }
 
@@ -428,12 +440,12 @@ function CreateMessageDialog({
       });
       if (error) throw error;
 
-      toast.success('Message enregistré');
+      toast.success(t.tm_toast_msg_saved);
       reset();
       onOpenChange(false);
       onCreated();
     } catch (e: any) {
-      toast.error(e.message || 'Erreur lors de l\'enregistrement');
+      toast.error(e.message || t.tm_toast_save_err);
     } finally {
       setSaving(false);
     }
@@ -443,13 +455,13 @@ function CreateMessageDialog({
     <Dialog open={open} onOpenChange={(o) => { if (!o) { reset(); } onOpenChange(o); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">Nouveau message dans le temps</DialogTitle>
+          <DialogTitle className="font-heading text-2xl">{t.tm_dialog_title}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5">
           {/* Format */}
           <div>
-            <Label className="mb-2 block">Format</Label>
+            <Label className="mb-2 block">{t.tm_field_format}</Label>
             <div className="grid grid-cols-3 gap-2">
               {(['audio', 'video', 'text'] as Format[]).map((f) => {
                 const Icon = formatIcon(f);
@@ -463,7 +475,7 @@ function CreateMessageDialog({
                     }`}
                   >
                     <Icon className="w-5 h-5 mx-auto mb-1 text-primary" />
-                    <div className="text-sm font-medium">{formatLabel(f)}</div>
+                    <div className="text-sm font-medium">{formatLabel(f, t)}</div>
                   </button>
                 );
               })}
@@ -473,18 +485,18 @@ function CreateMessageDialog({
           {/* Recording / file / text */}
           {format === 'text' ? (
             <div>
-              <Label htmlFor="text">Votre message</Label>
+              <Label htmlFor="text">{t.tm_field_text}</Label>
               <Textarea
                 id="text"
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
                 rows={6}
-                placeholder="Mon cher petit-fils, le jour de tes 18 ans…"
+                placeholder={t.tm_field_text_ph}
               />
             </div>
           ) : (
             <div className="space-y-3">
-              <Label>Enregistrement</Label>
+              <Label>{t.tm_field_recording}</Label>
               {format === 'video' && (
                 <video
                   ref={videoPreviewRef}
@@ -537,53 +549,53 @@ function CreateMessageDialog({
           )}
 
           <div>
-            <Label htmlFor="title">Titre du message</Label>
+            <Label htmlFor="title">{t.tm_field_title}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ex: Bonne fête pour tes 18 ans" />
+              placeholder={t.tm_field_title_ph} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="recipient">Destinataire</Label>
+              <Label htmlFor="recipient">{t.tm_field_recipient}</Label>
               <Input id="recipient" value={recipientName} onChange={(e) => setRecipientName(e.target.value)}
-                placeholder="Ex: Léa Dupont" />
+                placeholder={t.tm_field_recipient_ph} />
             </div>
             <div>
-              <Label htmlFor="rel">Lien</Label>
+              <Label htmlFor="rel">{t.tm_field_relationship}</Label>
               <Input id="rel" value={relationship} onChange={(e) => setRelationship(e.target.value)}
-                placeholder="Ex: Petite-fille" />
+                placeholder={t.tm_field_relationship_ph} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="email">Courriel du destinataire</Label>
+              <Label htmlFor="email">{t.tm_field_email}</Label>
               <Input id="email" type="email" value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
-                placeholder="ex: lea.dupont@email.com" />
+                placeholder={t.tm_field_email_ph} />
             </div>
             <div>
-              <Label htmlFor="phone">Téléphone du destinataire</Label>
+              <Label htmlFor="phone">{t.tm_field_phone}</Label>
               <Input id="phone" type="tel" value={recipientPhone}
                 onChange={(e) => setRecipientPhone(e.target.value)}
-                placeholder="ex: +1 514 555 0123" />
+                placeholder="+1 514 555 0123" />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="occ">Occasion (facultatif)</Label>
+            <Label htmlFor="occ">{t.tm_field_occasion}</Label>
             <Input id="occ" value={occasion} onChange={(e) => setOccasion(e.target.value)}
-              placeholder="Ex: 18 ans, mariage, naissance…" />
+              placeholder={t.tm_field_occasion_ph} />
           </div>
 
           {/* Trigger */}
           <div>
-            <Label className="mb-2 block">Quand l'envoyer ?</Label>
+            <Label className="mb-2 block">{t.tm_field_when}</Label>
             <Select value={trigger} onValueChange={(v) => setTrigger(v as Trigger)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="scheduled_date">À une date précise</SelectItem>
-                <SelectItem value="after_death">Après mon décès</SelectItem>
+                <SelectItem value="scheduled_date">{t.tm_when_scheduled}</SelectItem>
+                <SelectItem value="after_death">{t.tm_when_after_death}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -591,14 +603,14 @@ function CreateMessageDialog({
           {trigger === 'scheduled_date' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="date">Date d'envoi</Label>
+                <Label htmlFor="date">{t.tm_field_date}</Label>
                 <Input id="date" type="date" value={scheduledFor}
                   onChange={(e) => setScheduledFor(e.target.value)} />
               </div>
               <div className="flex items-end">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={recurring} onChange={(e) => setRecurring(e.target.checked)} />
-                  <span className="text-sm">Répéter chaque année</span>
+                  <span className="text-sm">{t.tm_repeat_yearly}</span>
                 </label>
               </div>
             </div>
@@ -607,16 +619,15 @@ function CreateMessageDialog({
           {trigger === 'after_death' && (
             <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground flex gap-2">
               <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
-              Ce message sera libéré quand vos gardiens de confiance confirmeront votre décès,
-              ou après une longue inactivité (6 mois par défaut).
+              {t.tm_after_death_info}
             </div>
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
+            <Button variant="ghost" onClick={() => onOpenChange(false)}>{t.common_cancel}</Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Enregistrer le message
+              {t.tm_save_btn}
             </Button>
           </div>
         </div>
@@ -626,10 +637,10 @@ function CreateMessageDialog({
 }
 
 function GuardiansDialog({
-  open, onOpenChange, userId, circleId, guardians, onChange,
+  open, onOpenChange, userId, circleId, guardians, onChange, t,
 }: {
   open: boolean; onOpenChange: (o: boolean) => void;
-  userId: string; circleId: string; guardians: Guardian[]; onChange: () => void;
+  userId: string; circleId: string; guardians: Guardian[]; onChange: () => void; t: TmCopy;
 }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -638,7 +649,7 @@ function GuardiansDialog({
 
   const handleAdd = async () => {
     if (!name.trim() || !email.trim()) {
-      toast.error('Nom et courriel obligatoires');
+      toast.error(t.tm_toast_guardian_required);
       return;
     }
     setSaving(true);
@@ -652,14 +663,14 @@ function GuardiansDialog({
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     setName(''); setEmail(''); setRel('');
-    toast.success('Gardien ajouté');
+    toast.success(t.tm_toast_guardian_added);
     onChange();
   };
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from('time_message_guardians').delete().eq('id', id);
     if (error) toast.error(error.message);
-    else { toast.success('Gardien retiré'); onChange(); }
+    else { toast.success(t.tm_toast_guardian_removed); onChange(); }
   };
 
   return (
@@ -668,13 +679,12 @@ function GuardiansDialog({
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl flex items-center gap-2">
             <ShieldCheck className="w-5 h-5" />
-            Gardiens de confiance
+            {t.tm_guardians_dialog_title}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Ces personnes pourront confirmer votre décès et libérer vos messages posthumes.
-            Choisissez 1 à 2 personnes en qui vous avez pleinement confiance.
+            {t.tm_guardians_dialog_desc}
           </p>
 
           <div className="space-y-2">
@@ -692,20 +702,20 @@ function GuardiansDialog({
               </div>
             ))}
             {guardians.length === 0 && (
-              <p className="text-sm text-center text-muted-foreground py-4">Aucun gardien désigné</p>
+              <p className="text-sm text-center text-muted-foreground py-4">{t.tm_no_guardians}</p>
             )}
           </div>
 
           <div className="border-t pt-4 space-y-3">
             <h4 className="font-medium text-sm flex items-center gap-2">
-              <UserPlus className="w-4 h-4" /> Ajouter un gardien
+              <UserPlus className="w-4 h-4" /> {t.tm_designate_guardian}
             </h4>
-            <Input placeholder="Nom complet" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input placeholder="Courriel" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <Input placeholder="Lien (ex: enfant aîné)" value={rel} onChange={(e) => setRel(e.target.value)} />
+            <Input placeholder={t.tm_guardian_name_ph} value={name} onChange={(e) => setName(e.target.value)} />
+            <Input placeholder={t.tm_guardian_email_ph} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input placeholder={t.tm_guardian_rel_ph} value={rel} onChange={(e) => setRel(e.target.value)} />
             <Button onClick={handleAdd} disabled={saving} className="w-full">
               {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-              Ajouter ce gardien
+              {t.tm_guardian_add}
             </Button>
           </div>
         </div>
