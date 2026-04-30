@@ -540,8 +540,9 @@ const RecipesPage: React.FC = () => {
 
       <RecipeQuickAddDialog
         open={quickAddOpen}
-        onClose={() => setQuickAddOpen(false)}
+        onClose={() => { setQuickAddOpen(false); setQuickAddInitialMode('choose'); }}
         onExtracted={handleExtracted}
+        initialMode={quickAddInitialMode}
       />
 
       <CreateRecipeDialog
