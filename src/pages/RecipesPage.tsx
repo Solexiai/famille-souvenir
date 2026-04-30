@@ -463,9 +463,18 @@ const RecipesPage: React.FC = () => {
         <section aria-label="Nos recettes">
           <div className="flex items-baseline justify-between mb-4">
             <h2 className="font-heading text-2xl font-semibold text-foreground">Nos recettes</h2>
-            <Button variant="outline" size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
-              <Plus className="h-4 w-4" /> Ajouter
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => setQuickAddOpen(true)}
+                className="gap-1.5 bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white"
+              >
+                <Sparkles className="h-4 w-4" /> Scan IA
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => { setRecipePrefill(null); setCreateOpen(true); }} className="gap-1.5">
+                <Plus className="h-4 w-4" /> Manuel
+              </Button>
+            </div>
           </div>
 
           {hasRealRecipes ? (
