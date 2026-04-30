@@ -1311,6 +1311,129 @@ export type Database = {
         }
         Relationships: []
       }
+      stories: {
+        Row: {
+          ai_summary: string | null
+          author_id: string
+          circle_id: string
+          content: string
+          created_at: string
+          id: string
+          source: string
+          story_date: string | null
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["memory_visibility"]
+        }
+        Insert: {
+          ai_summary?: string | null
+          author_id: string
+          circle_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          source?: string
+          story_date?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["memory_visibility"]
+        }
+        Update: {
+          ai_summary?: string | null
+          author_id?: string
+          circle_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          source?: string
+          story_date?: string | null
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["memory_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stories_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "family_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_anecdotes: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          story_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content?: string
+          created_at?: string
+          id?: string
+          story_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          story_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_anecdotes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_media: {
+        Row: {
+          ai_description: string | null
+          created_at: string
+          id: string
+          media_type: string
+          storage_path: string
+          story_id: string
+          uploader_id: string
+        }
+        Insert: {
+          ai_description?: string | null
+          created_at?: string
+          id?: string
+          media_type: string
+          storage_path: string
+          story_id: string
+          uploader_id: string
+        }
+        Update: {
+          ai_description?: string | null
+          created_at?: string
+          id?: string
+          media_type?: string
+          storage_path?: string
+          story_id?: string
+          uploader_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_media_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           billing_cycle: string | null
