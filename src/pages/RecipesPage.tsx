@@ -668,8 +668,9 @@ const RecipeCard: React.FC<{
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onOpen: () => void;
-}> = ({ recipe, branchName, generationName, occasionName, isFavorite, onToggleFavorite, onOpen }) => {
-  const subtitle = branchName || occasionName || generationName || DISH_TYPE_LABEL[recipe.dish_type];
+  c: MemoriesCopy;
+}> = ({ recipe, branchName, generationName, occasionName, isFavorite, onToggleFavorite, onOpen, c }) => {
+  const subtitle = branchName || occasionName || generationName || dishTypeLabel(c)[recipe.dish_type];
   return (
     <button onClick={onOpen} className="group text-left rounded-xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
@@ -683,14 +684,14 @@ const RecipeCard: React.FC<{
         <button
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
           className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
-          aria-label="Favori"
+          aria-label={c.rec_filter_favorites}
         >
           <Heart className={cn('h-4 w-4', isFavorite ? 'fill-[hsl(355_60%_55%)] text-[hsl(355_60%_55%)]' : 'text-foreground/60')} />
         </button>
         {(recipe.has_handwritten_note || recipe.has_audio_memory) && (
           <div className="absolute bottom-2 left-2 flex gap-1">
-            {recipe.has_handwritten_note && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> Note</Badge>}
-            {recipe.has_audio_memory && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> Audio</Badge>}
+            {recipe.has_handwritten_note && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> {c.rec_badge_note}</Badge>}
+            {recipe.has_audio_memory && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> {c.rec_badge_audio}</Badge>}
           </div>
         )}
       </div>
@@ -702,17 +703,17 @@ const RecipeCard: React.FC<{
   );
 };
 
-const DemoRecipesGrid: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
+const DemoRecipesGrid: React.FC<{ onOpen: () => void; c: MemoriesCopy }> = ({ onOpen, c }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     {DEMO_RECIPES.map((r) => (
       <button key={r.id} onClick={onOpen} className="group text-left rounded-xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
         <div className="relative aspect-[4/3] bg-muted overflow-hidden">
           <img src={r.image} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          <Badge className="absolute top-2 left-2 bg-white/90 text-[hsl(35_70%_35%)] text-[10px]">DÉMO</Badge>
+          <Badge className="absolute top-2 left-2 bg-white/90 text-[hsl(35_70%_35%)] text-[10px]">{c.rec_demo_badge}</Badge>
           <div className="absolute bottom-2 left-2 right-2 flex gap-1 flex-wrap">
-            {r.badges.includes('handwritten' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> Manuscrit</Badge>}
-            {r.badges.includes('audio' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> Audio</Badge>}
-            {r.badges.includes('memory' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Heart className="h-3 w-3" /> Souvenir</Badge>}
+            {r.badges.includes('handwritten' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> {c.rec_badge_handwritten}</Badge>}
+            {r.badges.includes('audio' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> {c.rec_badge_audio}</Badge>}
+            {r.badges.includes('memory' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Heart className="h-3 w-3" /> {c.rec_badge_memory}</Badge>}
           </div>
         </div>
         <div className="p-3">
@@ -724,42 +725,42 @@ const DemoRecipesGrid: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
   </div>
 );
 
-const EmptyStateBlock: React.FC<{ onCreate: () => void; onScan: () => void; onInvite: () => void }> = ({ onCreate, onScan, onInvite }) => (
+const EmptyStateBlock: React.FC<{ onCreate: () => void; onScan: () => void; onInvite: () => void; c: MemoriesCopy }> = ({ onCreate, onScan, onInvite, c }) => (
   <Card className="border-dashed border-2 border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)]">
     <CardContent className="p-8 text-center space-y-4">
       <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(35_60%_92%)]">
         <BookOpen className="h-7 w-7 text-[hsl(35_70%_45%)]" />
       </div>
-      <h3 className="font-heading text-2xl font-bold text-foreground">Commencez votre livre de recettes familial</h3>
+      <h3 className="font-heading text-2xl font-bold text-foreground">{c.rec_empty_title}</h3>
       <p className="text-muted-foreground max-w-xl mx-auto">
-        Ajoutez une première recette, numérisez un carnet manuscrit ou invitez un proche à partager un souvenir culinaire.
+        {c.rec_empty_desc}
       </p>
       <div className="flex flex-wrap gap-2 justify-center pt-2">
-        <Button onClick={onCreate} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white gap-2"><Plus className="h-4 w-4" /> Ajouter une recette</Button>
-        <Button onClick={onScan} variant="outline" className="gap-2"><ScanLine className="h-4 w-4" /> Numériser une recette</Button>
-        <Button onClick={onInvite} variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> Inviter un proche</Button>
+        <Button onClick={onCreate} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white gap-2"><Plus className="h-4 w-4" /> {c.rec_empty_add}</Button>
+        <Button onClick={onScan} variant="outline" className="gap-2"><ScanLine className="h-4 w-4" /> {c.rec_empty_scan}</Button>
+        <Button onClick={onInvite} variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> {c.rec_empty_invite}</Button>
       </div>
     </CardContent>
   </Card>
 );
 
-const HeritageCallout: React.FC<{ onAddMemory: () => void }> = ({ onAddMemory }) => (
+const HeritageCallout: React.FC<{ onAddMemory: () => void; c: MemoriesCopy }> = ({ onAddMemory, c }) => (
   <Card className="overflow-hidden border-border bg-gradient-to-br from-[hsl(35_60%_97%)] to-[hsl(40_33%_98%)] shadow-sm">
     <CardContent className="p-6 sm:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
       <div className="space-y-3">
-        <h3 className="font-heading text-2xl font-bold text-foreground">L'histoire derrière la recette</h3>
+        <h3 className="font-heading text-2xl font-bold text-foreground">{c.rec_heritage_title}</h3>
         <p className="text-muted-foreground leading-relaxed">
-          Chaque recette a une histoire. Préservons-la ensemble pour les générations à venir.
+          {c.rec_heritage_desc}
         </p>
         <div className="flex flex-wrap gap-3 pt-1 text-sm">
-          <span className="inline-flex items-center gap-1.5 text-foreground"><ImageIcon className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Photos de famille</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Mic className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Souvenirs audio</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Pencil className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Notes manuscrites</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Anecdotes</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><ImageIcon className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_photos}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Mic className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_audio}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Pencil className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_notes}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_anec}</span>
         </div>
       </div>
       <Button onClick={onAddMemory} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white rounded-full">
-        Ajouter un souvenir <ChevronRight className="h-4 w-4" />
+        {c.rec_heritage_cta} <ChevronRight className="h-4 w-4" />
       </Button>
     </CardContent>
   </Card>
