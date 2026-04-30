@@ -20,6 +20,7 @@ import {
 import type { FamilyCircle } from '@/types/database';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
+import { RecipeQuickAddDialog, type ExtractedRecipe } from '@/components/recipes/RecipeQuickAddDialog';
 import recipeTourtiere from '@/assets/demo/recipe-tourtiere.jpg';
 import recipeApplePie from '@/assets/demo/recipe-apple-pie.jpg';
 import recipeSpaghetti from '@/assets/demo/recipe-spaghetti.jpg';
@@ -174,8 +175,29 @@ const RecipesPage: React.FC = () => {
   const view: ClassificationKey | 'list' = (searchParams.get('view') as ClassificationKey) || 'list';
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [recipePrefill, setRecipePrefill] = useState<RecipePrefill | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
+
+  const handleExtracted = useCallback((extracted: ExtractedRecipe) => {
+    setRecipePrefill({
+      title: extracted.title,
+      story: extracted.notes || '',
+      ingredients: extracted.ingredients,
+      steps: extracted.steps,
+      preparation_time_minutes: extracted.preparation_time_minutes,
+      cooking_time_minutes: extracted.cooking_time_minutes,
+      servings: extracted.servings,
+      dish_type: extracted.dish_type,
+      difficulty: extracted.difficulty,
+      has_handwritten_note: !!extracted.is_handwritten,
+      scannedImageBase64: extracted.scannedImageBase64,
+    });
+    setQuickAddOpen(false);
+    setCreateOpen(true);
+    toast.success('Recette détectée ! Vérifiez et enregistrez.');
+  }, []);
 
   // ====== Data loading ======
   const loadAll = useCallback(async () => {
@@ -441,9 +463,18 @@ const RecipesPage: React.FC = () => {
         <section aria-label="Nos recettes">
           <div className="flex items-baseline justify-between mb-4">
             <h2 className="font-heading text-2xl font-semibold text-foreground">Nos recettes</h2>
-            <Button variant="outline" size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
-              <Plus className="h-4 w-4" /> Ajouter
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => setQuickAddOpen(true)}
+                className="gap-1.5 bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white"
+              >
+                <Sparkles className="h-4 w-4" /> Scan IA
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => { setRecipePrefill(null); setCreateOpen(true); }} className="gap-1.5">
+                <Plus className="h-4 w-4" /> Manuel
+              </Button>
+            </div>
           </div>
 
           {hasRealRecipes ? (
@@ -474,8 +505,8 @@ const RecipesPage: React.FC = () => {
         {/* Empty state full block (only when no real recipes) */}
         {!hasRealRecipes && (
           <EmptyStateBlock
-            onCreate={() => setCreateOpen(true)}
-            onScan={() => navigate('/documents')}
+            onCreate={() => { setRecipePrefill(null); setCreateOpen(true); }}
+            onScan={() => setQuickAddOpen(true)}
             onInvite={() => navigate('/circle/members')}
           />
         )}
@@ -484,16 +515,23 @@ const RecipesPage: React.FC = () => {
         <HeritageCallout onAddMemory={() => navigate('/memories')} />
       </div>
 
+      <RecipeQuickAddDialog
+        open={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onExtracted={handleExtracted}
+      />
+
       <CreateRecipeDialog
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
+        onClose={() => { setCreateOpen(false); setRecipePrefill(null); }}
         circle={circle}
         userId={user!.id}
         branches={branches}
         generations={generations}
         occasions={occasions}
         members={members}
-        onCreated={() => { setCreateOpen(false); loadAll(); }}
+        prefill={recipePrefill}
+        onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
       />
 
       <RecipeDetailDialog
@@ -848,6 +886,20 @@ const RecipeDetailDialog: React.FC<{
 };
 
 // ====== Create dialog ======
+export interface RecipePrefill {
+  title?: string;
+  story?: string;
+  ingredients?: string[];
+  steps?: string[];
+  preparation_time_minutes?: number;
+  cooking_time_minutes?: number;
+  servings?: number;
+  dish_type?: DishType;
+  difficulty?: Difficulty;
+  has_handwritten_note?: boolean;
+  scannedImageBase64?: string;
+}
+
 const CreateRecipeDialog: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -858,7 +910,8 @@ const CreateRecipeDialog: React.FC<{
   occasions: Occasion[];
   members: Array<{ id: string; user_id: string; name: string }>;
   onCreated: () => void;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated }) => {
+  prefill?: RecipePrefill | null;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -876,6 +929,22 @@ const CreateRecipeDialog: React.FC<{
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [hasHandwritten, setHasHandwritten] = useState(false);
   const [privacy, setPrivacy] = useState<Privacy>('circle');
+
+  // Apply prefill when dialog opens with new prefill data
+  useEffect(() => {
+    if (open && prefill) {
+      if (prefill.title !== undefined) setTitle(prefill.title);
+      if (prefill.story !== undefined) setStory(prefill.story);
+      if (prefill.ingredients !== undefined) setIngredientsText(prefill.ingredients.join('\n'));
+      if (prefill.steps !== undefined) setStepsText(prefill.steps.join('\n'));
+      if (prefill.preparation_time_minutes !== undefined) setPrepTime(String(prefill.preparation_time_minutes || ''));
+      if (prefill.cooking_time_minutes !== undefined) setCookTime(String(prefill.cooking_time_minutes || ''));
+      if (prefill.servings !== undefined) setServings(String(prefill.servings || ''));
+      if (prefill.dish_type) setDishType(prefill.dish_type);
+      if (prefill.difficulty) setDifficulty(prefill.difficulty);
+      if (prefill.has_handwritten_note !== undefined) setHasHandwritten(prefill.has_handwritten_note);
+    }
+  }, [open, prefill]);
 
   const reset = () => {
     setTitle(''); setStory(''); setIngredientsText(''); setStepsText('');
@@ -903,6 +972,29 @@ const CreateRecipeDialog: React.FC<{
     const ingredients = ingredientsText.split('\n').map((s) => s.trim()).filter(Boolean);
     const steps = stepsText.split('\n').map((s) => s.trim()).filter(Boolean);
 
+    // If we have a scanned image to attach, upload it first to memories-media
+    let imageUrl: string | null = null;
+    if (prefill?.scannedImageBase64) {
+      try {
+        const base64Data = prefill.scannedImageBase64.split(',')[1];
+        const mimeMatch = prefill.scannedImageBase64.match(/^data:(.*?);base64/);
+        const mime = mimeMatch?.[1] || 'image/jpeg';
+        const ext = mime.split('/')[1] || 'jpg';
+        const byteChars = atob(base64Data);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+        const blob = new Blob([new Uint8Array(byteNumbers)], { type: mime });
+        const path = `${userId}/recipes/${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('memories-media').upload(path, blob, { contentType: mime });
+        if (!upErr) {
+          const { data: signed } = await supabase.storage.from('memories-media').createSignedUrl(path, 60 * 60 * 24 * 365);
+          imageUrl = signed?.signedUrl || null;
+        }
+      } catch (err) {
+        console.warn('Image upload failed', err);
+      }
+    }
+
     const { data, error } = await supabase.from('recipes').insert({
       circle_id: circle.id,
       created_by: userId,
@@ -920,6 +1012,7 @@ const CreateRecipeDialog: React.FC<{
       transmitted_by_member_id: transmittedBy || null,
       privacy_level: privacy,
       has_handwritten_note: hasHandwritten,
+      image_url: imageUrl,
     }).select().single();
 
     if (error || !data) {
