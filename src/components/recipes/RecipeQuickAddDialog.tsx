@@ -162,6 +162,15 @@ export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtract
 
         {mode === 'choose' && (
           <div className="space-y-3 py-2">
+            <div className="rounded-xl border-2 border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)] p-4 flex gap-3">
+              <div className="text-2xl leading-none">📸📸</div>
+              <div className="text-sm text-foreground/90 leading-relaxed">
+                <p className="font-semibold text-[hsl(35_70%_35%)] mb-1">Conseil : prenez 2 photos de suite</p>
+                <p>
+                  Pour que l'IA analyse <strong>parfaitement</strong> la recette, prenez d'abord une photo de la <strong>page des ingrédients</strong>, puis une photo des <strong>étapes de préparation</strong>. Vous pourrez les ajouter l'une après l'autre.
+                </p>
+              </div>
+            </div>
             <button
               onClick={() => cameraInputRef.current?.click()}
               className="w-full text-left p-5 rounded-xl border-2 border-border hover:border-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_97%)] transition-all flex items-center gap-4"
