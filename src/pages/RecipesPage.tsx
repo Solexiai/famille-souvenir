@@ -471,26 +471,26 @@ const RecipesPage: React.FC = () => {
         </div>
 
         {/* 4. Nos recettes — la grille */}
-        <section aria-label="Nos recettes" className="space-y-5">
+        <section aria-label={c.rec_section_our} className="space-y-5">
           <h2 className="font-heading text-3xl font-semibold text-foreground text-center">
-            Nos recettes
+            {c.rec_section_our}
           </h2>
 
           {/* Filtres simplifiés — 4 seulement, plus gros */}
           {hasRealRecipes && (
             <div className="flex flex-wrap gap-2 justify-center">
-              {FILTER_CHIPS.filter((c) => ['all', 'main', 'dessert', 'favorites'].includes(c.key)).map((c) => (
+              {buildFilterChips(c).filter((chip) => ['all', 'main', 'dessert', 'favorites'].includes(chip.key)).map((chip) => (
                 <button
-                  key={c.key}
-                  onClick={() => setFilter(c.key)}
+                  key={chip.key}
+                  onClick={() => setFilter(chip.key as FilterKey)}
                   className={cn(
                     'px-5 py-2.5 rounded-full text-base font-medium border-2 transition-all',
-                    filter === c.key
+                    filter === chip.key
                       ? 'bg-[hsl(35_60%_92%)] border-[hsl(35_60%_55%)] text-[hsl(35_70%_30%)]'
                       : 'bg-card border-border text-foreground hover:border-[hsl(35_60%_55%)]/40'
                   )}
                 >
-                  {c.label}
+                  {chip.label}
                 </button>
               ))}
             </div>
@@ -508,39 +508,40 @@ const RecipesPage: React.FC = () => {
                   isFavorite={favorites.has(r.id)}
                   onToggleFavorite={() => toggleFavorite(r.id)}
                   onOpen={() => openDetail(r.id)}
+                  c={c}
                 />
               ))}
               {filteredRecipes.length === 0 && (
                 <p className="col-span-full text-center text-foreground/70 text-lg py-12">
-                  Aucune recette ne correspond à votre recherche.
+                  {c.rec_no_match}
                 </p>
               )}
             </div>
           ) : (
-            <DemoRecipesGrid onOpen={() => setCreateOpen(true)} />
+            <DemoRecipesGrid onOpen={() => setCreateOpen(true)} c={c} />
           )}
         </section>
 
         {/* 5. Ranger les recettes — visible seulement s'il y a déjà des recettes */}
         {hasRealRecipes && (
-          <section aria-label="Ranger les recettes" className="space-y-4">
+          <section aria-label={c.rec_organize_title} className="space-y-4">
             <h2 className="font-heading text-2xl font-semibold text-foreground text-center">
-              Ranger les recettes
+              {c.rec_organize_title}
             </h2>
-            <p className="text-center text-foreground/70">Touchez une catégorie pour voir les recettes regroupées.</p>
+            <p className="text-center text-foreground/70">{c.rec_organize_hint}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto">
-              {CLASSIFICATIONS.map((c) => (
+              {buildClassifications(c).map((cls) => (
                 <button
-                  key={c.key}
-                  onClick={() => setView(c.key)}
+                  key={cls.key}
+                  onClick={() => setView(cls.key)}
                   className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-5 text-left shadow-sm hover:shadow-md hover:border-[hsl(35_60%_55%)]/40 transition-all"
                 >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(35_60%_92%)] text-[hsl(35_70%_45%)]">
-                    <c.Icon className="h-6 w-6" />
+                    <cls.Icon className="h-6 w-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-heading text-lg font-semibold text-foreground leading-snug">{c.label}</h3>
-                    <p className="text-sm text-foreground/70">{c.hint}</p>
+                    <h3 className="font-heading text-lg font-semibold text-foreground leading-snug">{cls.label}</h3>
+                    <p className="text-sm text-foreground/70">{cls.hint}</p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground/60 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                 </button>
