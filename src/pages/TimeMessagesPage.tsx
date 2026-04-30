@@ -299,6 +299,8 @@ function CreateMessageDialog({
   const [title, setTitle] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [relationship, setRelationship] = useState('');
+  const [recipientEmail, setRecipientEmail] = useState('');
+  const [recipientPhone, setRecipientPhone] = useState('');
   const [occasion, setOccasion] = useState('');
   const [scheduledFor, setScheduledFor] = useState('');
   const [recurring, setRecurring] = useState(false);
