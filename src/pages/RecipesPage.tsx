@@ -999,27 +999,35 @@ const CreateRecipeDialog: React.FC<{
     const ingredients = ingredientsText.split('\n').map((s) => s.trim()).filter(Boolean);
     const steps = stepsText.split('\n').map((s) => s.trim()).filter(Boolean);
 
-    // If we have a scanned image to attach, upload it first to memories-media
+    // Photo du plat (compressée) prend priorité ; sinon on garde l'image scannée du carnet
     let imageUrl: string | null = null;
-    if (prefill?.scannedImageBase64) {
-      try {
+    try {
+      if (dishPhoto) {
+        const ext = (dishPhoto.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
+        const path = `${userId}/recipes/dish-${Date.now()}.${ext}`;
+        const { error: upErr } = await supabase.storage.from('memories-media').upload(path, dishPhoto, { contentType: dishPhoto.type });
+        if (!upErr) {
+          const { data: signed } = await supabase.storage.from('memories-media').createSignedUrl(path, 60 * 60 * 24 * 365);
+          imageUrl = signed?.signedUrl || null;
+        }
+      } else if (prefill?.scannedImageBase64) {
         const base64Data = prefill.scannedImageBase64.split(',')[1];
         const mimeMatch = prefill.scannedImageBase64.match(/^data:(.*?);base64/);
         const mime = mimeMatch?.[1] || 'image/jpeg';
-        const ext = mime.split('/')[1] || 'jpg';
+        const ext = (mime.split('/')[1] || 'jpg').replace('jpeg', 'jpg');
         const byteChars = atob(base64Data);
         const byteNumbers = new Array(byteChars.length);
         for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
         const blob = new Blob([new Uint8Array(byteNumbers)], { type: mime });
-        const path = `${userId}/recipes/${Date.now()}.${ext}`;
+        const path = `${userId}/recipes/scan-${Date.now()}.${ext}`;
         const { error: upErr } = await supabase.storage.from('memories-media').upload(path, blob, { contentType: mime });
         if (!upErr) {
           const { data: signed } = await supabase.storage.from('memories-media').createSignedUrl(path, 60 * 60 * 24 * 365);
           imageUrl = signed?.signedUrl || null;
         }
-      } catch (err) {
-        console.warn('Image upload failed', err);
       }
+    } catch (err) {
+      console.warn('Image upload failed', err);
     }
 
     const { data, error } = await supabase.from('recipes').insert({
