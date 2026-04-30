@@ -59,6 +59,8 @@ const formatLabel = (f: Format, t: TmCopy) =>
 
 export default function TimeMessagesPage() {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const t = useMemoriesCopy(lang);
   const [circleId, setCircleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<TimeMessage[]>([]);
