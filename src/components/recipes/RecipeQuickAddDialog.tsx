@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +25,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onExtracted: (recipe: ExtractedRecipe) => void;
+  initialMode?: 'choose' | 'record';
 }
 
 const fileToBase64 = (file: File | Blob): Promise<string> =>
@@ -35,7 +36,7 @@ const fileToBase64 = (file: File | Blob): Promise<string> =>
     reader.readAsDataURL(file);
   });
 
-export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtracted }) => {
+export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtracted, initialMode }) => {
   const [mode, setMode] = useState<'choose' | 'scanning' | 'recording' | 'transcribing'>('choose');
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,6 +110,15 @@ export const RecipeQuickAddDialog: React.FC<Props> = ({ open, onClose, onExtract
       toast.error("Impossible d'accéder au microphone. Autorisez l'accès et réessayez.");
     }
   };
+
+  // Auto-start recording when opened with initialMode='record'
+  useEffect(() => {
+    if (open && initialMode === 'record' && mode === 'choose') {
+      startRecording();
+    }
+    if (!open) setMode('choose');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialMode]);
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {

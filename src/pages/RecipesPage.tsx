@@ -177,6 +177,7 @@ const RecipesPage: React.FC = () => {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [quickAddInitialMode, setQuickAddInitialMode] = useState<'choose' | 'record'>('choose');
   const [recipePrefill, setRecipePrefill] = useState<RecipePrefill | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [activeRecipeId, setActiveRecipeId] = useState<string | null>(null);
@@ -406,30 +407,43 @@ const RecipesPage: React.FC = () => {
         </header>
 
         {/* 2. LES DEUX GRANDES ACTIONS — au centre, très visibles */}
-        <section aria-label="Ajouter une recette" className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+        <section aria-label="Ajouter une recette" className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
           <button
-            onClick={() => setQuickAddOpen(true)}
-            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-8 rounded-2xl bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white shadow-md hover:shadow-lg transition-all"
+            onClick={() => { setQuickAddInitialMode('choose'); setQuickAddOpen(true); }}
+            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-7 rounded-2xl bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white shadow-md hover:shadow-lg transition-all"
           >
-            <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
-              <Camera className="h-8 w-8" />
+            <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center">
+              <Camera className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-2xl font-bold">Prendre en photo</h2>
-              <p className="text-base text-white/90 mt-1">Photographiez une recette, l'IA s'occupe du reste.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">Prendre en photo</h2>
+              <p className="text-sm sm:text-base text-white/90 mt-1">L'IA s'occupe du reste.</p>
             </div>
           </button>
 
           <button
             onClick={() => { setRecipePrefill(null); setCreateOpen(true); }}
-            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-8 rounded-2xl bg-card border-2 border-border hover:border-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_97%)] text-foreground shadow-sm hover:shadow-md transition-all"
+            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-7 rounded-2xl bg-card border-2 border-border hover:border-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_97%)] text-foreground shadow-sm hover:shadow-md transition-all"
           >
-            <div className="h-16 w-16 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
-              <Pencil className="h-8 w-8" />
+            <div className="h-14 w-14 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
+              <Pencil className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-2xl font-bold">Écrire une recette</h2>
-              <p className="text-base text-foreground/70 mt-1">Remplissez vous-même, à votre rythme.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">Écrire une recette</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">À votre rythme.</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => { setQuickAddInitialMode('record'); setQuickAddOpen(true); }}
+            className="group flex flex-col items-center text-center gap-3 p-6 sm:p-7 rounded-2xl bg-card border-2 border-border hover:border-[hsl(220_45%_40%)] hover:bg-[hsl(220_45%_97%)] text-foreground shadow-sm hover:shadow-md transition-all"
+          >
+            <div className="h-14 w-14 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)]">
+              <Mic className="h-7 w-7" />
+            </div>
+            <div>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">Dicter la recette</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">Parlez, l'IA structure tout.</p>
             </div>
           </button>
         </section>
@@ -539,8 +553,9 @@ const RecipesPage: React.FC = () => {
 
       <RecipeQuickAddDialog
         open={quickAddOpen}
-        onClose={() => setQuickAddOpen(false)}
+        onClose={() => { setQuickAddOpen(false); setQuickAddInitialMode('choose'); }}
         onExtracted={handleExtracted}
+        initialMode={quickAddInitialMode}
       />
 
       <CreateRecipeDialog
