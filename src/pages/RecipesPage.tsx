@@ -867,7 +867,8 @@ const RecipeDetailDialog: React.FC<{
   members: Array<{ id: string; user_id: string; name: string }>;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
-}> = ({ open, onClose, recipeId, recipes, branches, generations, occasions, recipeOccasions, members, isFavorite, onToggleFavorite }) => {
+  c: MemoriesCopy;
+}> = ({ open, onClose, recipeId, recipes, branches, generations, occasions, recipeOccasions, members, isFavorite, onToggleFavorite, c }) => {
   const navigate = useNavigate();
   const recipe = recipeId ? recipes.find((r) => r.id === recipeId) : null;
   const photoInputRef = React.useRef<HTMLInputElement>(null);
@@ -896,14 +897,12 @@ const RecipeDetailDialog: React.FC<{
       const { data: pub } = supabase.storage.from('memories-media').getPublicUrl(path);
       const { error: updErr } = await supabase.from('recipes').update({ image_url: pub.publicUrl }).eq('id', recipe.id);
       if (updErr) throw updErr;
-      toast.success('Photo principale mise à jour');
-      // Mutate locally so UI reflects without a full reload
+      toast.success(c.rec_toast_photo_updated);
       recipe.image_url = pub.publicUrl;
-      // Force re-render by closing then reopening — simpler: trigger via window event
       window.dispatchEvent(new CustomEvent('recipes:reload'));
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || "Impossible de changer la photo");
+      toast.error(e?.message || c.rec_toast_photo_error);
     } finally {
       setPhotoBusy(false);
     }
@@ -915,13 +914,13 @@ const RecipeDetailDialog: React.FC<{
     try {
       const { error } = await supabase.from('recipes').delete().eq('id', recipe.id);
       if (error) throw error;
-      toast.success('Recette supprimée');
+      toast.success(c.rec_toast_deleted);
       setConfirmDelete(false);
       onClose();
       window.dispatchEvent(new CustomEvent('recipes:reload'));
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || 'Impossible de supprimer la recette');
+      toast.error(e?.message || c.rec_toast_delete_error);
     } finally {
       setDeleting(false);
     }
@@ -935,10 +934,10 @@ const RecipeDetailDialog: React.FC<{
             <div className="flex-1">
               <DialogTitle className="font-heading text-3xl">{recipe.title}</DialogTitle>
               <DialogDescription className="mt-1">
-                {[branch?.name, occ[0], gen?.name].filter(Boolean).join(' · ') || DISH_TYPE_LABEL[recipe.dish_type]}
+                {[branch?.name, occ[0], gen?.name].filter(Boolean).join(' · ') || dishTypeLabel(c)[recipe.dish_type]}
               </DialogDescription>
             </div>
-            <button onClick={() => onToggleFavorite(recipe.id)} aria-label="Favori">
+            <button onClick={() => onToggleFavorite(recipe.id)} aria-label={c.rec_filter_favorites}>
               <Heart className={cn('h-6 w-6', isFavorite ? 'fill-[hsl(355_60%_55%)] text-[hsl(355_60%_55%)]' : 'text-muted-foreground')} />
             </button>
           </div>
@@ -949,7 +948,7 @@ const RecipeDetailDialog: React.FC<{
             <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-              Aucune photo principale
+              {c.rec_no_main_photo}
             </div>
           )}
 
@@ -963,7 +962,7 @@ const RecipeDetailDialog: React.FC<{
                 className="inline-flex items-center gap-2 rounded-full bg-background/95 backdrop-blur px-4 py-2 text-sm font-medium border border-border shadow-md hover:bg-background transition disabled:opacity-60"
               >
                 {photoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                {recipe.image_url ? 'Changer la photo' : 'Ajouter une photo'}
+                {recipe.image_url ? c.rec_change_photo : c.rec_add_photo}
               </button>
             ) : (
               <div className="flex flex-col gap-2 rounded-2xl bg-background/95 backdrop-blur p-2 border border-border shadow-lg min-w-[220px]">
@@ -975,7 +974,7 @@ const RecipeDetailDialog: React.FC<{
                   <span className="h-8 w-8 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
                     <Camera className="h-4 w-4" />
                   </span>
-                  Prendre une photo
+                  {c.rec_take_photo}
                 </button>
                 <button
                   type="button"
@@ -985,20 +984,19 @@ const RecipeDetailDialog: React.FC<{
                   <span className="h-8 w-8 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)]">
                     <ImageIcon className="h-4 w-4" />
                   </span>
-                  Choisir depuis l'appareil
+                  {c.rec_pick_from_device}
                 </button>
                 <button
                   type="button"
                   onClick={() => setPhotoMenuOpen(false)}
                   className="text-xs text-muted-foreground hover:text-foreground py-1"
                 >
-                  Annuler
+                  {c.rec_cancel}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Camera capture (mobile back camera) */}
           <input
             ref={cameraInputRef}
             type="file"
@@ -1007,7 +1005,6 @@ const RecipeDetailDialog: React.FC<{
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handlePhotoChange(e.target.files[0])}
           />
-          {/* Library / file picker */}
           <input
             ref={photoInputRef}
             type="file"
@@ -1020,23 +1017,23 @@ const RecipeDetailDialog: React.FC<{
         <div className="border-t border-border my-2" />
 
         <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Préparation</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Cuisson</div><div className="font-medium">{formatDuration(recipe.cooking_time_minutes)}</div></div>
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Portions</div><div className="font-medium">{recipe.servings || '—'}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_prep}</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_cook}</div><div className="font-medium">{formatDuration(recipe.cooking_time_minutes)}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_servings}</div><div className="font-medium">{recipe.servings || '—'}</div></div>
         </div>
 
         <div className="border-t border-border my-2" />
 
         {recipe.story && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">L'histoire de cette recette</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_story_title}</h3>
             <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">{recipe.story}</p>
           </section>
         )}
 
         {recipe.ingredients?.length > 0 && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">Ingrédients</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_ingredients_title}</h3>
             <ul className="list-disc list-inside space-y-1 text-foreground/90">
               {recipe.ingredients.map((i, idx) => <li key={idx}>{String(i)}</li>)}
             </ul>
@@ -1045,7 +1042,7 @@ const RecipeDetailDialog: React.FC<{
 
         {recipe.steps?.length > 0 && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">Étapes</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_steps_title}</h3>
             <ol className="list-decimal list-inside space-y-2 text-foreground/90">
               {recipe.steps.map((s, idx) => <li key={idx} className="leading-relaxed">{String(s)}</li>)}
             </ol>
@@ -1053,11 +1050,11 @@ const RecipeDetailDialog: React.FC<{
         )}
 
         <section className="rounded-lg border border-border p-4 space-y-2 text-sm">
-          {transmittedBy && <div><span className="text-muted-foreground">Transmise par : </span><span className="font-medium">{transmittedBy}</span></div>}
-          {author && <div><span className="text-muted-foreground">Auteur original : </span><span className="font-medium">{author}</span></div>}
-          {branch && <div><span className="text-muted-foreground">Branche familiale : </span><span className="font-medium">{branch.name}</span></div>}
-          {gen && <div><span className="text-muted-foreground">Génération : </span><span className="font-medium">{gen.name}</span></div>}
-          {occ.length > 0 && <div><span className="text-muted-foreground">Occasions : </span><span className="font-medium">{occ.join(', ')}</span></div>}
+          {transmittedBy && <div><span className="text-muted-foreground">{c.rec_transmitted_by} : </span><span className="font-medium">{transmittedBy}</span></div>}
+          {author && <div><span className="text-muted-foreground">{c.rec_original_author} : </span><span className="font-medium">{author}</span></div>}
+          {branch && <div><span className="text-muted-foreground">{c.rec_branch} : </span><span className="font-medium">{branch.name}</span></div>}
+          {gen && <div><span className="text-muted-foreground">{c.rec_generation} : </span><span className="font-medium">{gen.name}</span></div>}
+          {occ.length > 0 && <div><span className="text-muted-foreground">{c.rec_occasions} : </span><span className="font-medium">{occ.join(', ')}</span></div>}
         </section>
 
         <DialogFooter className="gap-2 flex-wrap sm:justify-between">
@@ -1066,11 +1063,11 @@ const RecipeDetailDialog: React.FC<{
             onClick={() => setConfirmDelete(true)}
             className="gap-2 text-[hsl(355_60%_45%)] border-[hsl(355_60%_55%)]/40 hover:bg-[hsl(355_60%_97%)] hover:text-[hsl(355_60%_40%)]"
           >
-            🗑️ Supprimer la recette
+            {c.rec_delete_btn}
           </Button>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> Ajouter un souvenir</Button>
-            <Button onClick={onClose}>Fermer</Button>
+            <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> {c.rec_add_memory_btn}</Button>
+            <Button onClick={onClose}>{c.rec_close}</Button>
           </div>
         </DialogFooter>
 
@@ -1078,20 +1075,20 @@ const RecipeDetailDialog: React.FC<{
         <Dialog open={confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(false)}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-heading text-2xl">Supprimer cette recette ?</DialogTitle>
+              <DialogTitle className="font-heading text-2xl">{c.rec_confirm_delete_title}</DialogTitle>
               <DialogDescription>
-                Cette action est <strong>définitive</strong>. La recette « {recipe.title} » sera retirée du livre familial. Les souvenirs liés ne seront pas supprimés.
+                {c.rec_confirm_delete_desc} « {recipe.title} »
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>Annuler</Button>
+              <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>{c.rec_cancel}</Button>
               <Button
                 onClick={handleDelete}
                 disabled={deleting}
                 className="bg-[hsl(355_60%_45%)] hover:bg-[hsl(355_60%_40%)] text-white gap-2"
               >
                 {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
-                Oui, supprimer
+                {c.rec_confirm_delete_yes}
               </Button>
             </DialogFooter>
           </DialogContent>
