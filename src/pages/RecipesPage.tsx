@@ -505,8 +505,8 @@ const RecipesPage: React.FC = () => {
         {/* Empty state full block (only when no real recipes) */}
         {!hasRealRecipes && (
           <EmptyStateBlock
-            onCreate={() => setCreateOpen(true)}
-            onScan={() => navigate('/documents')}
+            onCreate={() => { setRecipePrefill(null); setCreateOpen(true); }}
+            onScan={() => setQuickAddOpen(true)}
             onInvite={() => navigate('/circle/members')}
           />
         )}
@@ -515,16 +515,23 @@ const RecipesPage: React.FC = () => {
         <HeritageCallout onAddMemory={() => navigate('/memories')} />
       </div>
 
+      <RecipeQuickAddDialog
+        open={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        onExtracted={handleExtracted}
+      />
+
       <CreateRecipeDialog
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
+        onClose={() => { setCreateOpen(false); setRecipePrefill(null); }}
         circle={circle}
         userId={user!.id}
         branches={branches}
         generations={generations}
         occasions={occasions}
         members={members}
-        onCreated={() => { setCreateOpen(false); loadAll(); }}
+        prefill={recipePrefill}
+        onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
       />
 
       <RecipeDetailDialog
