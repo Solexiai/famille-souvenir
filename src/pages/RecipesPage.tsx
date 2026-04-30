@@ -1286,15 +1286,15 @@ const CreateRecipeDialog: React.FC<{
     setArr(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]);
   };
 
+  const dl = dishTypeLabel(c);
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">Ajouter une recette familiale</DialogTitle>
-          <DialogDescription>Préservez une saveur, une histoire, un héritage.</DialogDescription>
+          <DialogTitle className="font-heading text-2xl">{c.rec_create_dialog_title}</DialogTitle>
+          <DialogDescription>{c.rec_create_dialog_desc}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Scanner IA + Photo du plat */}
           <div className="rounded-xl border-2 border-dashed border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)] p-3 space-y-3">
             {onOpenScanIA && (
               <button
@@ -1306,24 +1306,24 @@ const CreateRecipeDialog: React.FC<{
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-heading font-semibold text-sm">Scanner avec IA</div>
-                  <div className="text-xs text-muted-foreground">Photographiez un carnet ou un livre — l'IA remplit le formulaire</div>
+                  <div className="font-heading font-semibold text-sm">{c.rec_scan_ai}</div>
+                  <div className="text-xs text-muted-foreground">{c.rec_scan_ai_hint}</div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>
             )}
 
             <div>
-              <Label className="text-sm font-medium">Photo du plat <span className="text-muted-foreground font-normal">(optionnel, compressée automatiquement)</span></Label>
+              <Label className="text-sm font-medium">{c.rec_dish_photo_label} <span className="text-muted-foreground font-normal">{c.rec_dish_photo_optional}</span></Label>
               {dishPhotoPreview ? (
                 <div className="mt-2 relative">
-                  <img src={dishPhotoPreview} alt="Aperçu du plat" className="w-full h-40 object-cover rounded-lg border border-border" />
+                  <img src={dishPhotoPreview} alt={c.rec_dish_photo_label} className="w-full h-40 object-cover rounded-lg border border-border" />
                   <button
                     type="button"
                     onClick={() => { setDishPhoto(null); if (dishPhotoPreview) URL.revokeObjectURL(dishPhotoPreview); setDishPhotoPreview(null); }}
                     className="absolute top-2 right-2 px-2 py-1 text-xs rounded-md bg-black/70 text-white hover:bg-black"
                   >
-                    Retirer
+                    {c.rec_dish_photo_remove}
                   </button>
                 </div>
               ) : (
@@ -1332,8 +1332,8 @@ const CreateRecipeDialog: React.FC<{
                     {photoBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="font-heading font-semibold text-sm">Ajouter une photo du plat</div>
-                    <div className="text-xs text-muted-foreground">Vos invités voient la recette en image (max 1600px)</div>
+                    <div className="font-heading font-semibold text-sm">{c.rec_dish_photo_add}</div>
+                    <div className="text-xs text-muted-foreground">{c.rec_dish_photo_add_hint}</div>
                   </div>
                   <input
                     type="file"
@@ -1347,73 +1347,73 @@ const CreateRecipeDialog: React.FC<{
           </div>
 
           <div>
-            <Label htmlFor="title">Titre *</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex. Tourtière de Grand-maman Louise" required />
+            <Label htmlFor="title">{c.rec_field_title}</Label>
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={c.rec_field_title_placeholder} required />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Type de plat</Label>
+              <Label>{c.rec_field_dish_type}</Label>
               <Select value={dishType} onValueChange={(v) => setDishType(v as DishType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(DISH_TYPE_LABEL) as DishType[]).map((k) => (
-                    <SelectItem key={k} value={k}>{DISH_TYPE_LABEL[k]}</SelectItem>
+                  {(Object.keys(dl) as DishType[]).map((k) => (
+                    <SelectItem key={k} value={k}>{dl[k]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Difficulté</Label>
+              <Label>{c.rec_field_difficulty}</Label>
               <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="easy">Facile</SelectItem>
-                  <SelectItem value="medium">Intermédiaire</SelectItem>
-                  <SelectItem value="hard">Difficile</SelectItem>
+                  <SelectItem value="easy">{c.rec_difficulty_easy}</SelectItem>
+                  <SelectItem value="medium">{c.rec_difficulty_medium}</SelectItem>
+                  <SelectItem value="hard">{c.rec_difficulty_hard}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div><Label htmlFor="prep">Prép. (min)</Label><Input id="prep" type="number" min="0" value={prepTime} onChange={(e) => setPrepTime(e.target.value)} /></div>
-            <div><Label htmlFor="cook">Cuisson (min)</Label><Input id="cook" type="number" min="0" value={cookTime} onChange={(e) => setCookTime(e.target.value)} /></div>
-            <div><Label htmlFor="serv">Portions</Label><Input id="serv" type="number" min="0" value={servings} onChange={(e) => setServings(e.target.value)} /></div>
+            <div><Label htmlFor="prep">{c.rec_field_prep}</Label><Input id="prep" type="number" min="0" value={prepTime} onChange={(e) => setPrepTime(e.target.value)} /></div>
+            <div><Label htmlFor="cook">{c.rec_field_cook}</Label><Input id="cook" type="number" min="0" value={cookTime} onChange={(e) => setCookTime(e.target.value)} /></div>
+            <div><Label htmlFor="serv">{c.rec_field_servings_short}</Label><Input id="serv" type="number" min="0" value={servings} onChange={(e) => setServings(e.target.value)} /></div>
           </div>
 
           <div>
-            <Label htmlFor="story">L'histoire de cette recette</Label>
-            <Textarea id="story" value={story} onChange={(e) => setStory(e.target.value)} rows={3} placeholder="D'où vient-elle ? Pour quelle occasion ? Quel souvenir y est attaché ?" />
+            <Label htmlFor="story">{c.rec_field_story}</Label>
+            <Textarea id="story" value={story} onChange={(e) => setStory(e.target.value)} rows={3} placeholder={c.rec_field_story_placeholder} />
           </div>
 
           <div>
-            <Label htmlFor="ing">Ingrédients (un par ligne)</Label>
-            <Textarea id="ing" value={ingredientsText} onChange={(e) => setIngredientsText(e.target.value)} rows={4} placeholder="500 g de viande hachée&#10;1 oignon&#10;..." />
+            <Label htmlFor="ing">{c.rec_field_ingredients}</Label>
+            <Textarea id="ing" value={ingredientsText} onChange={(e) => setIngredientsText(e.target.value)} rows={4} placeholder={c.rec_field_ingredients_placeholder} />
           </div>
 
           <div>
-            <Label htmlFor="steps">Étapes (une par ligne)</Label>
-            <Textarea id="steps" value={stepsText} onChange={(e) => setStepsText(e.target.value)} rows={4} placeholder="Faire revenir les oignons...&#10;Ajouter la viande..." />
+            <Label htmlFor="steps">{c.rec_field_steps}</Label>
+            <Textarea id="steps" value={stepsText} onChange={(e) => setStepsText(e.target.value)} rows={4} placeholder={c.rec_field_steps_placeholder} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Branche familiale</Label>
+              <Label>{c.rec_field_branch}</Label>
               <Select value={branchId || 'none'} onValueChange={(v) => setBranchId(v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={c.rec_field_none} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Aucune</SelectItem>
+                  <SelectItem value="none">{c.rec_field_none}</SelectItem>
                   {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Génération</Label>
+              <Label>{c.rec_field_generation}</Label>
               <Select value={generationId || 'none'} onValueChange={(v) => setGenerationId(v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={c.rec_field_none} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Aucune</SelectItem>
+                  <SelectItem value="none">{c.rec_field_none}</SelectItem>
                   {generations.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -1421,11 +1421,11 @@ const CreateRecipeDialog: React.FC<{
           </div>
 
           <div>
-            <Label>Transmise par</Label>
+            <Label>{c.rec_field_transmitted}</Label>
             <Select value={transmittedBy || 'none'} onValueChange={(v) => setTransmittedBy(v === 'none' ? '' : v)}>
-              <SelectTrigger><SelectValue placeholder="Aucun membre" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={c.rec_field_no_member} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">—</SelectItem>
+                <SelectItem value="none">{c.rec_field_none_dash}</SelectItem>
                 {members.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -1433,7 +1433,7 @@ const CreateRecipeDialog: React.FC<{
 
           {occasions.length > 0 && (
             <div>
-              <Label className="mb-2 block">Occasions</Label>
+              <Label className="mb-2 block">{c.rec_field_occasions}</Label>
               <div className="flex flex-wrap gap-1.5">
                 {occasions.map((o) => (
                   <button key={o.id} type="button" onClick={() => toggleInArray(selectedOccasions, setSelectedOccasions, o.id)}
@@ -1447,7 +1447,7 @@ const CreateRecipeDialog: React.FC<{
 
           {members.length > 0 && (
             <div>
-              <Label className="mb-2 block">Membres associés</Label>
+              <Label className="mb-2 block">{c.rec_field_members}</Label>
               <div className="flex flex-wrap gap-1.5">
                 {members.map((m) => (
                   <button key={m.id} type="button" onClick={() => toggleInArray(selectedMembers, setSelectedMembers, m.id)}
@@ -1462,26 +1462,26 @@ const CreateRecipeDialog: React.FC<{
           <div className="flex items-center gap-3 flex-wrap">
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" checked={hasHandwritten} onChange={(e) => setHasHandwritten(e.target.checked)} className="rounded" />
-              Carnet manuscrit lié
+              {c.rec_field_handwritten_linked}
             </label>
             <div className="ml-auto flex items-center gap-2">
-              <Label className="text-sm">Visibilité :</Label>
+              <Label className="text-sm">{c.rec_field_visibility}</Label>
               <Select value={privacy} onValueChange={(v) => setPrivacy(v as Privacy)}>
                 <SelectTrigger className="w-40 h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="circle">Tout le cercle</SelectItem>
-                  <SelectItem value="managers">Gestionnaires</SelectItem>
-                  <SelectItem value="private">Privée</SelectItem>
+                  <SelectItem value="circle">{c.rec_visibility_circle}</SelectItem>
+                  <SelectItem value="managers">{c.rec_visibility_managers}</SelectItem>
+                  <SelectItem value="private">{c.rec_visibility_private}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>
+            <Button type="button" variant="outline" onClick={onClose}>{c.rec_cancel}</Button>
             <Button type="submit" disabled={saving} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Ajouter la recette
+              {c.rec_add_recipe}
             </Button>
           </DialogFooter>
         </form>
