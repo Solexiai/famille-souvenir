@@ -196,7 +196,7 @@ const RecipesPage: React.FC = () => {
       supabase.from('occasions').select('*').eq('circle_id', c.id),
       supabase.from('recipe_favorites').select('recipe_id').eq('user_id', user.id),
       supabase.from('recipe_occasions').select('recipe_id, occasion_id'),
-      supabase.from('circle_members').select('id, user_id, profiles:profiles!circle_members_user_id_fkey(full_name, first_name, last_name)').eq('circle_id', c.id),
+      supabase.from('circle_members').select('id, user_id').eq('circle_id', c.id),
     ]);
 
     setRecipes((r.data as Recipe[]) || []);
@@ -211,14 +211,19 @@ const RecipesPage: React.FC = () => {
     });
     setRecipeOccasions(map);
 
-    // Members – fallback (the FK join may not be configured; ignore errors)
-    if (cm.data && Array.isArray(cm.data)) {
-      const mapped = (cm.data as any[]).map((m) => {
-        const p = (m.profiles as any) || {};
+    // Load member profiles separately
+    const cmRows = (cm.data as Array<{ id: string; user_id: string }>) || [];
+    if (cmRows.length) {
+      const userIds = cmRows.map((m) => m.user_id);
+      const { data: profilesData } = await supabase.from('profiles').select('user_id, full_name, first_name, last_name').in('user_id', userIds);
+      const profMap = new Map((profilesData || []).map((p: any) => [p.user_id, p]));
+      setMembers(cmRows.map((m) => {
+        const p: any = profMap.get(m.user_id) || {};
         const name = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Membre';
-        return { id: m.id as string, user_id: m.user_id as string, name };
-      });
-      setMembers(mapped);
+        return { id: m.id, user_id: m.user_id, name };
+      }));
+    } else {
+      setMembers([]);
     }
 
     setLoading(false);
