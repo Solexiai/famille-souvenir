@@ -310,10 +310,10 @@ function MessageList({
 }
 
 function CreateMessageDialog({
-  open, onOpenChange, userId, circleId, onCreated,
+  open, onOpenChange, userId, circleId, onCreated, t,
 }: {
   open: boolean; onOpenChange: (o: boolean) => void;
-  userId: string; circleId: string; onCreated: () => void;
+  userId: string; circleId: string; onCreated: () => void; t: TmCopy;
 }) {
   const [format, setFormat] = useState<Format>('audio');
   const [trigger, setTrigger] = useState<Trigger>('scheduled_date');
