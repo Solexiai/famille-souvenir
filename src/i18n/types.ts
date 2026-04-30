@@ -243,6 +243,41 @@ export interface Translations {
   dash_step_checklist_title: string;
   dash_step_checklist_desc: string;
 
+  // Dashboard v2 — optional new keys (premium home redesign)
+  dash_hero_subtitle_v2?: string;
+  dash_hero_supporting?: string;
+  dash_hero_cta_continue?: string;
+  dash_hero_cta_documents?: string;
+  dash_hero_badge?: string;
+  dash_hero_progress_label?: string;
+  dash_card_circle_title?: string;
+  dash_card_circle_desc?: string;
+  dash_card_documents_title?: string;
+  dash_card_documents_desc?: string;
+  dash_card_memories_title?: string;
+  dash_card_memories_desc?: string;
+  dash_card_checklist_title?: string;
+  dash_card_checklist_desc?: string;
+  dash_card_open?: string;
+  dash_journey_subtitle_v2?: string;
+  dash_step_in_progress?: string;
+  dash_step_next_action?: string;
+  dash_step_status_done?: string;
+  dash_step_status_in_progress?: string;
+  dash_step_status_todo?: string;
+  dash_support_assistant_title?: string;
+  dash_support_assistant_desc?: string;
+  dash_support_assistant_cta?: string;
+  dash_support_scan_title?: string;
+  dash_support_scan_desc?: string;
+  dash_support_scan_cta?: string;
+  dash_reassure_simple_title?: string;
+  dash_reassure_simple_desc?: string;
+  dash_reassure_secure_title?: string;
+  dash_reassure_secure_desc?: string;
+  dash_reassure_family_title?: string;
+  dash_reassure_family_desc?: string;
+
   // Documentary status labels
   doc_status_unknown: string;
   doc_status_declared: string;

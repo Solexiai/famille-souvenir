@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, CircleDot, Sparkles, Camera, Check, ArrowRight } from 'lucide-react';
+import { Users, FolderOpen, CheckSquare, Shield, Briefcase, Image, UserPlus, AlertTriangle, FileCheck, UserCheck, ChevronRight, Sparkles, Camera, Check, ArrowRight, Heart, Lock, Scan } from 'lucide-react';
 import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, DocumentaryStatus, AppRole, MemberFamilyLabel, CircleMember } from '@/types/database';
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 import { GuidedOnboarding } from '@/components/GuidedOnboarding';
@@ -150,36 +150,118 @@ const DashboardPage: React.FC = () => {
 
   // executorLabel & checklistProgress reserved for future use
 
+  // Compute next incomplete journey step (used by hero "Continue" CTA)
+  const computeNextRoute = (): string => {
+    if (!circle) return '/circle';
+    if (memberCount <= 1 && invitationCount === 0) return '/circle/members';
+    if (govSummary.total === 0) return '/governance';
+    if (docCount === 0) return '/documents';
+    if (memoryCount === 0) return '/memories';
+    return '/checklist';
+  };
+
+  // Overall progress (UI only, derived from real engagement signals)
+  const overallProgress = (() => {
+    if (!circle) return 0;
+    const flags = [
+      true, // circle exists
+      memberCount > 1 || invitationCount > 0,
+      govSummary.total > 0,
+      docCount > 0,
+      memoryCount > 0,
+      checklistSummary.completed > 0,
+    ];
+    return Math.round((flags.filter(Boolean).length / flags.length) * 100);
+  })();
+
+  // Status helpers for journey steps
+  type StepStatus = 'done' | 'in_progress' | 'todo';
+  const statusBadge = (s: StepStatus) => {
+    const map: Record<StepStatus, { label: string; cls: string }> = {
+      done:        { label: t.dash_step_status_done ?? 'Terminé',   cls: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+      in_progress: { label: t.dash_step_status_in_progress ?? 'En cours', cls: 'bg-sky-100 text-sky-800 border-sky-200' },
+      todo:        { label: t.dash_step_status_todo ?? 'À faire',   cls: 'bg-muted text-muted-foreground border-border' },
+    };
+    return map[s];
+  };
+
   return (
     <AppLayout>
       <div className="space-y-8 animate-fade-in">
-        {/* Sanctuary hero */}
-        <section className="relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary via-primary to-[hsl(220,45%,18%)] text-primary-foreground shadow-elevated">
-          <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-accent/15 blur-3xl" aria-hidden="true" />
-          <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+        {/* ============ HERO ============ */}
+        <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary via-primary to-[hsl(220,45%,18%)] text-primary-foreground shadow-elevated">
+          {/* warm decorative glows */}
+          <div className="absolute -top-24 -right-16 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
+          <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[radial-gradient(circle_at_70%_50%,hsl(35_60%_55%/0.18),transparent_60%)]" aria-hidden="true" />
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
-          <div className="relative px-6 sm:px-10 py-10 sm:py-12">
-            <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent mb-3">
-              {t.app_name} · {t.app_tagline}
-            </p>
-            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.1] max-w-2xl">
-              {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
-            </h1>
-            <p className="mt-4 text-sm sm:text-base text-primary-foreground/75 max-w-xl leading-relaxed">
-              {t.dash_subtitle}
-            </p>
-            {circle && checklistSummary.total > 0 && (
-              <div className="mt-6 inline-flex items-center gap-3 rounded-full bg-primary-foreground/10 backdrop-blur px-4 py-2 border border-primary-foreground/15">
-                <CircleDot className="h-3.5 w-3.5 text-accent" />
+
+          <div className="relative px-6 sm:px-10 py-10 sm:py-14 grid lg:grid-cols-[1.4fr_1fr] gap-8 items-center">
+            <div className="min-w-0">
+              <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent mb-3">
+                {t.app_name} · {t.app_tagline}
+              </p>
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.08] max-w-2xl">
+                {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
+              </h1>
+              <p className="mt-4 text-base sm:text-lg text-primary-foreground/80 max-w-xl leading-relaxed">
+                {t.dash_hero_subtitle_v2 ?? t.dash_subtitle}
+              </p>
+              <p className="mt-2 text-sm text-accent/90 italic">
+                {t.dash_hero_supporting ?? ''}
+              </p>
+
+              <div className="mt-7 flex flex-col sm:flex-row gap-3">
+                <Button
+                  size="lg"
+                  onClick={() => navigate(computeNextRoute())}
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-7 h-12 text-base font-medium shadow-lg shadow-accent/20 gap-2"
+                >
+                  <ArrowRight className="h-5 w-5" />
+                  {t.dash_hero_cta_continue ?? 'Continuer mon parcours'}
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate('/documents')}
+                  className="rounded-full px-7 h-12 text-base font-medium bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground gap-2"
+                >
+                  <FolderOpen className="h-5 w-5" />
+                  {t.dash_hero_cta_documents ?? 'Voir mes documents'}
+                </Button>
+              </div>
+
+              <div className="mt-6 inline-flex items-center gap-2.5 rounded-full bg-primary-foreground/10 backdrop-blur px-4 py-2 border border-primary-foreground/15">
+                <Shield className="h-3.5 w-3.5 text-accent" />
                 <span className="text-xs sm:text-sm text-primary-foreground/85">
-                  {t.dash_completed.replace('{count}', `${checklistSummary.completed}/${checklistSummary.total}`)} · {dossierLabel(circle.dossier_readiness_status)}
+                  {t.dash_hero_badge ?? 'Simple • Sécurisé • Accessible à votre famille'}
                 </span>
               </div>
-            )}
+            </div>
+
+            {/* Progress card */}
+            <div className="relative">
+              <div className="rounded-2xl bg-primary-foreground/[0.07] backdrop-blur-md border border-primary-foreground/15 p-5 sm:p-6 shadow-xl">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs uppercase tracking-[0.18em] text-primary-foreground/70">
+                    {t.dash_hero_progress_label ?? 'Progression globale'}
+                  </p>
+                  <span className="font-heading text-3xl sm:text-4xl font-semibold text-accent leading-none">
+                    {overallProgress}<span className="text-lg ml-0.5">%</span>
+                  </span>
+                </div>
+                <Progress value={overallProgress} className="h-2 bg-primary-foreground/15 [&>div]:bg-accent" />
+                {circle && checklistSummary.total > 0 && (
+                  <p className="mt-3 text-xs text-primary-foreground/70 leading-relaxed">
+                    {t.dash_completed.replace('{count}', `${checklistSummary.completed}/${checklistSummary.total}`)} · {dossierLabel(circle.dossier_readiness_status)}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* No circle CTA */}
+        {/* ============ NO CIRCLE CTA ============ */}
         {!loading && !circle && (
           <Card className="shadow-card border-dashed border-2 border-accent/40 bg-card">
             <CardContent className="flex flex-col items-center justify-center py-14 text-center">
@@ -197,57 +279,103 @@ const DashboardPage: React.FC = () => {
 
         {circle && (
           <>
-
-
-            {/* Journey — 6 numbered steps */}
+            {/* ============ PRIMARY ACTION CARDS ============ */}
             {(() => {
-              const steps = [
-                { n: 1, icon: Users, title: t.dash_step_circle_title, desc: t.dash_step_circle_desc, done: !!circle, route: '/circle' },
-                { n: 2, icon: UserPlus, title: t.dash_step_members_title, desc: t.dash_step_members_desc, done: memberCount > 1 || invitationCount > 0, route: '/circle/members' },
-                { n: 3, icon: Shield, title: t.dash_step_roles_title, desc: t.dash_step_roles_desc, done: govSummary.total > 0, route: '/governance' },
-                { n: 4, icon: FolderOpen, title: t.dash_step_documents_title, desc: t.dash_step_documents_desc, done: docCount > 0, route: '/documents' },
-                { n: 5, icon: Image, title: t.dash_step_memories_title, desc: t.dash_step_memories_desc, done: memoryCount > 0, route: '/memories' },
-                { n: 6, icon: CheckSquare, title: t.dash_step_checklist_title, desc: t.dash_step_checklist_desc, done: checklistSummary.completed > 0, route: '/checklist' },
+              const cards = [
+                { icon: Users,      title: t.dash_card_circle_title    ?? 'Mon cercle familial', desc: t.dash_card_circle_desc    ?? 'Voir les proches et leurs rôles',         route: '/circle',          tint: 'bg-accent/10 text-accent' },
+                { icon: FolderOpen, title: t.dash_card_documents_title ?? 'Mes documents',       desc: t.dash_card_documents_desc ?? 'Centraliser mes documents importants',    route: '/documents',       tint: 'bg-sky-100 text-sky-700' },
+                { icon: Image,      title: t.dash_card_memories_title  ?? 'Mes souvenirs',       desc: t.dash_card_memories_desc  ?? 'Photos, vidéos et messages à transmettre',route: '/memories',        tint: 'bg-rose-100 text-rose-700' },
+                { icon: CheckSquare,title: t.dash_card_checklist_title ?? 'Ma checklist',        desc: t.dash_card_checklist_desc ?? 'Les actions à faire, étape par étape',   route: '/checklist',       tint: 'bg-emerald-100 text-emerald-700' },
               ];
               return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {cards.map((c) => {
+                    const Icon = c.icon;
+                    return (
+                      <button
+                        key={c.title}
+                        onClick={() => navigate(c.route)}
+                        aria-label={c.title}
+                        className="group text-left rounded-2xl bg-card border border-border/70 p-5 shadow-soft hover:shadow-elevated hover:border-accent/40 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+                      >
+                        <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-4 ${c.tint}`}>
+                          <Icon className="h-7 w-7" />
+                        </div>
+                        <h3 className="font-heading text-lg font-semibold text-primary leading-tight">{c.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1.5 leading-snug min-h-[2.5rem]">{c.desc}</p>
+                        <div className="mt-4 flex items-center justify-between text-sm font-medium text-primary group-hover:text-accent transition-colors">
+                          <span>{t.dash_card_open ?? 'Ouvrir'}</span>
+                          <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+
+            {/* ============ GUIDED JOURNEY ============ */}
+            {(() => {
+              const rawSteps: Array<{ icon: typeof Users; title: string; desc: string; status: StepStatus; route: string }> = [
+                { icon: Users,       title: t.dash_step_circle_title,     desc: t.dash_step_circle_desc,     status: circle ? 'done' : 'todo',                                                       route: '/circle' },
+                { icon: UserPlus,    title: t.dash_step_members_title,    desc: t.dash_step_members_desc,    status: memberCount > 1 ? 'done' : invitationCount > 0 ? 'in_progress' : 'todo',       route: '/circle/members' },
+                { icon: Shield,      title: t.dash_step_roles_title,      desc: t.dash_step_roles_desc,      status: govSummary.completed > 0 ? 'done' : govSummary.total > 0 ? 'in_progress' : 'todo', route: '/governance' },
+                { icon: FolderOpen,  title: t.dash_step_documents_title,  desc: t.dash_step_documents_desc,  status: docCount > 0 ? 'done' : 'todo',                                                  route: '/documents' },
+                { icon: Image,       title: t.dash_step_memories_title,   desc: t.dash_step_memories_desc,   status: memoryCount > 0 ? 'done' : 'todo',                                               route: '/memories' },
+                { icon: CheckSquare, title: t.dash_step_checklist_title,  desc: t.dash_step_checklist_desc,  status: checklistSummary.completed >= checklistSummary.total && checklistSummary.total > 0 ? 'done' : checklistSummary.completed > 0 ? 'in_progress' : 'todo', route: '/checklist' },
+              ];
+              const nextIdx = rawSteps.findIndex((s) => s.status !== 'done');
+              return (
                 <Card className="shadow-card overflow-hidden border-border/60">
-                  <div className="px-5 sm:px-6 pt-6 pb-5 border-b border-border/50">
-                    <h2 className="font-heading text-lg sm:text-xl font-semibold text-primary leading-tight">{t.dash_journey_title}</h2>
-                    <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-snug">{t.dash_journey_subtitle}</p>
+                  <div className="px-5 sm:px-7 pt-6 pb-5 border-b border-border/50">
+                    <div className="flex items-start gap-2.5">
+                      <Sparkles className="h-5 w-5 text-accent mt-0.5 shrink-0" aria-hidden="true" />
+                      <div>
+                        <h2 className="font-heading text-xl sm:text-2xl font-semibold text-primary leading-tight">{t.dash_journey_title}</h2>
+                        <p className="text-sm text-muted-foreground mt-1 leading-snug">{t.dash_journey_subtitle_v2 ?? t.dash_journey_subtitle}</p>
+                      </div>
+                    </div>
                   </div>
-                  <CardContent className="p-0">
-                    <ol className="divide-y divide-border/50">
-                      {steps.map((step) => {
+                  <CardContent className="p-5 sm:p-6">
+                    <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+                      {rawSteps.map((step, i) => {
                         const Icon = step.icon;
+                        const isNext = i === nextIdx;
+                        const badge = statusBadge(step.status);
                         return (
-                          <li key={step.n}>
+                          <li key={i} className="relative">
+                            {isNext && (
+                              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 inline-flex items-center gap-1 rounded-full bg-sky-100 text-sky-800 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 border border-sky-200 shadow-sm whitespace-nowrap">
+                                <Sparkles className="h-3 w-3" />
+                                {t.dash_step_next_action ?? 'Prochaine action'}
+                              </span>
+                            )}
                             <button
                               onClick={() => navigate(step.route)}
-                              className="w-full flex items-center gap-3 sm:gap-4 px-5 sm:px-6 py-3.5 hover:bg-muted/40 transition-colors text-left group"
+                              aria-label={step.title}
+                              className={`w-full h-full text-left rounded-2xl border p-4 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+                                isNext
+                                  ? 'bg-sky-50/60 border-sky-300 shadow-md hover:shadow-lg'
+                                  : 'bg-card border-border/70 hover:border-accent/40 hover:shadow-soft'
+                              }`}
                             >
-                              <div className={`h-9 w-9 rounded-full flex items-center justify-center font-heading text-sm font-semibold border-2 transition-colors shrink-0 ${
-                                step.done
-                                  ? 'bg-accent border-accent text-accent-foreground'
-                                  : 'bg-card border-border text-muted-foreground group-hover:border-accent/50'
-                              }`}>
-                                {step.done ? <Check className="h-4 w-4" /> : step.n}
-                              </div>
-                              <div className="hidden sm:flex h-9 w-9 rounded-lg bg-secondary items-center justify-center shrink-0">
-                                <Icon className="h-4 w-4 text-primary" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <p className="font-heading text-sm sm:text-base font-medium text-primary leading-tight">{step.title}</p>
-                                  <Badge
-                                    variant="outline"
-                                    className={`text-[10px] px-1.5 py-0 ${step.done ? 'bg-accent/10 text-accent border-accent/30' : 'bg-muted text-muted-foreground border-border'}`}
-                                  >
-                                    {step.done ? t.dash_step_done : t.dash_step_todo}
-                                  </Badge>
+                              <div className="flex items-center gap-2.5 mb-2.5">
+                                <div className={`h-8 w-8 rounded-full flex items-center justify-center font-heading text-sm font-semibold shrink-0 ${
+                                  step.status === 'done'
+                                    ? 'bg-emerald-500 text-white'
+                                    : isNext
+                                      ? 'bg-sky-500 text-white'
+                                      : 'bg-muted text-muted-foreground'
+                                }`}>
+                                  {step.status === 'done' ? <Check className="h-4 w-4" /> : i + 1}
                                 </div>
-                                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 leading-snug">{step.desc}</p>
+                                <Icon className="h-4 w-4 text-primary/70" />
                               </div>
-                              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" />
+                              <p className="font-heading text-sm font-semibold text-primary leading-tight">{step.title}</p>
+                              <p className="text-xs text-muted-foreground mt-1 leading-snug line-clamp-2">{step.desc}</p>
+                              <Badge variant="outline" className={`mt-3 text-[10px] px-2 py-0.5 ${badge.cls}`}>
+                                {badge.label}
+                              </Badge>
                             </button>
                           </li>
                         );
@@ -258,45 +386,52 @@ const DashboardPage: React.FC = () => {
               );
             })()}
 
-            {/* Helpers row — Assistant + Demo + Scan */}
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-stretch">
-              {/* Demo button column placed BETWEEN the two helper cards on desktop */}
-              {/* (rendered via order classes below) */}
-              <Card className="shadow-card border-accent/30 bg-gradient-to-br from-accent/5 to-transparent">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-accent/15 flex items-center justify-center shrink-0">
-                    <Sparkles className="h-5 w-5 text-accent" />
+            {/* ============ SUPPORT TOOLS ROW ============ */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="shadow-soft border-accent/30 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent overflow-hidden">
+                <CardContent className="p-5 sm:p-6 flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-2xl bg-accent/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="h-7 w-7 text-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-heading text-sm font-medium text-primary leading-tight">{aiT.next_step_open_assistant}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{aiT.empty_assistant}</p>
+                    <h3 className="font-heading text-lg font-semibold text-primary leading-tight">{t.dash_support_assistant_title ?? aiT.scan_dashboard_title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 leading-snug">{t.dash_support_assistant_desc ?? aiT.empty_assistant}</p>
                   </div>
-                  <Button onClick={() => navigate('/assistant')} size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full shrink-0">
-                    {aiT.nav_assistant}
+                  <Button
+                    onClick={() => navigate('/assistant')}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-5 h-11 shrink-0 font-medium"
+                  >
+                    {t.dash_support_assistant_cta ?? aiT.nav_assistant}
                   </Button>
                 </CardContent>
               </Card>
-              {/* Demo button — positioned between the two helper cards */}
-              <div className="flex items-center justify-center md:px-1">
-                <DemoTour triggerClassName="w-full md:w-auto" />
-              </div>
-              <Card className="shadow-card border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                <CardContent className="p-4 flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <Camera className="h-5 w-5 text-primary" />
+              <Card className="shadow-soft border-primary/20 bg-gradient-to-br from-sky-50 via-sky-50/40 to-transparent overflow-hidden">
+                <CardContent className="p-5 sm:p-6 flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-2xl bg-sky-100 flex items-center justify-center shrink-0">
+                    <Scan className="h-7 w-7 text-sky-700" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-heading text-sm font-medium text-primary leading-tight">{aiT.scan_dashboard_title}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug line-clamp-2">{aiT.scan_dashboard_desc}</p>
+                    <h3 className="font-heading text-lg font-semibold text-primary leading-tight">{t.dash_support_scan_title ?? aiT.scan_dashboard_title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 leading-snug">{t.dash_support_scan_desc ?? aiT.scan_dashboard_desc}</p>
                   </div>
-                  <Button onClick={() => navigate('/documents?scan=1')} size="sm" variant="outline" className="rounded-full border-primary/30 text-primary hover:bg-primary/10 shrink-0">
-                    {aiT.scan_dashboard_cta}
+                  <Button
+                    onClick={() => navigate('/documents?scan=1')}
+                    variant="outline"
+                    className="rounded-full px-5 h-11 shrink-0 border-primary/30 text-primary hover:bg-primary/5 gap-2 font-medium"
+                  >
+                    <Camera className="h-4 w-4" />
+                    {t.dash_support_scan_cta ?? aiT.scan_dashboard_cta}
                   </Button>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Alerts row */}
+            {/* Discreet demo tour link */}
+            <div className="flex justify-center">
+              <DemoTour triggerClassName="" />
+            </div>
+
+            {/* ============ ALERTS ROW ============ */}
             {(checklistSummary.needsReview > 0 || checklistSummary.blocked > 0 || checklistSummary.proReview > 0) && (
               <div className="flex flex-wrap gap-2">
                 {checklistSummary.needsReview > 0 && (
@@ -320,7 +455,6 @@ const DashboardPage: React.FC = () => {
               </div>
             )}
 
-            {/* Documentary preparation — refined, explanatory layout */}
             {(() => {
               const docItems = [
                 { key: 'testament', icon: FileCheck, label: t.doc_status_testament, desc: t.dash_doc_desc_testament, value: circle.testament_status },
@@ -453,6 +587,30 @@ const DashboardPage: React.FC = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* ============ REASSURANCE BAND ============ */}
+            <section className="rounded-2xl bg-gradient-to-br from-accent/5 via-card to-card border border-border/60 p-6 sm:p-8 shadow-soft">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-border/50">
+                {[
+                  { icon: Heart,  title: t.dash_reassure_simple_title  ?? 'Simple',                       desc: t.dash_reassure_simple_desc ?? '', tint: 'bg-accent/15 text-accent' },
+                  { icon: Lock,   title: t.dash_reassure_secure_title  ?? 'Sécurisé',                     desc: t.dash_reassure_secure_desc ?? '', tint: 'bg-sky-100 text-sky-700' },
+                  { icon: Users,  title: t.dash_reassure_family_title  ?? 'Accessible à votre famille',   desc: t.dash_reassure_family_desc ?? '', tint: 'bg-emerald-100 text-emerald-700' },
+                ].map((b) => {
+                  const Icon = b.icon;
+                  return (
+                    <div key={b.title} className="flex items-start gap-4 pt-6 md:pt-0 md:px-4 first:pt-0">
+                      <div className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ${b.tint}`}>
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-heading text-base font-semibold text-primary leading-tight">{b.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1 leading-snug">{b.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
 
           </>
         )}
