@@ -296,6 +296,54 @@ export interface MemoriesCopy {
   rec_demo_recipe_branch: string;
   rec_demo_recipe_occasion: string;
   rec_demo_recipe_transmitted: string;
+  // CreateRecipeDialog form
+  rec_must_create_circle: string;
+  rec_create_circle_btn: string;
+  rec_loading: string;
+  rec_create_dialog_title: string;
+  rec_create_dialog_desc: string;
+  rec_scan_ai: string;
+  rec_scan_ai_hint: string;
+  rec_dish_photo_label: string;
+  rec_dish_photo_optional: string;
+  rec_dish_photo_add: string;
+  rec_dish_photo_add_hint: string;
+  rec_dish_photo_remove: string;
+  rec_field_title: string;
+  rec_field_title_placeholder: string;
+  rec_field_dish_type: string;
+  rec_field_difficulty: string;
+  rec_difficulty_easy: string;
+  rec_difficulty_medium: string;
+  rec_difficulty_hard: string;
+  rec_field_prep: string;
+  rec_field_cook: string;
+  rec_field_servings_short: string;
+  rec_field_story: string;
+  rec_field_story_placeholder: string;
+  rec_field_ingredients: string;
+  rec_field_ingredients_placeholder: string;
+  rec_field_steps: string;
+  rec_field_steps_placeholder: string;
+  rec_field_branch: string;
+  rec_field_generation: string;
+  rec_field_none: string;
+  rec_field_none_dash: string;
+  rec_field_transmitted: string;
+  rec_field_no_member: string;
+  rec_field_occasions: string;
+  rec_field_members: string;
+  rec_field_handwritten_linked: string;
+  rec_field_visibility: string;
+  rec_visibility_circle: string;
+  rec_visibility_managers: string;
+  rec_visibility_private: string;
+  rec_cancel: string;
+  rec_add_recipe: string;
+  rec_title_required: string;
+  rec_choose_image: string;
+  rec_save_error: string;
+  rec_save_success: string;
 
   // ===== StoriesPage =====
   st_back_memories: string;
@@ -740,6 +788,53 @@ const fr: MemoriesCopy = {
   rec_demo_recipe_branch: 'Branche Tremblay',
   rec_demo_recipe_occasion: 'Noël',
   rec_demo_recipe_transmitted: 'Grand-maman Louise',
+  rec_must_create_circle: "Vous devez d'abord créer un cercle familial.",
+  rec_create_circle_btn: 'Créer un cercle',
+  rec_loading: 'Chargement…',
+  rec_create_dialog_title: 'Ajouter une recette familiale',
+  rec_create_dialog_desc: 'Préservez une saveur, une histoire, un héritage.',
+  rec_scan_ai: 'Scanner avec IA',
+  rec_scan_ai_hint: "Photographiez un carnet ou un livre — l'IA remplit le formulaire",
+  rec_dish_photo_label: 'Photo du plat',
+  rec_dish_photo_optional: '(optionnel, compressée automatiquement)',
+  rec_dish_photo_add: 'Ajouter une photo du plat',
+  rec_dish_photo_add_hint: 'Vos invités voient la recette en image (max 1600px)',
+  rec_dish_photo_remove: 'Retirer',
+  rec_field_title: 'Titre *',
+  rec_field_title_placeholder: 'Ex. Tourtière de Grand-maman Louise',
+  rec_field_dish_type: 'Type de plat',
+  rec_field_difficulty: 'Difficulté',
+  rec_difficulty_easy: 'Facile',
+  rec_difficulty_medium: 'Intermédiaire',
+  rec_difficulty_hard: 'Difficile',
+  rec_field_prep: 'Prép. (min)',
+  rec_field_cook: 'Cuisson (min)',
+  rec_field_servings_short: 'Portions',
+  rec_field_story: "L'histoire de cette recette",
+  rec_field_story_placeholder: "D'où vient-elle ? Pour quelle occasion ? Quel souvenir y est attaché ?",
+  rec_field_ingredients: 'Ingrédients (un par ligne)',
+  rec_field_ingredients_placeholder: '500 g de viande hachée\n1 oignon\n...',
+  rec_field_steps: 'Étapes (une par ligne)',
+  rec_field_steps_placeholder: 'Faire revenir les oignons...\nAjouter la viande...',
+  rec_field_branch: 'Branche familiale',
+  rec_field_generation: 'Génération',
+  rec_field_none: 'Aucune',
+  rec_field_none_dash: '—',
+  rec_field_transmitted: 'Transmise par',
+  rec_field_no_member: 'Aucun membre',
+  rec_field_occasions: 'Occasions',
+  rec_field_members: 'Membres associés',
+  rec_field_handwritten_linked: 'Carnet manuscrit lié',
+  rec_field_visibility: 'Visibilité :',
+  rec_visibility_circle: 'Tout le cercle',
+  rec_visibility_managers: 'Gestionnaires',
+  rec_visibility_private: 'Privée',
+  rec_cancel: 'Annuler',
+  rec_add_recipe: 'Ajouter la recette',
+  rec_title_required: 'Le titre est requis',
+  rec_choose_image: 'Veuillez choisir une image',
+  rec_save_error: "Impossible d'enregistrer la recette",
+  rec_save_success: 'Recette ajoutée à votre livre familial',
 
   st_back_memories: 'Retour aux souvenirs',
   st_badge: 'Histoires racontées',
@@ -1181,6 +1276,53 @@ const en: MemoriesCopy = {
   rec_demo_recipe_branch: 'Tremblay branch',
   rec_demo_recipe_occasion: 'Christmas',
   rec_demo_recipe_transmitted: 'Grandma Louise',
+  rec_must_create_circle: 'You need to create a family circle first.',
+  rec_create_circle_btn: 'Create a circle',
+  rec_loading: 'Loading…',
+  rec_create_dialog_title: 'Add a family recipe',
+  rec_create_dialog_desc: 'Preserve a flavor, a story, a heritage.',
+  rec_scan_ai: 'Scan with AI',
+  rec_scan_ai_hint: 'Photograph a notebook or a book — AI fills in the form',
+  rec_dish_photo_label: 'Dish photo',
+  rec_dish_photo_optional: '(optional, automatically compressed)',
+  rec_dish_photo_add: 'Add a dish photo',
+  rec_dish_photo_add_hint: 'Your guests see the recipe with an image (max 1600px)',
+  rec_dish_photo_remove: 'Remove',
+  rec_field_title: 'Title *',
+  rec_field_title_placeholder: 'E.g. Grandma Louise\u2019s tourtière',
+  rec_field_dish_type: 'Dish type',
+  rec_field_difficulty: 'Difficulty',
+  rec_difficulty_easy: 'Easy',
+  rec_difficulty_medium: 'Intermediate',
+  rec_difficulty_hard: 'Hard',
+  rec_field_prep: 'Prep (min)',
+  rec_field_cook: 'Cook (min)',
+  rec_field_servings_short: 'Servings',
+  rec_field_story: 'The story of this recipe',
+  rec_field_story_placeholder: 'Where does it come from? For what occasion? What memory is attached to it?',
+  rec_field_ingredients: 'Ingredients (one per line)',
+  rec_field_ingredients_placeholder: '500 g ground meat\n1 onion\n...',
+  rec_field_steps: 'Steps (one per line)',
+  rec_field_steps_placeholder: 'Brown the onions...\nAdd the meat...',
+  rec_field_branch: 'Family branch',
+  rec_field_generation: 'Generation',
+  rec_field_none: 'None',
+  rec_field_none_dash: '—',
+  rec_field_transmitted: 'Transmitted by',
+  rec_field_no_member: 'No member',
+  rec_field_occasions: 'Occasions',
+  rec_field_members: 'Linked members',
+  rec_field_handwritten_linked: 'Linked handwritten notebook',
+  rec_field_visibility: 'Visibility:',
+  rec_visibility_circle: 'Whole circle',
+  rec_visibility_managers: 'Managers',
+  rec_visibility_private: 'Private',
+  rec_cancel: 'Cancel',
+  rec_add_recipe: 'Add the recipe',
+  rec_title_required: 'Title is required',
+  rec_choose_image: 'Please choose an image',
+  rec_save_error: 'Could not save the recipe',
+  rec_save_success: 'Recipe added to your family book',
 
   st_back_memories: 'Back to memories',
   st_badge: 'Spoken stories',
@@ -1622,6 +1764,53 @@ const es: MemoriesCopy = {
   rec_demo_recipe_branch: 'Rama Tremblay',
   rec_demo_recipe_occasion: 'Navidad',
   rec_demo_recipe_transmitted: 'Abuela Louise',
+  rec_must_create_circle: 'Primero debe crear un círculo familiar.',
+  rec_create_circle_btn: 'Crear un círculo',
+  rec_loading: 'Cargando…',
+  rec_create_dialog_title: 'Añadir una receta familiar',
+  rec_create_dialog_desc: 'Conserve un sabor, una historia, un legado.',
+  rec_scan_ai: 'Escanear con IA',
+  rec_scan_ai_hint: 'Fotografíe un cuaderno o un libro — la IA rellena el formulario',
+  rec_dish_photo_label: 'Foto del plato',
+  rec_dish_photo_optional: '(opcional, comprimida automáticamente)',
+  rec_dish_photo_add: 'Añadir una foto del plato',
+  rec_dish_photo_add_hint: 'Sus invitados ven la receta con imagen (máx 1600px)',
+  rec_dish_photo_remove: 'Quitar',
+  rec_field_title: 'Título *',
+  rec_field_title_placeholder: 'Ej. Tourtière de la abuela Louise',
+  rec_field_dish_type: 'Tipo de plato',
+  rec_field_difficulty: 'Dificultad',
+  rec_difficulty_easy: 'Fácil',
+  rec_difficulty_medium: 'Intermedia',
+  rec_difficulty_hard: 'Difícil',
+  rec_field_prep: 'Prep. (min)',
+  rec_field_cook: 'Cocción (min)',
+  rec_field_servings_short: 'Porciones',
+  rec_field_story: 'La historia de esta receta',
+  rec_field_story_placeholder: '¿De dónde viene? ¿Para qué ocasión? ¿Qué recuerdo le está vinculado?',
+  rec_field_ingredients: 'Ingredientes (uno por línea)',
+  rec_field_ingredients_placeholder: '500 g de carne picada\n1 cebolla\n...',
+  rec_field_steps: 'Pasos (uno por línea)',
+  rec_field_steps_placeholder: 'Dorar las cebollas...\nAñadir la carne...',
+  rec_field_branch: 'Rama familiar',
+  rec_field_generation: 'Generación',
+  rec_field_none: 'Ninguna',
+  rec_field_none_dash: '—',
+  rec_field_transmitted: 'Transmitida por',
+  rec_field_no_member: 'Ningún miembro',
+  rec_field_occasions: 'Ocasiones',
+  rec_field_members: 'Miembros vinculados',
+  rec_field_handwritten_linked: 'Cuaderno manuscrito vinculado',
+  rec_field_visibility: 'Visibilidad:',
+  rec_visibility_circle: 'Todo el círculo',
+  rec_visibility_managers: 'Gestores',
+  rec_visibility_private: 'Privada',
+  rec_cancel: 'Cancelar',
+  rec_add_recipe: 'Añadir la receta',
+  rec_title_required: 'El título es obligatorio',
+  rec_choose_image: 'Por favor elija una imagen',
+  rec_save_error: 'No se pudo guardar la receta',
+  rec_save_success: 'Receta añadida a su libro familiar',
 
   st_back_memories: 'Volver a los recuerdos',
   st_badge: 'Historias contadas',

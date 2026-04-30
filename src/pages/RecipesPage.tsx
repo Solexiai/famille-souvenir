@@ -22,6 +22,8 @@ import { z } from 'zod';
 import { cn } from '@/lib/utils';
 import { RecipeQuickAddDialog, type ExtractedRecipe } from '@/components/recipes/RecipeQuickAddDialog';
 import { prepareImageForUpload } from '@/lib/image-preparation';
+import { useLocale } from '@/contexts/LocaleContext';
+import { useMemoriesCopy, type MemoriesCopy } from '@/lib/memories-i18n';
 import recipeTourtiere from '@/assets/demo/recipe-tourtiere.jpg';
 import recipeApplePie from '@/assets/demo/recipe-apple-pie.jpg';
 import recipeSpaghetti from '@/assets/demo/recipe-spaghetti.jpg';
@@ -117,33 +119,40 @@ const DEMO_RECIPES = [
 
 // ======== Helpers ========
 
-const FILTER_CHIPS = [
-  { key: 'all', label: 'Tous' },
-  { key: 'branch', label: 'Branche familiale' },
-  { key: 'dessert', label: 'Desserts' },
-  { key: 'main', label: 'Plats mijotés' },
-  { key: 'celebration', label: 'Fêtes' },
-  { key: 'quick', label: 'Rapide' },
-  { key: 'handwritten', label: 'Carnet manuscrit' },
-  { key: 'favorites', label: 'Favoris' },
+const buildFilterChips = (c: MemoriesCopy) => [
+  { key: 'all', label: c.rec_filter_all },
+  { key: 'branch', label: c.rec_class_family },
+  { key: 'dessert', label: c.rec_filter_dessert },
+  { key: 'main', label: c.rec_filter_main },
+  { key: 'celebration', label: c.rec_class_occasion },
+  { key: 'quick', label: c.rec_filter_main },
+  { key: 'handwritten', label: c.rec_class_scanned },
+  { key: 'favorites', label: c.rec_filter_favorites },
 ] as const;
-type FilterKey = (typeof FILTER_CHIPS)[number]['key'];
+type FilterKey = 'all' | 'branch' | 'dessert' | 'main' | 'celebration' | 'quick' | 'handwritten' | 'favorites';
 
-const CLASSIFICATIONS = [
-  { key: 'family', label: 'Par famille', Icon: UsersIcon, hint: 'Branches & lignées' },
-  { key: 'occasion', label: 'Par occasion', Icon: CalendarDays, hint: 'Noël, mariages, fêtes' },
-  { key: 'generation', label: 'Par génération', Icon: GitBranch, hint: 'Époques & lignées' },
-  { key: 'dish', label: 'Par type de plat', Icon: ChefHat, hint: 'Entrées, mains, desserts' },
-  { key: 'scanned', label: 'Carnets numérisés', Icon: BookOpen, hint: 'Recettes manuscrites' },
-  { key: 'favorites', label: 'Favoris', Icon: Heart, hint: 'Vos préférées' },
-] as const;
-type ClassificationKey = (typeof CLASSIFICATIONS)[number]['key'];
+const buildClassifications = (c: MemoriesCopy) => [
+  { key: 'family' as const, label: c.rec_class_family, Icon: UsersIcon, hint: c.rec_class_family_hint },
+  { key: 'occasion' as const, label: c.rec_class_occasion, Icon: CalendarDays, hint: c.rec_class_occasion_hint },
+  { key: 'generation' as const, label: c.rec_class_generation, Icon: GitBranch, hint: c.rec_class_generation_hint },
+  { key: 'dish' as const, label: c.rec_class_dish, Icon: ChefHat, hint: c.rec_class_dish_hint },
+  { key: 'scanned' as const, label: c.rec_class_scanned, Icon: BookOpen, hint: c.rec_class_scanned_hint },
+  { key: 'favorites' as const, label: c.rec_class_favorites, Icon: Heart, hint: c.rec_class_favorites_hint },
+];
+type ClassificationKey = 'family' | 'occasion' | 'generation' | 'dish' | 'scanned' | 'favorites';
 
-const DISH_TYPE_LABEL: Record<DishType, string> = {
-  appetizer: 'Entrée', soup: 'Soupe', main: 'Plat principal', side: 'Accompagnement',
-  dessert: 'Dessert', preserve: 'Conserve', drink: 'Boisson', sauce: 'Sauce',
-  bread: 'Pain', other: 'Autre',
-};
+const dishTypeLabel = (c: MemoriesCopy): Record<DishType, string> => ({
+  appetizer: c.rec_dish_appetizer,
+  soup: c.rec_dish_soup,
+  main: c.rec_dish_main,
+  side: c.rec_dish_side,
+  dessert: c.rec_dish_dessert,
+  preserve: c.rec_dish_preserve,
+  drink: c.rec_dish_drink,
+  sauce: c.rec_dish_sauce,
+  bread: c.rec_dish_bread,
+  other: c.rec_dish_other,
+});
 
 function formatDuration(minutes: number): string {
   if (!minutes) return '—';
@@ -157,6 +166,8 @@ function formatDuration(minutes: number): string {
 
 const RecipesPage: React.FC = () => {
   const { user } = useAuth();
+  const { lang } = useLocale();
+  const c = useMemoriesCopy(lang);
   const navigate = useNavigate();
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -198,8 +209,8 @@ const RecipesPage: React.FC = () => {
     });
     setQuickAddOpen(false);
     setCreateOpen(true);
-    toast.success('Recette détectée ! Vérifiez et enregistrez.');
-  }, []);
+    toast.success(c.rec_toast_extracted);
+  }, [c]);
 
   // ====== Data loading ======
   const loadAll = useCallback(async () => {
@@ -345,8 +356,8 @@ const RecipesPage: React.FC = () => {
     return (
       <AppLayout>
         <div className="text-center py-20">
-          <p className="text-muted-foreground">Vous devez d'abord créer un cercle familial.</p>
-          <Button className="mt-4" onClick={() => navigate('/circle')}>Créer un cercle</Button>
+          <p className="text-muted-foreground">{c.rec_must_create_circle}</p>
+          <Button className="mt-4" onClick={() => navigate('/circle')}>{c.rec_create_circle_btn}</Button>
         </div>
       </AppLayout>
     );
@@ -358,7 +369,7 @@ const RecipesPage: React.FC = () => {
       <AppLayout>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
           <Button variant="ghost" size="sm" onClick={() => setView('list')} className="gap-2">
-            <ArrowLeft className="h-4 w-4" /> Toutes les recettes
+            <ArrowLeft className="h-4 w-4" /> {c.rec_back_all}
           </Button>
           <FilteredView
             view={view as ClassificationKey}
@@ -370,6 +381,7 @@ const RecipesPage: React.FC = () => {
             favorites={favorites}
             onOpen={openDetail}
             onToggleFavorite={toggleFavorite}
+            c={c}
           />
         </div>
         <RecipeDetailDialog
@@ -384,6 +396,7 @@ const RecipesPage: React.FC = () => {
           members={members}
           isFavorite={activeRecipeId ? favorites.has(activeRecipeId) : false}
           onToggleFavorite={toggleFavorite}
+          c={c}
         />
       </AppLayout>
     );
@@ -399,15 +412,15 @@ const RecipesPage: React.FC = () => {
             <ChefHat className="h-8 w-8 text-[hsl(35_70%_45%)]" />
           </div>
           <h1 className="font-heading text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-            Nos recettes de famille
+            {c.rec_title}
           </h1>
           <p className="text-foreground/70 text-lg sm:text-xl leading-relaxed">
-            Gardons ensemble les recettes qui nous rassemblent.
+            {c.rec_subtitle}
           </p>
         </header>
 
         {/* 2. LES DEUX GRANDES ACTIONS — au centre, très visibles */}
-        <section aria-label="Ajouter une recette" className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        <section aria-label={c.rec_title} className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
           <button
             onClick={() => { setQuickAddInitialMode('choose'); setQuickAddOpen(true); }}
             className="group flex flex-col items-center text-center gap-3 p-6 sm:p-7 rounded-2xl bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white shadow-md hover:shadow-lg transition-all"
@@ -416,8 +429,8 @@ const RecipesPage: React.FC = () => {
               <Camera className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Prendre en photo</h2>
-              <p className="text-sm sm:text-base text-white/90 mt-1">L'IA s'occupe du reste.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_photo}</h2>
+              <p className="text-sm sm:text-base text-white/90 mt-1">{c.rec_action_photo_hint}</p>
             </div>
           </button>
 
@@ -429,8 +442,8 @@ const RecipesPage: React.FC = () => {
               <Pencil className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Écrire une recette</h2>
-              <p className="text-sm sm:text-base text-foreground/70 mt-1">À votre rythme.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_write}</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">{c.rec_action_write_hint}</p>
             </div>
           </button>
 
@@ -442,8 +455,8 @@ const RecipesPage: React.FC = () => {
               <Mic className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Dicter la recette</h2>
-              <p className="text-sm sm:text-base text-foreground/70 mt-1">Parlez, l'IA structure tout.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_dictate}</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">{c.rec_action_dictate_hint}</p>
             </div>
           </button>
         </section>
@@ -454,32 +467,32 @@ const RecipesPage: React.FC = () => {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Chercher une recette ou un ingrédient…"
+            placeholder={c.rec_search_placeholder}
             className="pl-14 h-14 rounded-full bg-card border-border shadow-sm text-lg"
           />
         </div>
 
         {/* 4. Nos recettes — la grille */}
-        <section aria-label="Nos recettes" className="space-y-5">
+        <section aria-label={c.rec_section_our} className="space-y-5">
           <h2 className="font-heading text-3xl font-semibold text-foreground text-center">
-            Nos recettes
+            {c.rec_section_our}
           </h2>
 
           {/* Filtres simplifiés — 4 seulement, plus gros */}
           {hasRealRecipes && (
             <div className="flex flex-wrap gap-2 justify-center">
-              {FILTER_CHIPS.filter((c) => ['all', 'main', 'dessert', 'favorites'].includes(c.key)).map((c) => (
+              {buildFilterChips(c).filter((chip) => ['all', 'main', 'dessert', 'favorites'].includes(chip.key)).map((chip) => (
                 <button
-                  key={c.key}
-                  onClick={() => setFilter(c.key)}
+                  key={chip.key}
+                  onClick={() => setFilter(chip.key as FilterKey)}
                   className={cn(
                     'px-5 py-2.5 rounded-full text-base font-medium border-2 transition-all',
-                    filter === c.key
+                    filter === chip.key
                       ? 'bg-[hsl(35_60%_92%)] border-[hsl(35_60%_55%)] text-[hsl(35_70%_30%)]'
                       : 'bg-card border-border text-foreground hover:border-[hsl(35_60%_55%)]/40'
                   )}
                 >
-                  {c.label}
+                  {chip.label}
                 </button>
               ))}
             </div>
@@ -497,39 +510,40 @@ const RecipesPage: React.FC = () => {
                   isFavorite={favorites.has(r.id)}
                   onToggleFavorite={() => toggleFavorite(r.id)}
                   onOpen={() => openDetail(r.id)}
+                  c={c}
                 />
               ))}
               {filteredRecipes.length === 0 && (
                 <p className="col-span-full text-center text-foreground/70 text-lg py-12">
-                  Aucune recette ne correspond à votre recherche.
+                  {c.rec_no_match}
                 </p>
               )}
             </div>
           ) : (
-            <DemoRecipesGrid onOpen={() => setCreateOpen(true)} />
+            <DemoRecipesGrid onOpen={() => setCreateOpen(true)} c={c} />
           )}
         </section>
 
         {/* 5. Ranger les recettes — visible seulement s'il y a déjà des recettes */}
         {hasRealRecipes && (
-          <section aria-label="Ranger les recettes" className="space-y-4">
+          <section aria-label={c.rec_organize_title} className="space-y-4">
             <h2 className="font-heading text-2xl font-semibold text-foreground text-center">
-              Ranger les recettes
+              {c.rec_organize_title}
             </h2>
-            <p className="text-center text-foreground/70">Touchez une catégorie pour voir les recettes regroupées.</p>
+            <p className="text-center text-foreground/70">{c.rec_organize_hint}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-3xl mx-auto">
-              {CLASSIFICATIONS.map((c) => (
+              {buildClassifications(c).map((cls) => (
                 <button
-                  key={c.key}
-                  onClick={() => setView(c.key)}
+                  key={cls.key}
+                  onClick={() => setView(cls.key)}
                   className="group flex items-center gap-4 rounded-xl border-2 border-border bg-card p-5 text-left shadow-sm hover:shadow-md hover:border-[hsl(35_60%_55%)]/40 transition-all"
                 >
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(35_60%_92%)] text-[hsl(35_70%_45%)]">
-                    <c.Icon className="h-6 w-6" />
+                    <cls.Icon className="h-6 w-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-heading text-lg font-semibold text-foreground leading-snug">{c.label}</h3>
-                    <p className="text-sm text-foreground/70">{c.hint}</p>
+                    <h3 className="font-heading text-lg font-semibold text-foreground leading-snug">{cls.label}</h3>
+                    <p className="text-sm text-foreground/70">{cls.hint}</p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground/60 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                 </button>
@@ -544,11 +558,12 @@ const RecipesPage: React.FC = () => {
             onCreate={() => { setRecipePrefill(null); setCreateOpen(true); }}
             onScan={() => setQuickAddOpen(true)}
             onInvite={() => navigate('/circle/members')}
+            c={c}
           />
         )}
 
         {/* 7. Heritage callout */}
-        <HeritageCallout onAddMemory={() => navigate('/memories')} />
+        <HeritageCallout onAddMemory={() => navigate('/memories')} c={c} />
       </div>
 
       <RecipeQuickAddDialog
@@ -570,6 +585,7 @@ const RecipesPage: React.FC = () => {
         prefill={recipePrefill}
         onOpenScanIA={() => { setCreateOpen(false); setQuickAddOpen(true); }}
         onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
+        c={c}
       />
 
       <RecipeDetailDialog
@@ -584,6 +600,7 @@ const RecipesPage: React.FC = () => {
         members={members}
         isFavorite={activeRecipeId ? favorites.has(activeRecipeId) : false}
         onToggleFavorite={toggleFavorite}
+        c={c}
       />
     </AppLayout>
   );
@@ -651,8 +668,9 @@ const RecipeCard: React.FC<{
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onOpen: () => void;
-}> = ({ recipe, branchName, generationName, occasionName, isFavorite, onToggleFavorite, onOpen }) => {
-  const subtitle = branchName || occasionName || generationName || DISH_TYPE_LABEL[recipe.dish_type];
+  c: MemoriesCopy;
+}> = ({ recipe, branchName, generationName, occasionName, isFavorite, onToggleFavorite, onOpen, c }) => {
+  const subtitle = branchName || occasionName || generationName || dishTypeLabel(c)[recipe.dish_type];
   return (
     <button onClick={onOpen} className="group text-left rounded-xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="relative aspect-[4/3] bg-muted overflow-hidden">
@@ -666,14 +684,14 @@ const RecipeCard: React.FC<{
         <button
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
           className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
-          aria-label="Favori"
+          aria-label={c.rec_filter_favorites}
         >
           <Heart className={cn('h-4 w-4', isFavorite ? 'fill-[hsl(355_60%_55%)] text-[hsl(355_60%_55%)]' : 'text-foreground/60')} />
         </button>
         {(recipe.has_handwritten_note || recipe.has_audio_memory) && (
           <div className="absolute bottom-2 left-2 flex gap-1">
-            {recipe.has_handwritten_note && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> Note</Badge>}
-            {recipe.has_audio_memory && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> Audio</Badge>}
+            {recipe.has_handwritten_note && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> {c.rec_badge_note}</Badge>}
+            {recipe.has_audio_memory && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> {c.rec_badge_audio}</Badge>}
           </div>
         )}
       </div>
@@ -685,17 +703,17 @@ const RecipeCard: React.FC<{
   );
 };
 
-const DemoRecipesGrid: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
+const DemoRecipesGrid: React.FC<{ onOpen: () => void; c: MemoriesCopy }> = ({ onOpen, c }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     {DEMO_RECIPES.map((r) => (
       <button key={r.id} onClick={onOpen} className="group text-left rounded-xl overflow-hidden border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
         <div className="relative aspect-[4/3] bg-muted overflow-hidden">
           <img src={r.image} alt={r.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          <Badge className="absolute top-2 left-2 bg-white/90 text-[hsl(35_70%_35%)] text-[10px]">DÉMO</Badge>
+          <Badge className="absolute top-2 left-2 bg-white/90 text-[hsl(35_70%_35%)] text-[10px]">{c.rec_demo_badge}</Badge>
           <div className="absolute bottom-2 left-2 right-2 flex gap-1 flex-wrap">
-            {r.badges.includes('handwritten' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> Manuscrit</Badge>}
-            {r.badges.includes('audio' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> Audio</Badge>}
-            {r.badges.includes('memory' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Heart className="h-3 w-3" /> Souvenir</Badge>}
+            {r.badges.includes('handwritten' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><FileText className="h-3 w-3" /> {c.rec_badge_handwritten}</Badge>}
+            {r.badges.includes('audio' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Mic className="h-3 w-3" /> {c.rec_badge_audio}</Badge>}
+            {r.badges.includes('memory' as never) && <Badge className="bg-white/90 text-foreground gap-1 text-[10px]"><Heart className="h-3 w-3" /> {c.rec_badge_memory}</Badge>}
           </div>
         </div>
         <div className="p-3">
@@ -707,42 +725,42 @@ const DemoRecipesGrid: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
   </div>
 );
 
-const EmptyStateBlock: React.FC<{ onCreate: () => void; onScan: () => void; onInvite: () => void }> = ({ onCreate, onScan, onInvite }) => (
+const EmptyStateBlock: React.FC<{ onCreate: () => void; onScan: () => void; onInvite: () => void; c: MemoriesCopy }> = ({ onCreate, onScan, onInvite, c }) => (
   <Card className="border-dashed border-2 border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)]">
     <CardContent className="p-8 text-center space-y-4">
       <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[hsl(35_60%_92%)]">
         <BookOpen className="h-7 w-7 text-[hsl(35_70%_45%)]" />
       </div>
-      <h3 className="font-heading text-2xl font-bold text-foreground">Commencez votre livre de recettes familial</h3>
+      <h3 className="font-heading text-2xl font-bold text-foreground">{c.rec_empty_title}</h3>
       <p className="text-muted-foreground max-w-xl mx-auto">
-        Ajoutez une première recette, numérisez un carnet manuscrit ou invitez un proche à partager un souvenir culinaire.
+        {c.rec_empty_desc}
       </p>
       <div className="flex flex-wrap gap-2 justify-center pt-2">
-        <Button onClick={onCreate} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white gap-2"><Plus className="h-4 w-4" /> Ajouter une recette</Button>
-        <Button onClick={onScan} variant="outline" className="gap-2"><ScanLine className="h-4 w-4" /> Numériser une recette</Button>
-        <Button onClick={onInvite} variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> Inviter un proche</Button>
+        <Button onClick={onCreate} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white gap-2"><Plus className="h-4 w-4" /> {c.rec_empty_add}</Button>
+        <Button onClick={onScan} variant="outline" className="gap-2"><ScanLine className="h-4 w-4" /> {c.rec_empty_scan}</Button>
+        <Button onClick={onInvite} variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> {c.rec_empty_invite}</Button>
       </div>
     </CardContent>
   </Card>
 );
 
-const HeritageCallout: React.FC<{ onAddMemory: () => void }> = ({ onAddMemory }) => (
+const HeritageCallout: React.FC<{ onAddMemory: () => void; c: MemoriesCopy }> = ({ onAddMemory, c }) => (
   <Card className="overflow-hidden border-border bg-gradient-to-br from-[hsl(35_60%_97%)] to-[hsl(40_33%_98%)] shadow-sm">
     <CardContent className="p-6 sm:p-8 grid md:grid-cols-[1fr_auto] gap-6 items-center">
       <div className="space-y-3">
-        <h3 className="font-heading text-2xl font-bold text-foreground">L'histoire derrière la recette</h3>
+        <h3 className="font-heading text-2xl font-bold text-foreground">{c.rec_heritage_title}</h3>
         <p className="text-muted-foreground leading-relaxed">
-          Chaque recette a une histoire. Préservons-la ensemble pour les générations à venir.
+          {c.rec_heritage_desc}
         </p>
         <div className="flex flex-wrap gap-3 pt-1 text-sm">
-          <span className="inline-flex items-center gap-1.5 text-foreground"><ImageIcon className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Photos de famille</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Mic className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Souvenirs audio</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Pencil className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Notes manuscrites</span>
-          <span className="inline-flex items-center gap-1.5 text-foreground"><Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> Anecdotes</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><ImageIcon className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_photos}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Mic className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_audio}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Pencil className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_notes}</span>
+          <span className="inline-flex items-center gap-1.5 text-foreground"><Sparkles className="h-4 w-4 text-[hsl(35_70%_45%)]" /> {c.rec_heritage_anec}</span>
         </div>
       </div>
       <Button onClick={onAddMemory} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white rounded-full">
-        Ajouter un souvenir <ChevronRight className="h-4 w-4" />
+        {c.rec_heritage_cta} <ChevronRight className="h-4 w-4" />
       </Button>
     </CardContent>
   </Card>
@@ -759,17 +777,22 @@ const FilteredView: React.FC<{
   favorites: Set<string>;
   onOpen: (id: string) => void;
   onToggleFavorite: (id: string) => void;
-}> = ({ view, recipes, branches, generations, occasions, recipeOccasions, favorites, onOpen, onToggleFavorite }) => {
+  c: MemoriesCopy;
+}> = ({ view, recipes, branches, generations, occasions, recipeOccasions, favorites, onOpen, onToggleFavorite, c }) => {
   const labels: Record<ClassificationKey, string> = {
-    family: 'Par famille', occasion: 'Par occasion', generation: 'Par génération',
-    dish: 'Par type de plat', scanned: 'Carnets numérisés', favorites: 'Favoris',
+    family: c.rec_class_family,
+    occasion: c.rec_class_occasion,
+    generation: c.rec_class_generation,
+    dish: c.rec_class_dish,
+    scanned: c.rec_class_scanned,
+    favorites: c.rec_class_favorites,
   };
 
   const renderGroup = (title: string, items: Recipe[]) => (
     <div key={title} className="space-y-3">
       <h3 className="font-heading text-xl font-semibold text-foreground">{title} <span className="text-sm text-muted-foreground font-normal">({items.length})</span></h3>
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Aucune recette dans cette catégorie.</p>
+        <p className="text-sm text-muted-foreground">{c.rec_no_recipe_in_cat}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {items.map((r) => (
@@ -782,6 +805,7 @@ const FilteredView: React.FC<{
               isFavorite={favorites.has(r.id)}
               onToggleFavorite={() => onToggleFavorite(r.id)}
               onOpen={() => onOpen(r.id)}
+              c={c}
             />
           ))}
         </div>
@@ -794,25 +818,26 @@ const FilteredView: React.FC<{
   if (view === 'family') {
     groups = branches.map((b) => ({ title: b.name, items: recipes.filter((r) => r.family_branch_id === b.id) }));
     const orphans = recipes.filter((r) => !r.family_branch_id);
-    if (orphans.length) groups.push({ title: 'Sans branche', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_branch, items: orphans });
   } else if (view === 'generation') {
     groups = generations.map((g) => ({ title: g.name, items: recipes.filter((r) => r.generation_id === g.id) }));
     const orphans = recipes.filter((r) => !r.generation_id);
-    if (orphans.length) groups.push({ title: 'Sans génération', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_generation, items: orphans });
   } else if (view === 'occasion') {
     groups = occasions.map((o) => ({
       title: o.name,
       items: recipes.filter((r) => (recipeOccasions[r.id] || []).includes(o.id)),
     }));
     const orphans = recipes.filter((r) => !(recipeOccasions[r.id] || []).length);
-    if (orphans.length) groups.push({ title: 'Sans occasion', items: orphans });
+    if (orphans.length) groups.push({ title: c.rec_without_occasion, items: orphans });
   } else if (view === 'dish') {
     const types: DishType[] = ['appetizer', 'soup', 'main', 'side', 'dessert', 'preserve', 'drink', 'sauce', 'bread', 'other'];
-    groups = types.map((t) => ({ title: DISH_TYPE_LABEL[t], items: recipes.filter((r) => r.dish_type === t) })).filter((g) => g.items.length > 0);
+    const dl = dishTypeLabel(c);
+    groups = types.map((t) => ({ title: dl[t], items: recipes.filter((r) => r.dish_type === t) })).filter((g) => g.items.length > 0);
   } else if (view === 'scanned') {
-    groups = [{ title: 'Recettes manuscrites numérisées', items: recipes.filter((r) => r.has_handwritten_note || r.scanned_document_id) }];
+    groups = [{ title: c.rec_handwritten_group, items: recipes.filter((r) => r.has_handwritten_note || r.scanned_document_id) }];
   } else if (view === 'favorites') {
-    groups = [{ title: 'Vos recettes favorites', items: recipes.filter((r) => favorites.has(r.id)) }];
+    groups = [{ title: c.rec_favorites_group, items: recipes.filter((r) => favorites.has(r.id)) }];
   }
 
   return (
@@ -821,7 +846,7 @@ const FilteredView: React.FC<{
         <h2 className="font-heading text-3xl font-bold text-foreground">{labels[view]}</h2>
       </div>
       {groups.length === 0 ? (
-        <p className="text-muted-foreground">Aucune donnée à afficher. Commencez par ajouter une recette ou créer des branches familiales.</p>
+        <p className="text-muted-foreground">{c.rec_no_data_view}</p>
       ) : (
         groups.map((g) => renderGroup(g.title, g.items))
       )}
@@ -842,7 +867,8 @@ const RecipeDetailDialog: React.FC<{
   members: Array<{ id: string; user_id: string; name: string }>;
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
-}> = ({ open, onClose, recipeId, recipes, branches, generations, occasions, recipeOccasions, members, isFavorite, onToggleFavorite }) => {
+  c: MemoriesCopy;
+}> = ({ open, onClose, recipeId, recipes, branches, generations, occasions, recipeOccasions, members, isFavorite, onToggleFavorite, c }) => {
   const navigate = useNavigate();
   const recipe = recipeId ? recipes.find((r) => r.id === recipeId) : null;
   const photoInputRef = React.useRef<HTMLInputElement>(null);
@@ -871,14 +897,12 @@ const RecipeDetailDialog: React.FC<{
       const { data: pub } = supabase.storage.from('memories-media').getPublicUrl(path);
       const { error: updErr } = await supabase.from('recipes').update({ image_url: pub.publicUrl }).eq('id', recipe.id);
       if (updErr) throw updErr;
-      toast.success('Photo principale mise à jour');
-      // Mutate locally so UI reflects without a full reload
+      toast.success(c.rec_toast_photo_updated);
       recipe.image_url = pub.publicUrl;
-      // Force re-render by closing then reopening — simpler: trigger via window event
       window.dispatchEvent(new CustomEvent('recipes:reload'));
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || "Impossible de changer la photo");
+      toast.error(e?.message || c.rec_toast_photo_error);
     } finally {
       setPhotoBusy(false);
     }
@@ -890,13 +914,13 @@ const RecipeDetailDialog: React.FC<{
     try {
       const { error } = await supabase.from('recipes').delete().eq('id', recipe.id);
       if (error) throw error;
-      toast.success('Recette supprimée');
+      toast.success(c.rec_toast_deleted);
       setConfirmDelete(false);
       onClose();
       window.dispatchEvent(new CustomEvent('recipes:reload'));
     } catch (e: any) {
       console.error(e);
-      toast.error(e?.message || 'Impossible de supprimer la recette');
+      toast.error(e?.message || c.rec_toast_delete_error);
     } finally {
       setDeleting(false);
     }
@@ -910,10 +934,10 @@ const RecipeDetailDialog: React.FC<{
             <div className="flex-1">
               <DialogTitle className="font-heading text-3xl">{recipe.title}</DialogTitle>
               <DialogDescription className="mt-1">
-                {[branch?.name, occ[0], gen?.name].filter(Boolean).join(' · ') || DISH_TYPE_LABEL[recipe.dish_type]}
+                {[branch?.name, occ[0], gen?.name].filter(Boolean).join(' · ') || dishTypeLabel(c)[recipe.dish_type]}
               </DialogDescription>
             </div>
-            <button onClick={() => onToggleFavorite(recipe.id)} aria-label="Favori">
+            <button onClick={() => onToggleFavorite(recipe.id)} aria-label={c.rec_filter_favorites}>
               <Heart className={cn('h-6 w-6', isFavorite ? 'fill-[hsl(355_60%_55%)] text-[hsl(355_60%_55%)]' : 'text-muted-foreground')} />
             </button>
           </div>
@@ -924,7 +948,7 @@ const RecipeDetailDialog: React.FC<{
             <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-              Aucune photo principale
+              {c.rec_no_main_photo}
             </div>
           )}
 
@@ -938,7 +962,7 @@ const RecipeDetailDialog: React.FC<{
                 className="inline-flex items-center gap-2 rounded-full bg-background/95 backdrop-blur px-4 py-2 text-sm font-medium border border-border shadow-md hover:bg-background transition disabled:opacity-60"
               >
                 {photoBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                {recipe.image_url ? 'Changer la photo' : 'Ajouter une photo'}
+                {recipe.image_url ? c.rec_change_photo : c.rec_add_photo}
               </button>
             ) : (
               <div className="flex flex-col gap-2 rounded-2xl bg-background/95 backdrop-blur p-2 border border-border shadow-lg min-w-[220px]">
@@ -950,7 +974,7 @@ const RecipeDetailDialog: React.FC<{
                   <span className="h-8 w-8 rounded-full bg-[hsl(35_60%_92%)] flex items-center justify-center text-[hsl(35_70%_45%)]">
                     <Camera className="h-4 w-4" />
                   </span>
-                  Prendre une photo
+                  {c.rec_take_photo}
                 </button>
                 <button
                   type="button"
@@ -960,20 +984,19 @@ const RecipeDetailDialog: React.FC<{
                   <span className="h-8 w-8 rounded-full bg-[hsl(220_45%_92%)] flex items-center justify-center text-[hsl(220_45%_25%)]">
                     <ImageIcon className="h-4 w-4" />
                   </span>
-                  Choisir depuis l'appareil
+                  {c.rec_pick_from_device}
                 </button>
                 <button
                   type="button"
                   onClick={() => setPhotoMenuOpen(false)}
                   className="text-xs text-muted-foreground hover:text-foreground py-1"
                 >
-                  Annuler
+                  {c.rec_cancel}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Camera capture (mobile back camera) */}
           <input
             ref={cameraInputRef}
             type="file"
@@ -982,7 +1005,6 @@ const RecipeDetailDialog: React.FC<{
             className="hidden"
             onChange={(e) => e.target.files?.[0] && handlePhotoChange(e.target.files[0])}
           />
-          {/* Library / file picker */}
           <input
             ref={photoInputRef}
             type="file"
@@ -995,23 +1017,23 @@ const RecipeDetailDialog: React.FC<{
         <div className="border-t border-border my-2" />
 
         <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Préparation</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Cuisson</div><div className="font-medium">{formatDuration(recipe.cooking_time_minutes)}</div></div>
-          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">Portions</div><div className="font-medium">{recipe.servings || '—'}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_prep}</div><div className="font-medium">{formatDuration(recipe.preparation_time_minutes)}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_cook}</div><div className="font-medium">{formatDuration(recipe.cooking_time_minutes)}</div></div>
+          <div className="rounded-lg bg-muted p-3"><div className="text-xs text-muted-foreground">{c.rec_servings}</div><div className="font-medium">{recipe.servings || '—'}</div></div>
         </div>
 
         <div className="border-t border-border my-2" />
 
         {recipe.story && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">L'histoire de cette recette</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_story_title}</h3>
             <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">{recipe.story}</p>
           </section>
         )}
 
         {recipe.ingredients?.length > 0 && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">Ingrédients</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_ingredients_title}</h3>
             <ul className="list-disc list-inside space-y-1 text-foreground/90">
               {recipe.ingredients.map((i, idx) => <li key={idx}>{String(i)}</li>)}
             </ul>
@@ -1020,7 +1042,7 @@ const RecipeDetailDialog: React.FC<{
 
         {recipe.steps?.length > 0 && (
           <section>
-            <h3 className="font-heading text-lg font-semibold mb-2">Étapes</h3>
+            <h3 className="font-heading text-lg font-semibold mb-2">{c.rec_steps_title}</h3>
             <ol className="list-decimal list-inside space-y-2 text-foreground/90">
               {recipe.steps.map((s, idx) => <li key={idx} className="leading-relaxed">{String(s)}</li>)}
             </ol>
@@ -1028,11 +1050,11 @@ const RecipeDetailDialog: React.FC<{
         )}
 
         <section className="rounded-lg border border-border p-4 space-y-2 text-sm">
-          {transmittedBy && <div><span className="text-muted-foreground">Transmise par : </span><span className="font-medium">{transmittedBy}</span></div>}
-          {author && <div><span className="text-muted-foreground">Auteur original : </span><span className="font-medium">{author}</span></div>}
-          {branch && <div><span className="text-muted-foreground">Branche familiale : </span><span className="font-medium">{branch.name}</span></div>}
-          {gen && <div><span className="text-muted-foreground">Génération : </span><span className="font-medium">{gen.name}</span></div>}
-          {occ.length > 0 && <div><span className="text-muted-foreground">Occasions : </span><span className="font-medium">{occ.join(', ')}</span></div>}
+          {transmittedBy && <div><span className="text-muted-foreground">{c.rec_transmitted_by} : </span><span className="font-medium">{transmittedBy}</span></div>}
+          {author && <div><span className="text-muted-foreground">{c.rec_original_author} : </span><span className="font-medium">{author}</span></div>}
+          {branch && <div><span className="text-muted-foreground">{c.rec_branch} : </span><span className="font-medium">{branch.name}</span></div>}
+          {gen && <div><span className="text-muted-foreground">{c.rec_generation} : </span><span className="font-medium">{gen.name}</span></div>}
+          {occ.length > 0 && <div><span className="text-muted-foreground">{c.rec_occasions} : </span><span className="font-medium">{occ.join(', ')}</span></div>}
         </section>
 
         <DialogFooter className="gap-2 flex-wrap sm:justify-between">
@@ -1041,11 +1063,11 @@ const RecipeDetailDialog: React.FC<{
             onClick={() => setConfirmDelete(true)}
             className="gap-2 text-[hsl(355_60%_45%)] border-[hsl(355_60%_55%)]/40 hover:bg-[hsl(355_60%_97%)] hover:text-[hsl(355_60%_40%)]"
           >
-            🗑️ Supprimer la recette
+            {c.rec_delete_btn}
           </Button>
           <div className="flex gap-2 flex-wrap">
-            <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> Ajouter un souvenir</Button>
-            <Button onClick={onClose}>Fermer</Button>
+            <Button variant="outline" onClick={() => navigate('/memories')} className="gap-2"><Plus className="h-4 w-4" /> {c.rec_add_memory_btn}</Button>
+            <Button onClick={onClose}>{c.rec_close}</Button>
           </div>
         </DialogFooter>
 
@@ -1053,20 +1075,20 @@ const RecipeDetailDialog: React.FC<{
         <Dialog open={confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(false)}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-heading text-2xl">Supprimer cette recette ?</DialogTitle>
+              <DialogTitle className="font-heading text-2xl">{c.rec_confirm_delete_title}</DialogTitle>
               <DialogDescription>
-                Cette action est <strong>définitive</strong>. La recette « {recipe.title} » sera retirée du livre familial. Les souvenirs liés ne seront pas supprimés.
+                {c.rec_confirm_delete_desc} « {recipe.title} »
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>Annuler</Button>
+              <Button variant="outline" onClick={() => setConfirmDelete(false)} disabled={deleting}>{c.rec_cancel}</Button>
               <Button
                 onClick={handleDelete}
                 disabled={deleting}
                 className="bg-[hsl(355_60%_45%)] hover:bg-[hsl(355_60%_40%)] text-white gap-2"
               >
                 {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
-                Oui, supprimer
+                {c.rec_confirm_delete_yes}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1103,7 +1125,8 @@ const CreateRecipeDialog: React.FC<{
   onCreated: () => void;
   prefill?: RecipePrefill | null;
   onOpenScanIA?: () => void;
-}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA }) => {
+  c: MemoriesCopy;
+}> = ({ open, onClose, circle, userId, branches, generations, occasions, members, onCreated, prefill, onOpenScanIA, c }) => {
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState('');
   const [story, setStory] = useState('');
@@ -1153,7 +1176,7 @@ const CreateRecipeDialog: React.FC<{
 
   const handlePhotoSelected = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      toast.error('Veuillez choisir une image');
+      toast.error(c.rec_choose_image);
       return;
     }
     setPhotoBusy(true);
@@ -1172,7 +1195,7 @@ const CreateRecipeDialog: React.FC<{
   };
 
   const schema = z.object({
-    title: z.string().trim().min(1, 'Le titre est requis').max(200),
+    title: z.string().trim().min(1, c.rec_title_required).max(200),
     story: z.string().max(5000).optional(),
   });
 
@@ -1240,7 +1263,7 @@ const CreateRecipeDialog: React.FC<{
     }).select().single();
 
     if (error || !data) {
-      toast.error("Impossible d'enregistrer la recette");
+      toast.error(c.rec_save_error);
       setSaving(false);
       return;
     }
@@ -1253,7 +1276,7 @@ const CreateRecipeDialog: React.FC<{
       await supabase.from('recipe_members').insert(selectedMembers.map((member_id) => ({ recipe_id: data.id, member_id })));
     }
 
-    toast.success('Recette ajoutée à votre livre familial');
+    toast.success(c.rec_save_success);
     reset();
     setSaving(false);
     onCreated();
@@ -1263,15 +1286,15 @@ const CreateRecipeDialog: React.FC<{
     setArr(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]);
   };
 
+  const dl = dishTypeLabel(c);
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">Ajouter une recette familiale</DialogTitle>
-          <DialogDescription>Préservez une saveur, une histoire, un héritage.</DialogDescription>
+          <DialogTitle className="font-heading text-2xl">{c.rec_create_dialog_title}</DialogTitle>
+          <DialogDescription>{c.rec_create_dialog_desc}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Scanner IA + Photo du plat */}
           <div className="rounded-xl border-2 border-dashed border-[hsl(35_60%_55%)]/40 bg-[hsl(35_60%_97%)] p-3 space-y-3">
             {onOpenScanIA && (
               <button
@@ -1283,24 +1306,24 @@ const CreateRecipeDialog: React.FC<{
                   <Sparkles className="h-5 w-5" />
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="font-heading font-semibold text-sm">Scanner avec IA</div>
-                  <div className="text-xs text-muted-foreground">Photographiez un carnet ou un livre — l'IA remplit le formulaire</div>
+                  <div className="font-heading font-semibold text-sm">{c.rec_scan_ai}</div>
+                  <div className="text-xs text-muted-foreground">{c.rec_scan_ai_hint}</div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>
             )}
 
             <div>
-              <Label className="text-sm font-medium">Photo du plat <span className="text-muted-foreground font-normal">(optionnel, compressée automatiquement)</span></Label>
+              <Label className="text-sm font-medium">{c.rec_dish_photo_label} <span className="text-muted-foreground font-normal">{c.rec_dish_photo_optional}</span></Label>
               {dishPhotoPreview ? (
                 <div className="mt-2 relative">
-                  <img src={dishPhotoPreview} alt="Aperçu du plat" className="w-full h-40 object-cover rounded-lg border border-border" />
+                  <img src={dishPhotoPreview} alt={c.rec_dish_photo_label} className="w-full h-40 object-cover rounded-lg border border-border" />
                   <button
                     type="button"
                     onClick={() => { setDishPhoto(null); if (dishPhotoPreview) URL.revokeObjectURL(dishPhotoPreview); setDishPhotoPreview(null); }}
                     className="absolute top-2 right-2 px-2 py-1 text-xs rounded-md bg-black/70 text-white hover:bg-black"
                   >
-                    Retirer
+                    {c.rec_dish_photo_remove}
                   </button>
                 </div>
               ) : (
@@ -1309,8 +1332,8 @@ const CreateRecipeDialog: React.FC<{
                     {photoBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ImageIcon className="h-5 w-5" />}
                   </div>
                   <div className="flex-1 text-left">
-                    <div className="font-heading font-semibold text-sm">Ajouter une photo du plat</div>
-                    <div className="text-xs text-muted-foreground">Vos invités voient la recette en image (max 1600px)</div>
+                    <div className="font-heading font-semibold text-sm">{c.rec_dish_photo_add}</div>
+                    <div className="text-xs text-muted-foreground">{c.rec_dish_photo_add_hint}</div>
                   </div>
                   <input
                     type="file"
@@ -1324,73 +1347,73 @@ const CreateRecipeDialog: React.FC<{
           </div>
 
           <div>
-            <Label htmlFor="title">Titre *</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex. Tourtière de Grand-maman Louise" required />
+            <Label htmlFor="title">{c.rec_field_title}</Label>
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={c.rec_field_title_placeholder} required />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Type de plat</Label>
+              <Label>{c.rec_field_dish_type}</Label>
               <Select value={dishType} onValueChange={(v) => setDishType(v as DishType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(DISH_TYPE_LABEL) as DishType[]).map((k) => (
-                    <SelectItem key={k} value={k}>{DISH_TYPE_LABEL[k]}</SelectItem>
+                  {(Object.keys(dl) as DishType[]).map((k) => (
+                    <SelectItem key={k} value={k}>{dl[k]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Difficulté</Label>
+              <Label>{c.rec_field_difficulty}</Label>
               <Select value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="easy">Facile</SelectItem>
-                  <SelectItem value="medium">Intermédiaire</SelectItem>
-                  <SelectItem value="hard">Difficile</SelectItem>
+                  <SelectItem value="easy">{c.rec_difficulty_easy}</SelectItem>
+                  <SelectItem value="medium">{c.rec_difficulty_medium}</SelectItem>
+                  <SelectItem value="hard">{c.rec_difficulty_hard}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div><Label htmlFor="prep">Prép. (min)</Label><Input id="prep" type="number" min="0" value={prepTime} onChange={(e) => setPrepTime(e.target.value)} /></div>
-            <div><Label htmlFor="cook">Cuisson (min)</Label><Input id="cook" type="number" min="0" value={cookTime} onChange={(e) => setCookTime(e.target.value)} /></div>
-            <div><Label htmlFor="serv">Portions</Label><Input id="serv" type="number" min="0" value={servings} onChange={(e) => setServings(e.target.value)} /></div>
+            <div><Label htmlFor="prep">{c.rec_field_prep}</Label><Input id="prep" type="number" min="0" value={prepTime} onChange={(e) => setPrepTime(e.target.value)} /></div>
+            <div><Label htmlFor="cook">{c.rec_field_cook}</Label><Input id="cook" type="number" min="0" value={cookTime} onChange={(e) => setCookTime(e.target.value)} /></div>
+            <div><Label htmlFor="serv">{c.rec_field_servings_short}</Label><Input id="serv" type="number" min="0" value={servings} onChange={(e) => setServings(e.target.value)} /></div>
           </div>
 
           <div>
-            <Label htmlFor="story">L'histoire de cette recette</Label>
-            <Textarea id="story" value={story} onChange={(e) => setStory(e.target.value)} rows={3} placeholder="D'où vient-elle ? Pour quelle occasion ? Quel souvenir y est attaché ?" />
+            <Label htmlFor="story">{c.rec_field_story}</Label>
+            <Textarea id="story" value={story} onChange={(e) => setStory(e.target.value)} rows={3} placeholder={c.rec_field_story_placeholder} />
           </div>
 
           <div>
-            <Label htmlFor="ing">Ingrédients (un par ligne)</Label>
-            <Textarea id="ing" value={ingredientsText} onChange={(e) => setIngredientsText(e.target.value)} rows={4} placeholder="500 g de viande hachée&#10;1 oignon&#10;..." />
+            <Label htmlFor="ing">{c.rec_field_ingredients}</Label>
+            <Textarea id="ing" value={ingredientsText} onChange={(e) => setIngredientsText(e.target.value)} rows={4} placeholder={c.rec_field_ingredients_placeholder} />
           </div>
 
           <div>
-            <Label htmlFor="steps">Étapes (une par ligne)</Label>
-            <Textarea id="steps" value={stepsText} onChange={(e) => setStepsText(e.target.value)} rows={4} placeholder="Faire revenir les oignons...&#10;Ajouter la viande..." />
+            <Label htmlFor="steps">{c.rec_field_steps}</Label>
+            <Textarea id="steps" value={stepsText} onChange={(e) => setStepsText(e.target.value)} rows={4} placeholder={c.rec_field_steps_placeholder} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Branche familiale</Label>
+              <Label>{c.rec_field_branch}</Label>
               <Select value={branchId || 'none'} onValueChange={(v) => setBranchId(v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={c.rec_field_none} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Aucune</SelectItem>
+                  <SelectItem value="none">{c.rec_field_none}</SelectItem>
                   {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Génération</Label>
+              <Label>{c.rec_field_generation}</Label>
               <Select value={generationId || 'none'} onValueChange={(v) => setGenerationId(v === 'none' ? '' : v)}>
-                <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={c.rec_field_none} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Aucune</SelectItem>
+                  <SelectItem value="none">{c.rec_field_none}</SelectItem>
                   {generations.map((g) => <SelectItem key={g.id} value={g.id}>{g.name}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -1398,11 +1421,11 @@ const CreateRecipeDialog: React.FC<{
           </div>
 
           <div>
-            <Label>Transmise par</Label>
+            <Label>{c.rec_field_transmitted}</Label>
             <Select value={transmittedBy || 'none'} onValueChange={(v) => setTransmittedBy(v === 'none' ? '' : v)}>
-              <SelectTrigger><SelectValue placeholder="Aucun membre" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={c.rec_field_no_member} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">—</SelectItem>
+                <SelectItem value="none">{c.rec_field_none_dash}</SelectItem>
                 {members.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -1410,7 +1433,7 @@ const CreateRecipeDialog: React.FC<{
 
           {occasions.length > 0 && (
             <div>
-              <Label className="mb-2 block">Occasions</Label>
+              <Label className="mb-2 block">{c.rec_field_occasions}</Label>
               <div className="flex flex-wrap gap-1.5">
                 {occasions.map((o) => (
                   <button key={o.id} type="button" onClick={() => toggleInArray(selectedOccasions, setSelectedOccasions, o.id)}
@@ -1424,7 +1447,7 @@ const CreateRecipeDialog: React.FC<{
 
           {members.length > 0 && (
             <div>
-              <Label className="mb-2 block">Membres associés</Label>
+              <Label className="mb-2 block">{c.rec_field_members}</Label>
               <div className="flex flex-wrap gap-1.5">
                 {members.map((m) => (
                   <button key={m.id} type="button" onClick={() => toggleInArray(selectedMembers, setSelectedMembers, m.id)}
@@ -1439,26 +1462,26 @@ const CreateRecipeDialog: React.FC<{
           <div className="flex items-center gap-3 flex-wrap">
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" checked={hasHandwritten} onChange={(e) => setHasHandwritten(e.target.checked)} className="rounded" />
-              Carnet manuscrit lié
+              {c.rec_field_handwritten_linked}
             </label>
             <div className="ml-auto flex items-center gap-2">
-              <Label className="text-sm">Visibilité :</Label>
+              <Label className="text-sm">{c.rec_field_visibility}</Label>
               <Select value={privacy} onValueChange={(v) => setPrivacy(v as Privacy)}>
                 <SelectTrigger className="w-40 h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="circle">Tout le cercle</SelectItem>
-                  <SelectItem value="managers">Gestionnaires</SelectItem>
-                  <SelectItem value="private">Privée</SelectItem>
+                  <SelectItem value="circle">{c.rec_visibility_circle}</SelectItem>
+                  <SelectItem value="managers">{c.rec_visibility_managers}</SelectItem>
+                  <SelectItem value="private">{c.rec_visibility_private}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>Annuler</Button>
+            <Button type="button" variant="outline" onClick={onClose}>{c.rec_cancel}</Button>
             <Button type="submit" disabled={saving} className="bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-              Ajouter la recette
+              {c.rec_add_recipe}
             </Button>
           </DialogFooter>
         </form>
