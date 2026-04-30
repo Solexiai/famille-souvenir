@@ -902,6 +902,8 @@ const fr: MemoriesCopy = {
   tm_toast_mic_err: "Impossible d'accéder au micro/caméra",
   tm_toast_guardian_added: 'Gardien ajouté',
   tm_toast_guardian_required: 'Nom et courriel obligatoires',
+  tm_guardians_dialog_desc: 'Ces personnes pourront confirmer votre décès et libérer vos messages posthumes. Choisissez 1 à 2 personnes en qui vous avez pleinement confiance.',
+  tm_toast_guardian_removed: 'Gardien retiré',
 };
 
 const en: MemoriesCopy = {
@@ -1341,6 +1343,8 @@ const en: MemoriesCopy = {
   tm_toast_mic_err: 'Could not access microphone/camera',
   tm_toast_guardian_added: 'Guardian added',
   tm_toast_guardian_required: 'Name and email are required',
+  tm_guardians_dialog_desc: 'These people can confirm your passing and release your posthumous messages. Choose 1 or 2 people you fully trust.',
+  tm_toast_guardian_removed: 'Guardian removed',
 };
 
 const es: MemoriesCopy = {
@@ -1780,6 +1784,8 @@ const es: MemoriesCopy = {
   tm_toast_mic_err: 'No se puede acceder al micrófono/cámara',
   tm_toast_guardian_added: 'Guardián añadido',
   tm_toast_guardian_required: 'Nombre y correo obligatorios',
+  tm_guardians_dialog_desc: 'Estas personas podrán confirmar su fallecimiento y liberar sus mensajes póstumos. Elija 1 o 2 personas en las que confíe plenamente.',
+  tm_toast_guardian_removed: 'Guardián retirado',
 };
 
 export const MEMORIES_COPY: Record<MemLang, MemoriesCopy> = { fr, en, es };
