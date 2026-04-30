@@ -532,6 +532,7 @@ const RecipesPage: React.FC = () => {
         occasions={occasions}
         members={members}
         prefill={recipePrefill}
+        onOpenScanIA={() => { setCreateOpen(false); setQuickAddOpen(true); }}
         onCreated={() => { setCreateOpen(false); setRecipePrefill(null); loadAll(); }}
       />
 
