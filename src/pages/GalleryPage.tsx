@@ -70,6 +70,8 @@ function monthLabel(dateStr: string, locale: string): string {
 export default function GalleryPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { lang } = useLocale();
+  const t = useMemoriesCopy(lang);
   const [loading, setLoading] = useState(true);
   const [circleId, setCircleId] = useState<string | null>(null);
   const [storage, setStorage] = useState<UserStorage | null>(null);
