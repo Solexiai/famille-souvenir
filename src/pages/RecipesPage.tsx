@@ -410,15 +410,15 @@ const RecipesPage: React.FC = () => {
             <ChefHat className="h-8 w-8 text-[hsl(35_70%_45%)]" />
           </div>
           <h1 className="font-heading text-4xl sm:text-5xl font-bold text-foreground tracking-tight">
-            Nos recettes de famille
+            {c.rec_title}
           </h1>
           <p className="text-foreground/70 text-lg sm:text-xl leading-relaxed">
-            Gardons ensemble les recettes qui nous rassemblent.
+            {c.rec_subtitle}
           </p>
         </header>
 
         {/* 2. LES DEUX GRANDES ACTIONS — au centre, très visibles */}
-        <section aria-label="Ajouter une recette" className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        <section aria-label={c.rec_title} className="grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
           <button
             onClick={() => { setQuickAddInitialMode('choose'); setQuickAddOpen(true); }}
             className="group flex flex-col items-center text-center gap-3 p-6 sm:p-7 rounded-2xl bg-[hsl(35_60%_55%)] hover:bg-[hsl(35_60%_48%)] text-white shadow-md hover:shadow-lg transition-all"
@@ -427,8 +427,8 @@ const RecipesPage: React.FC = () => {
               <Camera className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Prendre en photo</h2>
-              <p className="text-sm sm:text-base text-white/90 mt-1">L'IA s'occupe du reste.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_photo}</h2>
+              <p className="text-sm sm:text-base text-white/90 mt-1">{c.rec_action_photo_hint}</p>
             </div>
           </button>
 
@@ -440,8 +440,8 @@ const RecipesPage: React.FC = () => {
               <Pencil className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Écrire une recette</h2>
-              <p className="text-sm sm:text-base text-foreground/70 mt-1">À votre rythme.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_write}</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">{c.rec_action_write_hint}</p>
             </div>
           </button>
 
@@ -453,8 +453,8 @@ const RecipesPage: React.FC = () => {
               <Mic className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="font-heading text-xl sm:text-2xl font-bold">Dicter la recette</h2>
-              <p className="text-sm sm:text-base text-foreground/70 mt-1">Parlez, l'IA structure tout.</p>
+              <h2 className="font-heading text-xl sm:text-2xl font-bold">{c.rec_action_dictate}</h2>
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">{c.rec_action_dictate_hint}</p>
             </div>
           </button>
         </section>
@@ -465,7 +465,7 @@ const RecipesPage: React.FC = () => {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Chercher une recette ou un ingrédient…"
+            placeholder={c.rec_search_placeholder}
             className="pl-14 h-14 rounded-full bg-card border-border shadow-sm text-lg"
           />
         </div>
