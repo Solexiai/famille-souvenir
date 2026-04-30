@@ -186,7 +186,7 @@ export default function GalleryPage() {
   async function handleFiles(files: FileList | null) {
     if (!files || files.length === 0 || !circleId || !user) return;
     if (isOverQuota) {
-      toast.error('Stockage plein — passez à un forfait pour continuer');
+      toast.error(t.gal_toast_full);
       navigate('/storage-plans');
       return;
     }
@@ -195,7 +195,7 @@ export default function GalleryPage() {
       (f) => f.type.startsWith('image/') || f.type.startsWith('video/'),
     );
     if (list.length === 0) {
-      toast.error('Aucune photo ou vidéo trouvée');
+      toast.error(t.gal_toast_no_media);
       return;
     }
 
@@ -214,7 +214,7 @@ export default function GalleryPage() {
 
         if (prepared.size > remaining) {
           skipped++;
-          toast.error(`Stockage plein. Reste à importer : ${list.length - i}`);
+          toast.error(`${t.gal_toast_full_remaining} : ${list.length - i}`);
           break;
         }
 
