@@ -640,7 +640,7 @@ const StoriesPage: React.FC = () => {
 };
 
 // ============ STORY CARD ============
-const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOpen }) => {
+const StoryCard: React.FC<{ story: Story; lang: 'fr' | 'en' | 'es'; t: StCopy; onOpen: () => void }> = ({ story, lang, t, onOpen }) => {
   return (
     <button
       onClick={onOpen}
@@ -648,16 +648,16 @@ const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOp
     >
       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
         <Calendar className="h-3.5 w-3.5" />
-        {formatFR(story.created_at)}
+        {formatLocale(story.created_at, lang)}
         {story.source === 'dictated' && (
           <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[hsl(355_60%_94%)] text-[hsl(355_60%_45%)] text-[10px] font-medium">
-            <Mic className="h-3 w-3" /> Dictée
+            <Mic className="h-3 w-3" /> {t.st_dictated_badge}
           </span>
         )}
       </div>
-      <h3 className="font-heading text-lg font-semibold leading-snug line-clamp-2">{story.title || 'Sans titre'}</h3>
+      <h3 className="font-heading text-lg font-semibold leading-snug line-clamp-2">{story.title || t.st_no_title}</h3>
       <p className="text-sm text-muted-foreground mt-2 line-clamp-3 leading-relaxed">
-        {story.ai_summary || story.content || 'Pas encore de contenu.'}
+        {story.ai_summary || story.content || t.st_no_content}
       </p>
     </button>
   );
@@ -666,9 +666,11 @@ const StoryCard: React.FC<{ story: Story; onOpen: () => void }> = ({ story, onOp
 // ============ STORY DETAIL ============
 const StoryDetailDialog: React.FC<{
   storyId: string;
+  lang: 'fr' | 'en' | 'es';
+  t: StCopy;
   onClose: () => void;
   onDeleted: () => void;
-}> = ({ storyId, onClose, onDeleted }) => {
+}> = ({ storyId, lang, t, onClose, onDeleted }) => {
   const { user } = useAuth();
   const [story, setStory] = useState<Story | null>(null);
   const [anecdotes, setAnecdotes] = useState<Anecdote[]>([]);
