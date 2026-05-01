@@ -319,6 +319,12 @@ const DashboardPage: React.FC = () => {
               );
             })()}
 
+            {/* ============ INSPIRATIONAL CAROUSEL ============ */}
+            <InspirationCarousel
+              t={t}
+              onAction={(route) => navigate(route)}
+            />
+
             {/* ============ GUIDED JOURNEY ============ */}
             {(() => {
               const rawSteps: Array<{ icon: typeof Users; title: string; desc: string; status: StepStatus; route: string }> = [
