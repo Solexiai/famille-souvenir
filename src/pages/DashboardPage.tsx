@@ -18,6 +18,7 @@ import journeyLove from '@/assets/journey-love.jpg';
 import journeySuccession from '@/assets/journey-succession.jpg';
 import journeyTimeline from '@/assets/journey-timeline.jpg';
 import journeyVault from '@/assets/journey-vault.jpg';
+import solexiBadge from '@/assets/solexi-badge.png';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
