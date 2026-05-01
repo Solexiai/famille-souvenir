@@ -18,7 +18,7 @@ import journeyLove from '@/assets/journey-love.jpg';
 import journeySuccession from '@/assets/journey-succession.jpg';
 import journeyTimeline from '@/assets/journey-timeline.jpg';
 import journeyVault from '@/assets/journey-vault.jpg';
-import solexiBadge from '@/assets/solexi-badge.png';
+import heroBanner from '@/assets/hero-banner.png';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -195,43 +195,12 @@ const DashboardPage: React.FC = () => {
     <AppLayout>
       <div className="space-y-8 animate-fade-in">
         {/* ============ HERO ============ */}
-        <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary via-primary to-[hsl(220,45%,18%)] text-primary-foreground shadow-elevated">
-          {/* warm decorative glows */}
-          <div className="absolute -top-24 -right-16 h-72 w-72 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
-          <div className="absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[radial-gradient(circle_at_70%_50%,hsl(35_60%_55%/0.18),transparent_60%)]" aria-hidden="true" />
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent" aria-hidden="true" />
-
-          <div className="relative px-6 sm:px-10 py-10 sm:py-14 grid lg:grid-cols-[1.4fr_1fr] gap-8 items-center">
-            <div className="min-w-0">
-              <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent mb-3">
-                {t.app_name} · {t.app_tagline}
-              </p>
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.08] max-w-2xl">
-                {t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}
-              </h1>
-              <p className="mt-4 text-base sm:text-lg text-primary-foreground/80 max-w-xl leading-relaxed">
-                {t.dash_hero_subtitle_v2 ?? t.dash_subtitle}
-              </p>
-              <p className="mt-2 text-sm text-accent/90 italic">
-                {t.dash_hero_supporting ?? ''}
-              </p>
-
-            </div>
-
-            {/* Brand badge */}
-            <div className="relative flex items-center justify-center lg:justify-end">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(35_60%_55%/0.25),transparent_65%)] blur-2xl" aria-hidden="true" />
-              <img
-                src={solexiBadge}
-                alt={t.app_name}
-                loading="lazy"
-                width={1280}
-                height={853}
-                className="relative w-full max-w-sm lg:max-w-md h-auto drop-shadow-[0_25px_45px_rgba(0,0,0,0.45)]"
-              />
-            </div>
-          </div>
+        <section className="relative overflow-hidden rounded-3xl border border-primary/10 shadow-elevated">
+          <img
+            src={heroBanner}
+            alt={`${t.app_name} — ${t.dash_greeting.replace('{name}', profileName || t.dash_greeting_default)}`}
+            className="w-full h-auto block"
+          />
         </section>
 
         {/* ============ NO CIRCLE CTA ============ */}
