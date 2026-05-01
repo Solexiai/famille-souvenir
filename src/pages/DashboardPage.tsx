@@ -220,24 +220,21 @@ const DashboardPage: React.FC = () => {
                 <Button
                   size="lg"
                   onClick={() => navigate(computeNextRoute())}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-7 h-12 text-base font-medium shadow-lg shadow-accent/20 gap-2"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-7 h-12 text-base font-medium shadow-lg shadow-accent/20"
                 >
-                  <ArrowRight className="h-5 w-5" />
                   {t.dash_hero_cta_continue ?? 'Continuer mon parcours'}
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
                   onClick={() => navigate('/documents')}
-                  className="rounded-full px-7 h-12 text-base font-medium bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground gap-2"
+                  className="rounded-full px-7 h-12 text-base font-medium bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
                 >
-                  <FolderOpen className="h-5 w-5" />
                   {t.dash_hero_cta_documents ?? 'Voir mes documents'}
                 </Button>
               </div>
 
               <div className="mt-6 inline-flex items-center gap-2.5 rounded-full bg-primary-foreground/10 backdrop-blur px-4 py-2 border border-primary-foreground/15">
-                <Shield className="h-3.5 w-3.5 text-accent" />
                 <span className="text-xs sm:text-sm text-primary-foreground/85">
                   {t.dash_hero_badge ?? 'Simple • Sécurisé • Accessible à votre famille'}
                 </span>
