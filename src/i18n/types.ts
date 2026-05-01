@@ -277,6 +277,19 @@ export interface Translations {
   dash_reassure_secure_desc?: string;
   dash_reassure_family_title?: string;
   dash_reassure_family_desc?: string;
+  // Inspirational journey carousel
+  dash_inspire_eyebrow?: string;
+  dash_inspire_title?: string;
+  dash_inspire_subtitle?: string;
+  dash_inspire_cta?: string;
+  dash_inspire_1_title?: string;
+  dash_inspire_1_desc?: string;
+  dash_inspire_2_title?: string;
+  dash_inspire_2_desc?: string;
+  dash_inspire_3_title?: string;
+  dash_inspire_3_desc?: string;
+  dash_inspire_4_title?: string;
+  dash_inspire_4_desc?: string;
 
   // Documentary status labels
   doc_status_unknown: string;
