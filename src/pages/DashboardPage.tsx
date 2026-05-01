@@ -13,6 +13,11 @@ import type { FamilyCircle, ChecklistItem, GovernanceResponsibility, Documentary
 import { AI_COPY, type AILang } from '@/lib/ai-assistant-i18n';
 import { GuidedOnboarding } from '@/components/GuidedOnboarding';
 import { DemoTour } from '@/components/DemoTour';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
+import journeyLove from '@/assets/journey-love.jpg';
+import journeySuccession from '@/assets/journey-succession.jpg';
+import journeyTimeline from '@/assets/journey-timeline.jpg';
+import journeyVault from '@/assets/journey-vault.jpg';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
