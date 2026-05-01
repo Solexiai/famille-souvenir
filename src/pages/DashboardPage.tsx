@@ -218,24 +218,17 @@ const DashboardPage: React.FC = () => {
 
             </div>
 
-            {/* Progress card */}
-            <div className="relative">
-              <div className="rounded-2xl bg-primary-foreground/[0.07] backdrop-blur-md border border-primary-foreground/15 p-5 sm:p-6 shadow-xl">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs uppercase tracking-[0.18em] text-primary-foreground/70">
-                    {t.dash_hero_progress_label ?? 'Progression globale'}
-                  </p>
-                  <span className="font-heading text-3xl sm:text-4xl font-semibold text-accent leading-none">
-                    {overallProgress}<span className="text-lg ml-0.5">%</span>
-                  </span>
-                </div>
-                <Progress value={overallProgress} className="h-2 bg-primary-foreground/15 [&>div]:bg-accent" />
-                {circle && checklistSummary.total > 0 && (
-                  <p className="mt-3 text-xs text-primary-foreground/70 leading-relaxed">
-                    {t.dash_completed.replace('{count}', `${checklistSummary.completed}/${checklistSummary.total}`)} · {dossierLabel(circle.dossier_readiness_status)}
-                  </p>
-                )}
-              </div>
+            {/* Brand badge */}
+            <div className="relative flex items-center justify-center lg:justify-end">
+              <img
+                src={solexiBadge}
+                alt={t.app_name}
+                loading="lazy"
+                width={1500}
+                height={900}
+                className="w-full max-w-md h-auto drop-shadow-2xl"
+                style={{ clipPath: 'inset(0 0 22% 0)' }}
+              />
             </div>
           </div>
         </section>
