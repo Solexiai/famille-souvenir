@@ -638,4 +638,125 @@ const DashboardPage: React.FC = () => {
   );
 };
 
+// ============================================================
+// Inspirational carousel — premium, senior-friendly storytelling
+// ============================================================
+type InspireT = ReturnType<typeof useLocale>['t'];
+
+const InspirationCarousel: React.FC<{ t: InspireT; onAction: (route: string) => void }> = ({ t, onAction }) => {
+  const [api, setApi] = useState<CarouselApi | null>(null);
+  const [current, setCurrent] = useState(0);
+
+  const slides = [
+    { image: journeyLove,        title: t.dash_inspire_1_title ?? '', desc: t.dash_inspire_1_desc ?? '', route: '/memories', icon: Heart },
+    { image: journeySuccession,  title: t.dash_inspire_2_title ?? '', desc: t.dash_inspire_2_desc ?? '', route: '/assistant', icon: Sparkles },
+    { image: journeyTimeline,    title: t.dash_inspire_3_title ?? '', desc: t.dash_inspire_3_desc ?? '', route: '/memories/timeline', icon: Image },
+    { image: journeyVault,       title: t.dash_inspire_4_title ?? '', desc: t.dash_inspire_4_desc ?? '', route: '/documents', icon: Lock },
+  ];
+
+  useEffect(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+    const onSelect = () => setCurrent(api.selectedScrollSnap());
+    api.on('select', onSelect);
+    return () => { api.off('select', onSelect); };
+  }, [api]);
+
+  useEffect(() => {
+    if (!api) return;
+    const id = window.setInterval(() => {
+      if (api.canScrollNext()) api.scrollNext();
+      else api.scrollTo(0);
+    }, 6500);
+    return () => window.clearInterval(id);
+  }, [api]);
+
+  return (
+    <section aria-label={t.dash_inspire_title ?? 'Inspiration'} className="space-y-3">
+      <div className="flex items-end justify-between gap-3 px-1">
+        <div className="min-w-0">
+          <p className="text-[11px] sm:text-xs font-medium uppercase tracking-[0.22em] text-accent">
+            <Sparkles className="inline h-3.5 w-3.5 mr-1.5 -mt-0.5" />
+            {t.dash_inspire_eyebrow ?? 'Inspiration'}
+          </p>
+          <h2 className="font-heading text-xl sm:text-2xl font-semibold text-primary leading-tight mt-1">
+            {t.dash_inspire_title ?? ''}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1 leading-snug max-w-2xl">
+            {t.dash_inspire_subtitle ?? ''}
+          </p>
+        </div>
+      </div>
+
+      <Carousel
+        setApi={setApi}
+        opts={{ align: 'start', loop: true }}
+        className="relative"
+      >
+        <CarouselContent>
+          {slides.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <CarouselItem key={i}>
+                <div className="relative overflow-hidden rounded-3xl border border-border/60 shadow-elevated bg-card">
+                  <div className="grid md:grid-cols-2 min-h-[300px] sm:min-h-[360px]">
+                    <div className="relative h-56 sm:h-64 md:h-auto overflow-hidden">
+                      <img
+                        src={s.image}
+                        alt={s.title}
+                        loading="lazy"
+                        width={1280}
+                        height={800}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-background/40 via-transparent to-transparent" aria-hidden="true" />
+                    </div>
+                    <div className="relative px-6 sm:px-10 py-7 sm:py-10 flex flex-col justify-center bg-gradient-to-br from-card via-card to-accent/5">
+                      <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/15 text-accent px-3 py-1 text-[11px] font-semibold uppercase tracking-wider mb-4">
+                        <Icon className="h-3.5 w-3.5" />
+                        {`${i + 1} / ${slides.length}`}
+                      </div>
+                      <h3 className="font-heading text-2xl sm:text-3xl font-semibold text-primary leading-tight">
+                        {s.title}
+                      </h3>
+                      <p className="mt-3 text-base text-muted-foreground leading-relaxed max-w-md">
+                        {s.desc}
+                      </p>
+                      <div className="mt-6">
+                        <Button
+                          onClick={() => onAction(s.route)}
+                          className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-6 h-11 gap-2 font-medium shadow-md shadow-accent/20"
+                        >
+                          {t.dash_inspire_cta ?? 'Start'}
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            );
+          })}
+        </CarouselContent>
+
+        <CarouselPrevious className="left-3 sm:left-4 h-10 w-10 bg-background/90 backdrop-blur border-border shadow-md hover:bg-background" />
+        <CarouselNext className="right-3 sm:right-4 h-10 w-10 bg-background/90 backdrop-blur border-border shadow-md hover:bg-background" />
+      </Carousel>
+
+      <div className="flex justify-center gap-2 pt-1" role="tablist" aria-label="Slides">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            role="tab"
+            aria-selected={current === i}
+            aria-label={`Slide ${i + 1}`}
+            onClick={() => api?.scrollTo(i)}
+            className={`h-2 rounded-full transition-all ${current === i ? 'w-8 bg-accent' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+
 export default DashboardPage;
