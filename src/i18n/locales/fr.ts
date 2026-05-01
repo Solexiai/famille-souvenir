@@ -892,6 +892,18 @@ const fr: Translations = {
   dash_reassure_secure_desc: 'Vos informations sont protégées et restent confidentielles.',
   dash_reassure_family_title: 'Accessible à votre famille',
   dash_reassure_family_desc: 'Vos proches peuvent vous accompagner et prendre le relais.',
+  dash_inspire_eyebrow: 'Inspiration',
+  dash_inspire_title: 'Pourquoi commencer aujourd\'hui',
+  dash_inspire_subtitle: 'Quatre gestes simples pour transmettre l\'essentiel à ceux que vous aimez.',
+  dash_inspire_cta: 'Commencer cette étape',
+  dash_inspire_1_title: 'Dites à vos enfants combien vous les aimez',
+  dash_inspire_1_desc: 'Enregistrez un message, ajoutez une photo de famille, laissez une trace de tendresse à vos enfants et petits-enfants.',
+  dash_inspire_2_title: 'Ne laissez pas vos proches dans le néant',
+  dash_inspire_2_desc: 'Préparez votre succession sereinement, accompagné par l\'assistant Solexi AI, étape par étape.',
+  dash_inspire_3_title: 'Composez votre ligne du temps',
+  dash_inspire_3_desc: 'Rassemblez vos souvenirs marquants, vos rencontres et vos moments précieux en une seule histoire.',
+  dash_inspire_4_title: 'Mettez à l\'abri vos documents et photos',
+  dash_inspire_4_desc: 'Conservez en sécurité ce que vous avez de plus précieux, accessible aux personnes de confiance.',
 };
 
 export default fr;

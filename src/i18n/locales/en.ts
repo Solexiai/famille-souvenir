@@ -882,6 +882,18 @@ const en: Translations = {
   dash_reassure_secure_desc: 'Your information is protected and remains confidential.',
   dash_reassure_family_title: 'Accessible to your family',
   dash_reassure_family_desc: 'Your loved ones can support you and take over when needed.',
+  dash_inspire_eyebrow: 'Inspiration',
+  dash_inspire_title: 'Why start today',
+  dash_inspire_subtitle: 'Four simple gestures to pass on what matters most to those you love.',
+  dash_inspire_cta: 'Start this step',
+  dash_inspire_1_title: 'Tell your children how much you love them',
+  dash_inspire_1_desc: 'Record a message, add a family photo, leave a token of tenderness for your children and grandchildren.',
+  dash_inspire_2_title: 'Don\'t leave your loved ones in the dark',
+  dash_inspire_2_desc: 'Prepare your estate with peace of mind, guided by the Solexi AI assistant, step by step.',
+  dash_inspire_3_title: 'Build your timeline',
+  dash_inspire_3_desc: 'Gather your defining memories, encounters and precious moments into a single story.',
+  dash_inspire_4_title: 'Safeguard your documents and photos',
+  dash_inspire_4_desc: 'Keep what is most precious safely stored, accessible to the people you trust.',
 };
 
 export default en;
