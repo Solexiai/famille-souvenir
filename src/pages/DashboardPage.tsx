@@ -221,14 +221,14 @@ const DashboardPage: React.FC = () => {
 
             {/* Brand badge */}
             <div className="relative flex items-center justify-center lg:justify-end">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,hsl(35_60%_55%/0.25),transparent_65%)] blur-2xl" aria-hidden="true" />
               <img
                 src={solexiBadge}
                 alt={t.app_name}
                 loading="lazy"
-                width={1500}
-                height={900}
-                className="w-full max-w-md h-auto drop-shadow-2xl"
-                style={{ clipPath: 'inset(0 0 22% 0)' }}
+                width={1280}
+                height={853}
+                className="relative w-full max-w-sm lg:max-w-md h-auto drop-shadow-[0_25px_45px_rgba(0,0,0,0.45)]"
               />
             </div>
           </div>
